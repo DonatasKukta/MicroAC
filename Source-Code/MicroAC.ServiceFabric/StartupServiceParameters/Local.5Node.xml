@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<StartupServices xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.microsoft.com/2011/01/fabric">
+  <Parameters>
+    <Parameter Name="MicroAC.RequestManager_InstanceCount" Value="1" />
+    <Parameter Name="MicroAC.Authorization_InstanceCount" Value="1" />
+    <Parameter Name="MicroAC.Authentication_InstanceCount" Value="1" />
+    <Parameter Name="MicroAC.RequestManager_PartitionCount" Value="1" />
+    <Parameter Name="MicroAC.RequestManager_MinReplicaSetSize" Value="3" />
+    <Parameter Name="MicroAC.RequestManager_TargetReplicaSetSize" Value="3" />
+  </Parameters>
+</StartupServices>
