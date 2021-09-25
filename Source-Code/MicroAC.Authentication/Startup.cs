@@ -1,3 +1,4 @@
+using MicroAC.Core.Auth;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -33,7 +34,13 @@ namespace MicroAC.Authentication
             {
                 endpoints.MapGet("/", async context =>
                 {
-                    await context.Response.WriteAsync("Authentication " + DateTime.Now);
+                    var jwt = new JwtTokenHandler();
+                    var claims = new ClaimBuilder()
+                        .AddAudience("Authorization")
+                        .AddIssuer("Authentication")
+                        .AddSubject("UserId")
+                        .Build();
+                    await context.Response.WriteAsync(jwt.Create(claims));
                 });
             });
         }
