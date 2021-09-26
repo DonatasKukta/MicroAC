@@ -1,11 +1,18 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 
 namespace MicroAC.Core.Auth
 {
+    public enum TokenType
+    {
+        AccessExternal,
+        RefreshExternal,
+        AccessInternal,
+    }
+
     public struct MicroACClaimTypes
     {
         public const string KeyId = "kid";
@@ -16,77 +23,107 @@ namespace MicroAC.Core.Auth
 
     public class ClaimBuilder
     {
-        LinkedList<Claim> _claims;
+        Dictionary<string, object> _defaultClaims;
+        Dictionary<string, object> _claims;
+        readonly TokenType _type;
+        readonly double _expirationSeconds;
 
-        public ClaimBuilder()
+        public ClaimBuilder(TokenType type, double expirationSeconds)
         {
-            _claims = new LinkedList<Claim>();
+            _type = type;
+            _expirationSeconds = expirationSeconds;
+            _claims = new Dictionary<string, object>(5);
+            SetDefaultClaims();
         }
 
         /// <summary>
-        /// Add "Issued Add" claim and flush existing claims.
+        /// Flush existing claims.
         /// </summary>
-        /// <returns>Collection of added claim types.</returns>
-        public IEnumerable<Claim> Build()
+        /// <returns> Collection of added claim types. </returns>
+        public Dictionary<string, object> Build()
         {
-            _claims.AddLast(new Claim(JwtRegisteredClaimNames.Iat, DateTime.Now.ToString()));
             var result = _claims;
-            _claims = new LinkedList<Claim>();
+            _claims = new Dictionary<string, object>(5);
             return result;
         }
 
-        public ClaimBuilder AddIssuer(string value)
+        public ClaimBuilder AddCommonClaims()
         {
-            _claims.AddLast(new Claim(JwtRegisteredClaimNames.Iss, value));
+            foreach (var defaultClaim in _defaultClaims)
+                _claims.Add(defaultClaim.Key, defaultClaim.Value);
             return this;
         }
 
-        public ClaimBuilder AddSubject(string value)
+        public ClaimBuilder AddRole(object value)
         {
-            _claims.AddLast(new Claim(JwtRegisteredClaimNames.Sub, value));
+            _claims.Add(MicroACClaimTypes.Role, value);
             return this;
         }
 
-        public ClaimBuilder AddAudience(string value)
+        public ClaimBuilder AddSubjectClaims(object value)
         {
-            _claims.AddLast(new Claim(JwtRegisteredClaimNames.Aud, value));
+            _claims.Add(MicroACClaimTypes.SubjectClaims, value);
             return this;
         }
 
-        public ClaimBuilder AddExpirationTime(string value)
+        public ClaimBuilder AddConditions(object value)
         {
-            _claims.AddLast(new Claim(JwtRegisteredClaimNames.Exp, value));
+            _claims.Add(MicroACClaimTypes.Conditions, value);
             return this;
         }
 
-        public ClaimBuilder AddJwtId(string value)
+        private ClaimBuilder AddIssuer(object value)
         {
-            _claims.AddLast(new Claim(JwtRegisteredClaimNames.Jti, value));
+            _claims.Add(JwtRegisteredClaimNames.Iss, value);
             return this;
         }
 
-        public ClaimBuilder AddKeyId(string value)
+        private ClaimBuilder AddSubject(object value)
         {
-            _claims.AddLast(new Claim(MicroACClaimTypes.KeyId, value));
+            _claims.Add(JwtRegisteredClaimNames.Sub, value);
             return this;
         }
 
-        public ClaimBuilder AddRole(string value)
+        private ClaimBuilder AddAudience(object value)
         {
-            _claims.AddLast(new Claim(MicroACClaimTypes.Role, value));
+            _claims.Add(JwtRegisteredClaimNames.Aud, value);
             return this;
         }
 
-        public ClaimBuilder AddSubjectClaims(string value)
+        private ClaimBuilder AddJwtId(object value)
         {
-            _claims.AddLast(new Claim(MicroACClaimTypes.SubjectClaims, value));
+            _claims.Add(JwtRegisteredClaimNames.Jti, value);
             return this;
         }
 
-        public ClaimBuilder AddConditions(string value)
+        public Dictionary<string, object> GetDefaulClaims()
         {
-            _claims.AddLast(new Claim(MicroACClaimTypes.Conditions, value));
-            return this;
+            return _defaultClaims;
+        }
+
+        private void SetDefaultClaims()
+        {
+            var temp = _claims;
+            _claims = new Dictionary<string, object>();
+
+            AddJwtId(Guid.NewGuid().ToString());
+            switch (_type)
+            {
+                //TODO: Move hardcoded strings to constants.
+                case TokenType.AccessExternal:
+                case TokenType.RefreshExternal:
+                    AddIssuer("MicroAC:AuthenticationService");
+                    AddAudience("MicroAC:AuthorizationService");
+                    AddSubject("MicroAC:User");
+                    break;
+                case TokenType.AccessInternal:
+                    AddIssuer("MicroAC:AuthorizationService");
+                    AddAudience("MicroAC:Services");
+                    AddSubject("MicroAC:Request");
+                    break;
+            }
+            _defaultClaims = _claims;
+            _claims = temp;
         }
     }
 }

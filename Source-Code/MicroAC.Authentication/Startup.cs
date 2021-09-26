@@ -34,13 +34,13 @@ namespace MicroAC.Authentication
             {
                 endpoints.MapGet("/", async context =>
                 {
-                    var jwt = new JwtTokenHandler();
-                    var claims = new ClaimBuilder()
-                        .AddAudience("Authorization")
-                        .AddIssuer("Authentication")
-                        .AddSubject("UserId")
+                    var jwtHandler = new JwtTokenHandler();
+                    var claims = new ClaimBuilder(TokenType.AccessExternal, 1000000)
+                        .AddCommonClaims()
                         .Build();
-                    await context.Response.WriteAsync(jwt.Create(claims));
+                    var jwt = jwtHandler.Create(claims);
+                    jwtHandler.Validate(jwt);
+                    await context.Response.WriteAsync(jwt);
                 });
             });
         }
