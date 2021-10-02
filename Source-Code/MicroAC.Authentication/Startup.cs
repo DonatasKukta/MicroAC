@@ -18,6 +18,12 @@ namespace MicroAC.Authentication
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRouting();
+            services.AddControllers();
+
+            services.AddSingleton(typeof(IJwtTokenHandler<AccessExternal>), new JwtTokenHandler<AccessExternal>(new AccessExternal()));
+            services.AddSingleton(typeof(IJwtTokenHandler<RefreshExternal>), new JwtTokenHandler<RefreshExternal>(new RefreshExternal()));
+            services.AddSingleton(typeof(IClaimBuilder<AccessExternal>), new ClaimBuilder<AccessExternal>(new AccessExternal()));
+            services.AddSingleton(typeof(IClaimBuilder<RefreshExternal>), new ClaimBuilder<RefreshExternal>(new RefreshExternal()));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -27,22 +33,10 @@ namespace MicroAC.Authentication
             {
                 app.UseDeveloperExceptionPage();
             }
-
             app.UseRouting();
-
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/", async context =>
-                {
-                    var accessInternalToken = new AccessExternal();
-                    var jwtHandler = new JwtTokenHandler(accessInternalToken);
-                    var claims = new ClaimBuilder(accessInternalToken)
-                        .AddCommonClaims()
-                        .Build();
-                    var jwt = jwtHandler.Create(claims);
-                    jwtHandler.Validate(jwt);
-                    await context.Response.WriteAsync(jwt);
-                });
+                endpoints.MapControllers();
             });
         }
     }

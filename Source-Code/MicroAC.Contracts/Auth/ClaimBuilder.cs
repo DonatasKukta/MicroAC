@@ -12,13 +12,28 @@ namespace MicroAC.Core.Auth
         public const string Conditions = "cnd";
     }
 
-    public class ClaimBuilder
+    public interface IClaimBuilder<TokenType>
+        where TokenType : IDefaultTokenClaims
+    {
+        Dictionary<string, object> Build();
+
+        IClaimBuilder<TokenType> AddCommonClaims();
+
+        IClaimBuilder<TokenType> AddRole(object value);
+
+        IClaimBuilder<TokenType> AddSubjectClaims(object value);
+
+        IClaimBuilder<TokenType> AddConditions(object value);
+    }
+
+    public class ClaimBuilder<TokenType> : IClaimBuilder<TokenType>
+        where TokenType : IDefaultTokenClaims
     {
         Dictionary<string, object> _defaultClaims;
         Dictionary<string, object> _claims;
-        readonly IDefaultTokenClaims _token;
+        readonly TokenType _token;
 
-        public ClaimBuilder(IDefaultTokenClaims token)
+        public ClaimBuilder(TokenType token)
         {
             _token = token;
             _claims = new Dictionary<string, object>(5);
@@ -36,50 +51,50 @@ namespace MicroAC.Core.Auth
             return result;
         }
 
-        public ClaimBuilder AddCommonClaims()
+        public IClaimBuilder<TokenType> AddCommonClaims()
         {
             foreach (var defaultClaim in _defaultClaims)
                 _claims.Add(defaultClaim.Key, defaultClaim.Value);
             return this;
         }
 
-        public ClaimBuilder AddRole(object value)
+        public IClaimBuilder<TokenType> AddRole(object value)
         {
             _claims.Add(MicroACClaimTypes.Role, value);
             return this;
         }
 
-        public ClaimBuilder AddSubjectClaims(object value)
+        public IClaimBuilder<TokenType> AddSubjectClaims(object value)
         {
             _claims.Add(MicroACClaimTypes.SubjectClaims, value);
             return this;
         }
 
-        public ClaimBuilder AddConditions(object value)
+        public IClaimBuilder<TokenType> AddConditions(object value)
         {
             _claims.Add(MicroACClaimTypes.Conditions, value);
             return this;
         }
 
-        private ClaimBuilder AddIssuer(object value)
+        private IClaimBuilder<TokenType> AddIssuer(object value)
         {
             _claims.Add(JwtRegisteredClaimNames.Iss, value);
             return this;
         }
 
-        private ClaimBuilder AddSubject(object value)
+        private IClaimBuilder<TokenType> AddSubject(object value)
         {
             _claims.Add(JwtRegisteredClaimNames.Sub, value);
             return this;
         }
 
-        private ClaimBuilder AddAudience(object value)
+        private IClaimBuilder<TokenType> AddAudience(object value)
         {
             _claims.Add(JwtRegisteredClaimNames.Aud, value);
             return this;
         }
 
-        private ClaimBuilder AddJwtId(object value)
+        private IClaimBuilder<TokenType> AddJwtId(object value)
         {
             _claims.Add(JwtRegisteredClaimNames.Jti, value);
             return this;

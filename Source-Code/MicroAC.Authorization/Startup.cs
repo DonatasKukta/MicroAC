@@ -1,3 +1,4 @@
+using MicroAC.Core.Auth;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -17,6 +18,10 @@ namespace MicroAC.Authorization
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRouting();
+            services.AddControllers();
+
+            services.AddSingleton(typeof(IJwtTokenHandler<AccessInternal>), new JwtTokenHandler<AccessInternal>(new AccessInternal()));
+            services.AddSingleton(typeof(IClaimBuilder<AccessInternal>), new ClaimBuilder<AccessInternal>(new AccessInternal()));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -26,15 +31,10 @@ namespace MicroAC.Authorization
             {
                 app.UseDeveloperExceptionPage();
             }
-
             app.UseRouting();
-
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/", async context =>
-                {
-                    await context.Response.WriteAsync("Authorization " + DateTime.Now);
-                });
+                endpoints.MapControllers();
             });
         }
     }

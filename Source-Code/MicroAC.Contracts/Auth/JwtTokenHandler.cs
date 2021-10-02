@@ -7,17 +7,25 @@ using System.Text;
 
 namespace MicroAC.Core.Auth
 {
-    public class JwtTokenHandler
+    public interface IJwtTokenHandler<TokenType>
+        where TokenType : IDefaultTokenClaims
+    {
+        string Create(Dictionary<string, object> claims);
+        ClaimsPrincipal Validate(string token);
+    }
+
+    public class JwtTokenHandler<TokenType> : IJwtTokenHandler<TokenType>
+        where TokenType : IDefaultTokenClaims
     {
         //TODO: Take from config
         TimeSpan _expiration = TimeSpan.FromDays(10);
 
         readonly SigningCredentials _credentials;
         readonly JwtSecurityTokenHandler _jwtHandler;
-        readonly IDefaultTokenClaims _token;
+        readonly TokenType _token;
         readonly TokenValidationParameters _validationParameters;
 
-        public JwtTokenHandler(IDefaultTokenClaims token)
+        public JwtTokenHandler(TokenType token)
         {
             _credentials = new SigningCredentials(
                 new SymmetricSecurityKey(Encoding.ASCII.GetBytes("Long enough JWT Secret aka Secret Key")),
