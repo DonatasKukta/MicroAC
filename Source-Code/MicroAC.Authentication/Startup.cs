@@ -34,8 +34,9 @@ namespace MicroAC.Authentication
             {
                 endpoints.MapGet("/", async context =>
                 {
-                    var jwtHandler = new JwtTokenHandler();
-                    var claims = new ClaimBuilder(TokenType.AccessExternal, 1000000)
+                    var accessInternalToken = new AccessExternal();
+                    var jwtHandler = new JwtTokenHandler(accessInternalToken);
+                    var claims = new ClaimBuilder(accessInternalToken)
                         .AddCommonClaims()
                         .Build();
                     var jwt = jwtHandler.Create(claims);

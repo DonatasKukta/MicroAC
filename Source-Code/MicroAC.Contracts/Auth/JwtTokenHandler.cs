@@ -3,24 +3,28 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Principal;
 using System.Text;
 
 namespace MicroAC.Core.Auth
 {
     public class JwtTokenHandler
     {
-        SigningCredentials _credentials;
-        JwtSecurityTokenHandler _jwtHandler;
+        //TODO: Take from config
         TimeSpan _expiration = TimeSpan.FromDays(10);
 
-        public JwtTokenHandler()
+        readonly SigningCredentials _credentials;
+        readonly JwtSecurityTokenHandler _jwtHandler;
+        readonly IDefaultTokenClaims _token;
+        readonly TokenValidationParameters _validationParameters;
+
+        public JwtTokenHandler(IDefaultTokenClaims token)
         {
             _credentials = new SigningCredentials(
                 new SymmetricSecurityKey(Encoding.ASCII.GetBytes("Long enough JWT Secret aka Secret Key")),
             SecurityAlgorithms.HmacSha256Signature);
-
             _jwtHandler = new JwtSecurityTokenHandler();
+            _token = token;
+            _validationParameters = GetValidationParameters();
         }
 
         public string Create(Dictionary<string, object> claims)
@@ -37,19 +41,10 @@ namespace MicroAC.Core.Auth
             return tokenHandler.WriteToken(token);
         }
 
-        public SecurityToken Validate(string token)
-        {
-            var validationParameters = GetValidationParameters();
-            SecurityToken validatedToken;
-            IPrincipal principal = _jwtHandler.ValidateToken(token, validationParameters, out validatedToken);
-            return validatedToken;
-        }
-
-        public static long GetUnixTime(DateTime date)
-        {
-            return ((DateTimeOffset)date).ToUnixTimeSeconds();
-        }
-
+        //TODO: Additional validation parameters?
+        public ClaimsPrincipal Validate(string token) =>
+             _jwtHandler.ValidateToken(token, _validationParameters, out SecurityToken validatedToken);
+        
         private TokenValidationParameters GetValidationParameters()
         {
             return new TokenValidationParameters()
@@ -57,9 +52,9 @@ namespace MicroAC.Core.Auth
                 ValidateLifetime = true,
                 ValidateAudience = true,
                 ValidateIssuer = true,
-                ValidIssuer = "MicroAC:AuthenticationService",
-                ValidAudience = "MicroAC:AuthorizationService",
-                IssuerSigningKey = _credentials.Key // The same key as the one that generate the token
+                ValidIssuer = _token.Issuer,
+                ValidAudience = _token.Audience,
+                IssuerSigningKey = _credentials.Key
             };
         }
     }

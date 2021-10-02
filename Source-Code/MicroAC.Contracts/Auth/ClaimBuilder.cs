@@ -1,18 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
 
 namespace MicroAC.Core.Auth
 {
-    public enum TokenType
-    {
-        AccessExternal,
-        RefreshExternal,
-        AccessInternal,
-    }
-
     public struct MicroACClaimTypes
     {
         public const string KeyId = "kid";
@@ -25,13 +16,11 @@ namespace MicroAC.Core.Auth
     {
         Dictionary<string, object> _defaultClaims;
         Dictionary<string, object> _claims;
-        readonly TokenType _type;
-        readonly double _expirationSeconds;
+        readonly IDefaultTokenClaims _token;
 
-        public ClaimBuilder(TokenType type, double expirationSeconds)
+        public ClaimBuilder(IDefaultTokenClaims token)
         {
-            _type = type;
-            _expirationSeconds = expirationSeconds;
+            _token = token;
             _claims = new Dictionary<string, object>(5);
             SetDefaultClaims();
         }
@@ -107,21 +96,9 @@ namespace MicroAC.Core.Auth
             _claims = new Dictionary<string, object>();
 
             AddJwtId(Guid.NewGuid().ToString());
-            switch (_type)
-            {
-                //TODO: Move hardcoded strings to constants.
-                case TokenType.AccessExternal:
-                case TokenType.RefreshExternal:
-                    AddIssuer("MicroAC:AuthenticationService");
-                    AddAudience("MicroAC:AuthorizationService");
-                    AddSubject("MicroAC:User");
-                    break;
-                case TokenType.AccessInternal:
-                    AddIssuer("MicroAC:AuthorizationService");
-                    AddAudience("MicroAC:Services");
-                    AddSubject("MicroAC:Request");
-                    break;
-            }
+            AddIssuer(_token.Issuer);
+            AddAudience(_token.Audience);
+            AddSubject(_token.Subject);
             _defaultClaims = _claims;
             _claims = temp;
         }
