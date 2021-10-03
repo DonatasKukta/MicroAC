@@ -4,9 +4,6 @@
     <Parameter Name="MicroAC.RequestManager_InstanceCount" DefaultValue="-1" />
     <Parameter Name="MicroAC.Authorization_InstanceCount" DefaultValue="-1" />
     <Parameter Name="MicroAC.Authentication_InstanceCount" DefaultValue="-1" />
-    <Parameter Name="MicroAC.RequestManager_MinReplicaSetSize" DefaultValue="3" />
-    <Parameter Name="MicroAC.RequestManager_PartitionCount" DefaultValue="1" />
-    <Parameter Name="MicroAC.RequestManager_TargetReplicaSetSize" DefaultValue="3" />
   </Parameters>
   <Services>
     <!-- The section below creates instances of service types, when an instance of this 
