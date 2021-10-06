@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
-using System.Fabric;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -11,6 +9,19 @@ namespace MicroAC.RequestManager
     [Route("/{*url}")]
     public class RequestManagerController : Controller
     {
+        //TODO: Move to config
+        readonly string _basePath = "http://localhost:19083/";
+
+        /// <summary>
+        /// List of routes which are used for request forwarding.
+        /// TODO: Move to config.
+        /// </summary>
+        readonly Dictionary<string, string> _routes = new Dictionary<string, string>()
+        {
+            { "/Authorization", "MicroAC.ServiceFabric/MicroAC.Authorization" },
+            { "/Authentication", "MicroAC.ServiceFabric/MicroAC.Authentication" }
+        };
+
         HttpClient _http;
 
         public RequestManagerController(HttpClient httpClient)
@@ -20,9 +31,16 @@ namespace MicroAC.RequestManager
 
         public async Task<IActionResult> Index()
         {
-            var result = await _http.SendAsync(new HttpRequestMessage(HttpMethod.Get, "http://localhost:19081/MicroAC.ServiceFabric/MicroAC.Authorization/"));
-            
-            return Ok(await result.Content.ReadAsStringAsync());
+            var originalPath = this.HttpContext.Request.Path.ToString();
+            var forwardKey = _routes.Keys.FirstOrDefault(key => originalPath.StartsWith(key));
+            if(forwardKey != null)
+            {
+                //TODO: Forward content and headers of the request.
+                var result =  await _http.GetAsync(_basePath + originalPath.Replace(forwardKey, _routes[forwardKey]));
+                return Ok(await result.Content.ReadAsStringAsync());
+            }
+
+            return NotFound();
         }
     }
 }
