@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MicroAC.RequestManager
 {
-    [Route("/")]
+    [Route("/{*url}")]
     public class RequestManagerController : Controller
     {
         HttpClient _http;
