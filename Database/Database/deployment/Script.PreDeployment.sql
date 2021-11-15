@@ -9,22 +9,12 @@
                SELECT * FROM [$(TableName)]					
 --------------------------------------------------------------------------------------
 */
-/*
- Pre-Deployment Script Template							
---------------------------------------------------------------------------------------
- This file contains SQL statements that will be executed before the build script.	
- Use SQLCMD syntax to include a file in the pre-deployment script.			
- Example:      :r .\myfile.sql								
- Use SQLCMD syntax to reference a variable in the pre-deployment script.		
- Example:      :setvar TableName MyTable							
-               SELECT * FROM [$(TableName)]					
---------------------------------------------------------------------------------------
-*/
 
 --------------------------------------------------------------------------------------
 -- Drop all tables from DB
 --------------------------------------------------------------------------------------
 USE MicroAC
+PRINT N'Dropping all tables from [MicroAC] Database';
 -- Disable all referential integrity constraints
 EXEC sp_MSforeachtable 'ALTER TABLE ? NOCHECK CONSTRAINT ALL'
 GO
@@ -42,4 +32,5 @@ GO
 -- Drop all tables
 EXEC sp_MSforeachtable 'DROP TABLE ?'
 GO
+PRINT N'All tables from [MicroAC] Database successfully dropped';
 --------------------------------------------------------------------------------------
