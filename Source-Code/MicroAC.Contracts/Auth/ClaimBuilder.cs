@@ -7,6 +7,7 @@ namespace MicroAC.Core.Auth
     public struct MicroACClaimTypes
     {
         public const string KeyId = "kid";
+        public const string UserId = "uid";
         public const string Role = "role";
         public const string SubjectClaims = "sclaims";
         public const string Conditions = "cnd";
@@ -20,6 +21,8 @@ namespace MicroAC.Core.Auth
         IClaimBuilder<TokenType> AddCommonClaims();
 
         IClaimBuilder<TokenType> AddRole(object value);
+
+        IClaimBuilder<TokenType> AddUserId(object value);
 
         IClaimBuilder<TokenType> AddSubjectClaims(object value);
 
@@ -67,6 +70,12 @@ namespace MicroAC.Core.Auth
         public IClaimBuilder<TokenType> AddSubjectClaims(object value)
         {
             _claims.Add(MicroACClaimTypes.SubjectClaims, value);
+            return this;
+        }
+
+        public IClaimBuilder<TokenType> AddUserId(object value)
+        {
+            _claims.Add(MicroACClaimTypes.UserId, value);
             return this;
         }
 

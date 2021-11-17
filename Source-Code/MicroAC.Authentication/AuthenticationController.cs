@@ -1,7 +1,12 @@
 ﻿using MicroAC.Core.Auth;
+using MicroAC.Core.Models;
+using MicroAC.Core.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Fabric;
+using System.Linq;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace MicroAC.Authentication
 {
@@ -16,12 +21,15 @@ namespace MicroAC.Authentication
         readonly IJwtTokenHandler<RefreshExternal> _refreshTokenHandler;
         readonly IClaimBuilder<RefreshExternal> _refreshClaimBuilder;
 
+        readonly IUsersRepository _usersRepository;
+
         public AuthenticationController(
             StatelessServiceContext serviceContext,
             IJwtTokenHandler<AccessExternal> accessTokenHandler,
             IClaimBuilder<AccessExternal> accessClaimBuiler,
             IJwtTokenHandler<RefreshExternal> refreshTokenHandler,
-            IClaimBuilder<RefreshExternal> refreshClaimBuiler
+            IClaimBuilder<RefreshExternal> refreshClaimBuiler,
+            IUsersRepository usersRepository
             )
         {
             _serviceContext = serviceContext;
@@ -29,6 +37,7 @@ namespace MicroAC.Authentication
             _accessClaimBuilder = accessClaimBuiler;
             _refreshTokenHandler = refreshTokenHandler;
             _refreshClaimBuilder = refreshClaimBuiler;
+            _usersRepository = usersRepository;
         }
 
         [HttpGet]
@@ -37,24 +46,52 @@ namespace MicroAC.Authentication
             return Ok($"Authentication is ok on {_serviceContext.NodeContext.NodeName} at {DateTime.Now}");
         }
 
-        [HttpGet("Login")]
-        public ActionResult Login()
+        [HttpPost("Login")]
+        public ActionResult Login([FromBody] LoginCredentials credentials)
         {
-            var claims = _accessClaimBuilder
+            if (credentials.Email == null /* || credentials.Password == null*/)
+                return Unauthorized("Login credentials not provided");
+
+            var user = _usersRepository.GetUser(credentials.Email, credentials.Password);
+            if (user == null)
+                return Unauthorized("Incorrect username or password");
+
+            var accessClaims = _accessClaimBuilder
              .AddCommonClaims()
+             .AddUserId(user.Id)
+             .AddRole(user.Role)
              .Build();
-            var jwt = _accessTokenHandler.Create(claims);
-            return Ok(jwt);
+            var accessJwt = _accessTokenHandler.Create(accessClaims);
+
+            var refreshClaims = _refreshClaimBuilder
+             .AddCommonClaims()
+             .AddUserId(user.Id)
+             .Build();
+            var refreshJwt = _accessTokenHandler.Create(refreshClaims);
+
+            return Ok(new { accessJwt, refreshJwt });
         }
 
-        [HttpGet("Refresh")]
-        public ActionResult Refresh()
+        [HttpPost("Refresh")]
+        public async Task<ActionResult> Refresh()
         {
-            var claims = _refreshClaimBuilder
-                .AddCommonClaims()
-                .Build();
-            var jwt = _refreshTokenHandler.Create(claims);
-            return Ok(jwt);
+            var bodyStream = new StreamReader(Request.Body);
+
+            var refreshClaims  = _refreshTokenHandler.Validate(await bodyStream.ReadToEndAsync());
+
+            var userId = refreshClaims.Claims.FirstOrDefault(c => c.Type == MicroACClaimTypes.UserId)?.Value;
+            var user = _usersRepository.GetUser(new Guid(userId));
+            if (user == null)
+                return Unauthorized("User Id could not be found.");
+
+            var accessClaims = _accessClaimBuilder
+             .AddCommonClaims()
+             .AddUserId(user.Id)
+             .AddRole(user.Role)
+             .Build();
+            var accessJwt = _accessTokenHandler.Create(accessClaims);
+
+            return Ok(accessJwt);
         }
     }
 }

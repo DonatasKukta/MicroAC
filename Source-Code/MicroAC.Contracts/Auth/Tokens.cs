@@ -34,7 +34,7 @@
     public class RefreshExternal : IDefaultTokenClaims
     {
         public string Issuer => "MicroAC:AuthenticationService";
-        public string Audience => "MicroAC:AuthorizationService";
+        public string Audience => "MicroAC:AuthenticationService";
         public string Subject => "MicroAC:User";
         public TokenType Type => TokenType.RefreshExternal;
     }

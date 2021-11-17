@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace MicroAC.Core.Models
 {
-    public class Permission
+    public class LoginCredentials
     {
-        public string Action { get; set; }
-        public string Value { get; set; }
-        public string ServiceName { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
     }
 }

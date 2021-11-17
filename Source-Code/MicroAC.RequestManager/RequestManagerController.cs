@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -33,10 +34,14 @@ namespace MicroAC.RequestManager
         {
             var originalPath = this.HttpContext.Request.Path.ToString();
             var forwardKey = _routes.Keys.FirstOrDefault(key => originalPath.StartsWith(key));
-            if(forwardKey != null)
+
+            var bodyStream = new StreamReader(Request.Body);
+            var requestBody = await bodyStream.ReadToEndAsync();
+
+            if (forwardKey != null)
             {
                 //TODO: Forward content and headers of the request.
-                var result =  await _http.GetAsync(_basePath + originalPath.Replace(forwardKey, _routes[forwardKey]));
+                var result =  await _http.PostAsync(_basePath + originalPath.Replace(forwardKey, _routes[forwardKey]), new StringContent(requestBody));
                 return Ok(await result.Content.ReadAsStringAsync());
             }
 

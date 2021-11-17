@@ -31,6 +31,8 @@ namespace MicroAC.Core.Auth
                 new SymmetricSecurityKey(Encoding.ASCII.GetBytes("Long enough JWT Secret aka Secret Key")),
             SecurityAlgorithms.HmacSha256Signature);
             _jwtHandler = new JwtSecurityTokenHandler();
+            _jwtHandler.InboundClaimFilter.Clear();
+            _jwtHandler.OutboundClaimTypeMap.Clear();
             _token = token;
             _validationParameters = GetValidationParameters();
         }

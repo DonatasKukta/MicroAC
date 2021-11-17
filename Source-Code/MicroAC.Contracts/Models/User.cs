@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 
 namespace MicroAC.Core.Models
 {
-    public partial class User
+    public class User
     {
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-        public string Surname { get; set; }
-        public string Email { get; set; }
-        public string Phone { get; set; }
-        public string Organisation { get; set; }
-        public string Role { get; set; }
-        public bool IsBlocked { get; set; }
+        public Guid   Id            { get; set; }
+        public string Name          { get; set; }
+        public string Surname       { get; set; }
+        public string Email         { get; set; }
+        public string Phone         { get; set; }
+        public string Organisation  { get; set; }
+        public string Role          { get; set; }
+        public bool   IsBlocked     { get; set; }
 
         IEnumerable<Permission> Permissions;
     }

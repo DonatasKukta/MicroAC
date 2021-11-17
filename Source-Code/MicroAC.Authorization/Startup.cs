@@ -1,13 +1,10 @@
 using MicroAC.Core.Auth;
+using MicroAC.Core.Persistence;
+using MicroAC.Persistence;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MicroAC.Authorization
 {
@@ -20,8 +17,11 @@ namespace MicroAC.Authorization
             services.AddRouting();
             services.AddControllers();
 
+            services.AddSingleton(typeof(IJwtTokenHandler<AccessExternal>), new JwtTokenHandler<AccessExternal>(new AccessExternal()));
             services.AddSingleton(typeof(IJwtTokenHandler<AccessInternal>), new JwtTokenHandler<AccessInternal>(new AccessInternal()));
             services.AddSingleton(typeof(IClaimBuilder<AccessInternal>), new ClaimBuilder<AccessInternal>(new AccessInternal()));
+
+            services.AddScoped<IPermissionsRepository, PermissionsRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
