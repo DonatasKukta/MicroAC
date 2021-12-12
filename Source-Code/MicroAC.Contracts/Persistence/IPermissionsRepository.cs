@@ -5,6 +5,6 @@ namespace MicroAC.Core.Persistence
 {
     public interface IPermissionsRepository
     {
-        public IEnumerable<Permission> GetRolePermissions(string role);
+        public IEnumerable<Permission> GetRolePermissions(IEnumerable<string> role);
     }
 }

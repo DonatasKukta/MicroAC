@@ -59,7 +59,7 @@ namespace MicroAC.Authentication
             var accessClaims = _accessClaimBuilder
              .AddCommonClaims()
              .AddUserId(user.Id)
-             .AddRole(user.Role)
+             .AddRoles(user.Roles)
              .Build();
             var accessJwt = _accessTokenHandler.Create(accessClaims);
 
@@ -87,7 +87,7 @@ namespace MicroAC.Authentication
             var accessClaims = _accessClaimBuilder
              .AddCommonClaims()
              .AddUserId(user.Id)
-             .AddRole(user.Role)
+             .AddRoles(user.Roles)
              .Build();
             var accessJwt = _accessTokenHandler.Create(accessClaims);
 

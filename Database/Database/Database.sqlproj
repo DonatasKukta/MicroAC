@@ -128,7 +128,7 @@
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
-    <Build Include="dbo\Tables\Role_Permissions.sql">
+    <Build Include="dbo\Tables\Roles_Permissions.sql">
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
@@ -151,6 +151,7 @@
     <None Include="data\test-users.sql">
       <CopyToOutputDirectory>DoNotCopy</CopyToOutputDirectory>
     </None>
+    <Build Include="dbo\Tables\Users_Roles.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="deployment\Script.PostDeployment.sql" />

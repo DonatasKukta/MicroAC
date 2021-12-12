@@ -14,9 +14,8 @@ namespace MicroAC.Core.Models
         public string Email         { get; set; }
         public string Phone         { get; set; }
         public string Organisation  { get; set; }
-        public string Role          { get; set; }
         public bool   IsBlocked     { get; set; }
 
-        IEnumerable<Permission> Permissions;
+        public IEnumerable<string> Roles;
     }
 }

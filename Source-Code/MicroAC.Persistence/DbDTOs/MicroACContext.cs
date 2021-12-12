@@ -20,9 +20,10 @@ namespace MicroAC.Persistence.DbDTOs
         public virtual DbSet<Organisation> Organisations { get; set; }
         public virtual DbSet<Permission> Permissions { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
-        public virtual DbSet<RolePermission> RolePermissions { get; set; }
+        public virtual DbSet<RolesPermission> RolesPermissions { get; set; }
         public virtual DbSet<Service> Services { get; set; }
         public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<UsersRole> UsersRoles { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -78,11 +79,11 @@ namespace MicroAC.Persistence.DbDTOs
                 entity.Property(e => e.Name).HasMaxLength(42);
             });
 
-            modelBuilder.Entity<RolePermission>(entity =>
+            modelBuilder.Entity<RolesPermission>(entity =>
             {
                 entity.HasNoKey();
 
-                entity.ToTable("Role_Permissions");
+                entity.ToTable("Roles_Permissions");
 
                 entity.Property(e => e.Role)
                     .IsRequired()
@@ -92,13 +93,13 @@ namespace MicroAC.Persistence.DbDTOs
                     .WithMany()
                     .HasForeignKey(d => d.Permission)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Role_Permissions_Permissions");
+                    .HasConstraintName("FK_Roles_Permissions_Permissions");
 
                 entity.HasOne(d => d.RoleNavigation)
                     .WithMany()
                     .HasForeignKey(d => d.Role)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Role_Permissions_Roles");
+                    .HasConstraintName("FK_Roles_Permissions_Roles");
             });
 
             modelBuilder.Entity<Service>(entity =>
@@ -110,7 +111,7 @@ namespace MicroAC.Persistence.DbDTOs
 
             modelBuilder.Entity<User>(entity =>
             {
-                entity.HasNoKey();
+                entity.Property(e => e.Id).ValueGeneratedNever();
 
                 entity.Property(e => e.Email).HasMaxLength(82);
 
@@ -128,10 +129,6 @@ namespace MicroAC.Persistence.DbDTOs
                     .IsRequired()
                     .HasMaxLength(22);
 
-                entity.Property(e => e.Role)
-                    .IsRequired()
-                    .HasMaxLength(42);
-
                 entity.Property(e => e.Salt)
                     .HasMaxLength(16)
                     .IsFixedLength(true);
@@ -141,15 +138,32 @@ namespace MicroAC.Persistence.DbDTOs
                     .HasMaxLength(42);
 
                 entity.HasOne(d => d.OrganisationNavigation)
-                    .WithMany()
+                    .WithMany(p => p.Users)
                     .HasForeignKey(d => d.Organisation)
                     .HasConstraintName("FK_Users_Organisations");
+            });
+
+            modelBuilder.Entity<UsersRole>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToTable("Users_Roles");
+
+                entity.Property(e => e.Role)
+                    .IsRequired()
+                    .HasMaxLength(42);
 
                 entity.HasOne(d => d.RoleNavigation)
                     .WithMany()
                     .HasForeignKey(d => d.Role)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Users_Roles");
+                    .HasConstraintName("FK_Users_Roles_Roles");
+
+                entity.HasOne(d => d.UserNavigation)
+                    .WithMany()
+                    .HasForeignKey(d => d.User)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Users_Roles_Users");
             });
 
             OnModelCreatingPartial(modelBuilder);

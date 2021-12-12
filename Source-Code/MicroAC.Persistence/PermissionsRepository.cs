@@ -20,11 +20,10 @@ namespace MicroAC.Persistence
             Context = new DTO.MicroACContext();
         }
 
-        public IEnumerable<Domain.Permission> GetRolePermissions(string role)
-        {
-            var result = Context.RolePermissions.Where(rp => rp.Role.Equals(role)).Select(rp => Map(rp.PermissionNavigation));
-            return result;
-        }
+        public IEnumerable<Domain.Permission> GetRolePermissions(IEnumerable<string> roles) => 
+            Context.RolesPermissions.Where(rp => roles.Contains(rp.Role))
+                                    .Select(rp => Map(rp.PermissionNavigation));
+
 
         //TODO: Implement Automapping
         private static Domain.Permission Map(DTO.Permission permission)

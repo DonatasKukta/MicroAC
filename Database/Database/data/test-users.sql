@@ -1,40 +1,16 @@
 ﻿USE [MicroAC]
 GO
 
-INSERT INTO [dbo].[Organisations] ([Name]) VALUES
-('MicroAC'),
-('Analyticus'),
-('IT Technologies'),
-('Fine Solutions'),
-('Co-Herent');
-
-INSERT INTO [dbo].[Roles]([Name])VALUES
-('Administrator'),
-('Free User'),
-('Client'),
-('Consultant'),
-('Manager'),
-('Data Analyst');
-
-INSERT INTO [dbo].[Users]([Id],[Name],[Surname],[Email],[Phone],[Organisation],[Role],[Blocked],[PasswordHash],[Salt])VALUES
-(NEWID(),'admin'		,'admin' 		,'admin@admin.com'					,'+37065111111','MicroAC'			,'Administrator',0,NULL,NULL),
-(NEWID(),'Antanas'		,'Antanaitis'	,'Antanas.Antanaitis@gmail.com'		,'+37065348586','MicroAC'			,'Manager'		,0,NULL,NULL),
-(NEWID(),'Jonas'		,'Jonaitis'		,'Jonas.Jonaitis@gmail.com'			,'+37065348586','MicroAC'			,'Consultant'	,0,NULL,NULL),
-(NEWID(),'Kazimieras'	,'Antanaitis'	,'Kazimieras.antanaitis@gmail.com'	,'+37065348586','MicroAC'			,'Consultant'	,0,NULL,NULL),
-(NEWID(),'Deimantė'		,'Deimantienė'	,'Deimantė.Deimantienė@gmail.com'	,'+37065348586','MicroAC'			,'Data Analyst'	,0,NULL,NULL),
-(NEWID(),'Mantas'		,'Mantauskas'	,'Mantas.Mantauskas@gmail.com'		,'+37065348586','IT Technologies'	,'Client'		,0,NULL,NULL),
-(NEWID(),'Justas'		,'Justauskas'	,'Justas.Justauskas@gmail.com'		,'+37065348586','Co-Herent'			,'Client'		,0,NULL,NULL),
-(NEWID(),'Rolandas'		,'Rolandaitis'	,'Rolandas.Rolandaitis@gmail.com'	,'+37065348586','Fine Solutions'	,'Client'		,0,NULL,NULL),
-(NEWID(),'Dovilė'		,'Dovilienė'	,'Dovilė.Dovilienė@gmail.com'		,'+37065348586','IT Technologies'	,'Free User'	,0,NULL,NULL),
-(NEWID(),'Dominykas'	,'Dominykaitis'	,'Dominykas.Dominykaitis@gmail.com'	,'+37065348586','Analyticus'		,'Free User'	,0,NULL,NULL);
-
-INSERT INTO [dbo].[Services] ([Name]) VALUES
-('MicroAC-Users'),
-('Products'),
-('Shipping'),
-('Admin'),
-('Customers'),
-('Cart');
+DECLARE @User1   AS UNIQUEIDENTIFIER=NEWID();
+DECLARE @User2   AS UNIQUEIDENTIFIER=NEWID();
+DECLARE @User3   AS UNIQUEIDENTIFIER=NEWID();
+DECLARE @User4   AS UNIQUEIDENTIFIER=NEWID();
+DECLARE @User5   AS UNIQUEIDENTIFIER=NEWID();
+DECLARE @User6   AS UNIQUEIDENTIFIER=NEWID();
+DECLARE @User7   AS UNIQUEIDENTIFIER=NEWID();
+DECLARE @User8   AS UNIQUEIDENTIFIER=NEWID();
+DECLARE @User9   AS UNIQUEIDENTIFIER=NEWID();
+DECLARE @User10  AS UNIQUEIDENTIFIER=NEWID();
 
 DECLARE @Permission0  AS UNIQUEIDENTIFIER=NEWID();
 DECLARE @Permission1 AS UNIQUEIDENTIFIER=NEWID();
@@ -62,6 +38,64 @@ DECLARE @Permission160 AS UNIQUEIDENTIFIER=NEWID();
 DECLARE @Permission17 AS UNIQUEIDENTIFIER=NEWID();
 DECLARE @Permission18 AS UNIQUEIDENTIFIER=NEWID();
 DECLARE @Permission19 AS UNIQUEIDENTIFIER=NEWID();
+
+
+INSERT INTO [dbo].[Organisations] ([Name]) VALUES
+('MicroAC'),
+('Analyticus'),
+('IT Technologies'),
+('Fine Solutions'),
+('Co-Herent');
+
+INSERT INTO [dbo].[Roles]([Name])VALUES
+('Administrator'),
+('Free User'),
+('Client'),
+('Consultant'),
+('Manager'),
+('Data Analyst');
+
+INSERT INTO [dbo].[Users]([Id],[Name],[Surname],[Email],[Phone],[Organisation],[Blocked],[PasswordHash],[Salt])VALUES
+(@User1,'admin'			,'admin' 		,'admin@admin.com'					,'+37065111111','MicroAC'			,0,NULL,NULL),
+(@User2,'Antanas'		,'Antanaitis'	,'Antanas.Antanaitis@gmail.com'		,'+37065348586','MicroAC'			,0,NULL,NULL),
+(@User3,'Jonas'			,'Jonaitis'		,'Jonas.Jonaitis@gmail.com'			,'+37065348586','MicroAC'			,0,NULL,NULL),
+(@User4,'Kazimieras'	,'Antanaitis'	,'Kazimieras.antanaitis@gmail.com'	,'+37065348586','MicroAC'			,0,NULL,NULL),
+(@User5,'Deimantė'		,'Deimantienė'	,'Deimantė.Deimantienė@gmail.com'	,'+37065348586','MicroAC'			,0,NULL,NULL),
+(@User6,'Mantas'		,'Mantauskas'	,'Mantas.Mantauskas@gmail.com'		,'+37065348586','IT Technologies'	,0,NULL,NULL),
+(@User7,'Justas'		,'Justauskas'	,'Justas.Justauskas@gmail.com'		,'+37065348586','Co-Herent'			,0,NULL,NULL),
+(@User8,'Rolandas'		,'Rolandaitis'	,'Rolandas.Rolandaitis@gmail.com'	,'+37065348586','Fine Solutions'	,0,NULL,NULL),
+(@User9,'Dovilė'		,'Dovilienė'	,'Dovilė.Dovilienė@gmail.com'		,'+37065348586','IT Technologies'	,0,NULL,NULL),
+(@User10,'Dominykas'	,'Dominykaitis'	,'Dominykas.Dominykaitis@gmail.com'	,'+37065348586','Analyticus'		,0,NULL,NULL);
+
+INSERT INTO [dbo].[Users_Roles]([User],[Role])VALUES
+(@User1, 'Administrator'),
+(@User2, 'Free User'),
+(@User3, 'Client'),
+(@User4, 'Consultant'),
+(@User5, 'Manager'),
+(@User6, 'Data Analyst'),
+(@User7, 'Administrator'),
+(@User8, 'Free User'),
+(@User9, 'Client'),
+(@User10, 'Consultant'),
+(@User10, 'Administrator'),
+(@User9, 'Free User'),
+(@User8, 'Client'),
+(@User7, 'Consultant'),
+(@User6, 'Manager'),
+(@User5, 'Data Analyst'),
+(@User4, 'Administrator'),
+(@User3, 'Free User'),
+(@User2, 'Client'),
+(@User1, 'Consultant');
+
+INSERT INTO [dbo].[Services] ([Name]) VALUES
+('MicroAC-Users'),
+('Products'),
+('Shipping'),
+('Admin'),
+('Customers'),
+('Cart');
 
 INSERT INTO [dbo].[Permissions]([Id],[ServiceName],[Action],[Value],[Description]) VALUES
 (@Permission0 ,'Products'		,'All'		,'All'		,''),
@@ -91,7 +125,7 @@ INSERT INTO [dbo].[Permissions]([Id],[ServiceName],[Action],[Value],[Description
 (@Permission18,'Cart'			,'Remove'	,'My-Item'	,''),
 (@Permission19,'Cart'			,'PlaceOrder','My-Cart'	,'');
 
-INSERT INTO [dbo].[Role_Permissions]([Role],[Permission])VALUES
+INSERT INTO [dbo].[Roles_Permissions]([Role],[Permission])VALUES
 ('Administrator'	,@Permission0),
 ('Administrator'	,@Permission1),
 ('Data Analyst'		,@Permission01),

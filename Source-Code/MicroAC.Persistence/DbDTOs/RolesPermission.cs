@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace MicroAC.Persistence.DbDTOs
 {
-    public partial class RolePermission
+    public partial class RolesPermission
     {
         public string Role { get; set; }
         public Guid Permission { get; set; }

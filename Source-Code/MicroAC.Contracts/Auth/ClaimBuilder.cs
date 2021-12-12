@@ -8,7 +8,7 @@ namespace MicroAC.Core.Auth
     {
         public const string KeyId = "kid";
         public const string UserId = "uid";
-        public const string Role = "role";
+        public const string Roles = "uroles";
         public const string SubjectClaims = "sclaims";
         public const string Conditions = "cnd";
     }
@@ -20,7 +20,7 @@ namespace MicroAC.Core.Auth
 
         IClaimBuilder<TokenType> AddCommonClaims();
 
-        IClaimBuilder<TokenType> AddRole(object value);
+        IClaimBuilder<TokenType> AddRoles(object value);
 
         IClaimBuilder<TokenType> AddUserId(object value);
 
@@ -61,9 +61,9 @@ namespace MicroAC.Core.Auth
             return this;
         }
 
-        public IClaimBuilder<TokenType> AddRole(object value)
+        public IClaimBuilder<TokenType> AddRoles(object value)
         {
-            _claims.Add(MicroACClaimTypes.Role, value);
+            _claims.Add(MicroACClaimTypes.Roles, value);
             return this;
         }
 

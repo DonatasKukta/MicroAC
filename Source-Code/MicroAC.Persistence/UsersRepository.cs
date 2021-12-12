@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Security;
 
 using MicroAC.Core.Persistence;
 
@@ -22,19 +22,25 @@ namespace MicroAC.Persistence
         public Domain.User GetUser(string email, string password)
         {
             var user = Context.Users.Where(u => u.Email == email).FirstOrDefault();
+            var roles = GetUserRoles(user.Id);
 
-            return Map(user);
+            return Map(user, roles);
         }
 
         public Domain.User GetUser(Guid guid)
         {
             var user = Context.Users.Where(u => u.Id == guid).FirstOrDefault(); ;
+            var roles = GetUserRoles(user.Id);
 
-            return Map(user);
+            return Map(user, roles);
         }
 
+        private IEnumerable<string> GetUserRoles(Guid userId) => 
+            Context.UsersRoles.Where(ur => ur.User == userId)
+                              .Select(ur => ur.Role);
+
         //TODO: Implement Automapping
-        private static Domain.User Map(DTO.User user)
+        private static Domain.User Map(DTO.User user, IEnumerable<string> roles)
         {
             return new Domain.User
             {
@@ -44,8 +50,8 @@ namespace MicroAC.Persistence
                 Email = user.Email,
                 Phone = user.Phone,
                 Organisation = user.Organisation,
-                Role = user.Role,
                 IsBlocked = user.Blocked,
+                Roles = roles
             };
         }
     }

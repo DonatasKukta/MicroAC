@@ -49,15 +49,17 @@ namespace MicroAC.Authentication
             var bodyStr = await bodyStream.ReadToEndAsync();
             var accessClaims = _accessExternalTokenHandler.Validate(bodyStr);
 
-            var role = accessClaims.Claims.FirstOrDefault(c => c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role")?.Value;
+            var roles = accessClaims.Claims.Where(c => c.Type == MicroACClaimTypes.Roles)
+                                                           .Select(c => c.Value);
 
-            if (role == null)
-                return Unauthorized("Invalid token provided.");
+            if (roles.Count() < 1)
+                return Unauthorized("User has no roles assigned therefore cannot be authorized.");
 
-            var permissions = _permissionsRepository.GetRolePermissions(role);
+            var permissions = _permissionsRepository.GetRolePermissions(roles);
 
             var claims = _accessInternalClaimBuilder
                 .AddCommonClaims()
+                .AddRoles(roles)
                 .AddSubjectClaims(permissions)
                 .Build();
             var jwt = _accessInternalTokenHandler.Create(claims);
