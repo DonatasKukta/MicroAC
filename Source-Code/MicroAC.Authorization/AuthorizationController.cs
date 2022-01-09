@@ -7,7 +7,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Linq;
 
-namespace MicroAC.Authentication
+namespace MicroAC.Authorization
 {
     [Route("/")]
     public class AuthorizationController : Controller
