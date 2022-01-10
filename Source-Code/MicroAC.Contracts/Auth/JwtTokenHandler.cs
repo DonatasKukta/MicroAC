@@ -27,6 +27,7 @@ namespace MicroAC.Core.Auth
 
         public JwtTokenHandler(TokenType token)
         {
+            //TODO: Get key from config
             _credentials = new SigningCredentials(
                 new SymmetricSecurityKey(Encoding.ASCII.GetBytes("Long enough JWT Secret aka Secret Key")),
             SecurityAlgorithms.HmacSha256Signature);

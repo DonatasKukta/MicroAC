@@ -25,7 +25,8 @@ namespace MicroAC.RequestManager
         readonly Dictionary<string, string> _routes = new Dictionary<string, string>()
         {
             { "/Authorization", "MicroAC.ServiceFabric/MicroAC.Authorization" },
-            { "/Authentication", "MicroAC.ServiceFabric/MicroAC.Authentication" }
+            { "/Authentication", "MicroAC.ServiceFabric/MicroAC.Authentication" },
+            { "/ResourceApi", "MicroAC.ServiceFabric/Example.ResourceApi" }
         };
 
         readonly List<string> _headersToIgnore = new List<string>()

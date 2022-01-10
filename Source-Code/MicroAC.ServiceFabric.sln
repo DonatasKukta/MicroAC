@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MicroAC.RequestManager", "M
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MicroAC.Core", "MicroAC.Contracts\MicroAC.Core.csproj", "{00A2FD43-8A81-4BC3-A04E-A58A4B6D09F7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MicroAC.Persistence", "MicroAC.Persistence\MicroAC.Persistence.csproj", "{5ABCCC05-B6C3-45CE-9534-CCCDE317276D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MicroAC.Persistence", "MicroAC.Persistence\MicroAC.Persistence.csproj", "{5ABCCC05-B6C3-45CE-9534-CCCDE317276D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.ResourceApi", "Example.ResourceApi\Example.ResourceApi.csproj", "{91A09064-C1DE-4231-B3F0-4ABCFB10B926}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +73,14 @@ Global
 		{5ABCCC05-B6C3-45CE-9534-CCCDE317276D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5ABCCC05-B6C3-45CE-9534-CCCDE317276D}.Release|x64.ActiveCfg = Release|Any CPU
 		{5ABCCC05-B6C3-45CE-9534-CCCDE317276D}.Release|x64.Build.0 = Release|Any CPU
+		{91A09064-C1DE-4231-B3F0-4ABCFB10B926}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91A09064-C1DE-4231-B3F0-4ABCFB10B926}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91A09064-C1DE-4231-B3F0-4ABCFB10B926}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{91A09064-C1DE-4231-B3F0-4ABCFB10B926}.Debug|x64.Build.0 = Debug|Any CPU
+		{91A09064-C1DE-4231-B3F0-4ABCFB10B926}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91A09064-C1DE-4231-B3F0-4ABCFB10B926}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91A09064-C1DE-4231-B3F0-4ABCFB10B926}.Release|x64.ActiveCfg = Release|Any CPU
+		{91A09064-C1DE-4231-B3F0-4ABCFB10B926}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

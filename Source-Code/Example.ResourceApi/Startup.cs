@@ -1,11 +1,16 @@
-using System.Net.Http;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace MicroAC.RequestManager
+namespace Example.ResourceApi
 {
     public class Startup
     {
@@ -14,8 +19,7 @@ namespace MicroAC.RequestManager
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRouting();
-            services.AddControllers();
-            services.AddSingleton<HttpClient>(new HttpClient());
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -30,7 +34,11 @@ namespace MicroAC.RequestManager
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
+                endpoints.MapGet("/Action", async context =>
+                {
+                    Thread.Sleep(1000);
+                    await context.Response.WriteAsync("Hello World! 1s long response.");
+                });
             });
         }
     }

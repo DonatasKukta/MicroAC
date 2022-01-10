@@ -36,6 +36,9 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Example.ResourceApi\Example.ResourceApi.csproj">
+      <ServiceLaunchUrl>http://localhost:{ServicePort}/</ServiceLaunchUrl>
+    </ProjectReference>
     <ProjectReference Include="..\MicroAC.Authentication\MicroAC.Authentication.csproj">
       <ServiceLaunchUrl>http://localhost:{ServicePort}/</ServiceLaunchUrl>
     </ProjectReference>
