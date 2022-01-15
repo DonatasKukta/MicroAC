@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -15,42 +15,21 @@ namespace MicroAC.RequestManager
     {
         readonly Uri _authorizationUrl;
 
-        readonly string _basePath = "http://localhost:19083/";
+        readonly string _basePath;
         
         readonly HttpClient _http;
 
-        /// <summary>
-        /// List of routes which are used for request forwarding.
-        /// </summary>
-        //TODO: Read from config.
-        readonly List<EndpointRoute> _routesNew = new List<EndpointRoute>
-        {
-            new EndpointRoute {
-                ExternalRoute = "/Authentication",
-                InternalRoute = "MicroAC.ServiceFabric/MicroAC.Authentication",
-                RequiresAuhtentication = false,
-                RequiresAuthorization = false
-            },
-            new EndpointRoute {
-                ExternalRoute = "/ResourceApi",
-                InternalRoute = "MicroAC.ServiceFabric/Example.ResourceApi",
-                RequiresAuhtentication = true,
-                RequiresAuthorization = true
-            },
-        };
+        readonly List<EndpointRoute> _routes;
 
-        readonly List<string> _headersToIgnore = new List<string>()
-        {
-            "Host",
-            "User-Agent",
-            "Cache-Control",
-            "Content-Length"
-        };
+        readonly List<string> _headersToIgnore;
 
-        public RequestManagerController(HttpClient httpClient)
+        public RequestManagerController(HttpClient httpClient, IConfiguration config)
         {
             _http = httpClient;
-            _authorizationUrl = new Uri(_basePath + "MicroAC.ServiceFabric/MicroAC.Authorization/Authorize");
+            _routes = config.GetSection("EndpointRoutes").Get<List<EndpointRoute>>();
+            _basePath = config.GetSection("InternalGateway").Get<string>();
+            _authorizationUrl = new Uri(_basePath + config.GetSection("InternalAuthorizationRoute").Get<string>());
+            _headersToIgnore = config.GetSection("HeadersToIgnore").Get<List<string>>();
         }
 
         public async Task<IActionResult> Index()
@@ -106,7 +85,7 @@ namespace MicroAC.RequestManager
         private EndpointRoute GetMatchingEndpointRoute()
         {
             var originalPath = this.HttpContext.Request.Path.ToString();
-            return _routesNew.FirstOrDefault(r => originalPath.StartsWith(r.ExternalRoute));
+            return _routes.FirstOrDefault(r => originalPath.StartsWith(r.ExternalRoute));
         }
 
         private async Task<IActionResult> HandleForwardedResponse(HttpResponseMessage response)
