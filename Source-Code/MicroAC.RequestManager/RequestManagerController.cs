@@ -13,20 +13,30 @@ namespace MicroAC.RequestManager
     [Route("/{*url}")]
     public class RequestManagerController : Controller
     {
-        //TODO: Move to config
-        readonly string _basePath = "http://localhost:19083/";
+        readonly Uri _authorizationUrl;
 
-        HttpClient _http;
+        readonly string _basePath = "http://localhost:19083/";
+        
+        readonly HttpClient _http;
 
         /// <summary>
         /// List of routes which are used for request forwarding.
-        /// TODO: Read from config.
         /// </summary>
-        readonly Dictionary<string, string> _routes = new Dictionary<string, string>()
+        //TODO: Read from config.
+        readonly List<EndpointRoute> _routesNew = new List<EndpointRoute>
         {
-            { "/Authorization", "MicroAC.ServiceFabric/MicroAC.Authorization" },
-            { "/Authentication", "MicroAC.ServiceFabric/MicroAC.Authentication" },
-            { "/ResourceApi", "MicroAC.ServiceFabric/Example.ResourceApi" }
+            new EndpointRoute {
+                ExternalRoute = "/Authentication",
+                InternalRoute = "MicroAC.ServiceFabric/MicroAC.Authentication",
+                RequiresAuhtentication = false,
+                RequiresAuthorization = false
+            },
+            new EndpointRoute {
+                ExternalRoute = "/ResourceApi",
+                InternalRoute = "MicroAC.ServiceFabric/Example.ResourceApi",
+                RequiresAuhtentication = true,
+                RequiresAuthorization = true
+            },
         };
 
         readonly List<string> _headersToIgnore = new List<string>()
@@ -40,14 +50,63 @@ namespace MicroAC.RequestManager
         public RequestManagerController(HttpClient httpClient)
         {
             _http = httpClient;
+            _authorizationUrl = new Uri(_basePath + "MicroAC.ServiceFabric/MicroAC.Authorization/Authorize");
         }
 
         public async Task<IActionResult> Index()
         {
-            var forwardRequest = await CreateForwardRequest();
+            var requestedRoute = GetMatchingEndpointRoute();
+
+            if(requestedRoute is null) 
+                return NotFound("Requested resource could not be found.");
+
+            if (requestedRoute.RequiresAuhtentication)
+            {
+                var containsExternalAccessToken = this.Request.Headers.ContainsKey("Authorization");
+                if (!containsExternalAccessToken)
+                {
+                    return Unauthorized("Access token is missing.");
+                }
+            }
+
+            if (requestedRoute.RequiresAuthorization)
+            {
+                var authorised = await AuthorizeRequest();
+
+                if (!authorised)
+                {
+                    return Unauthorized("Unable to authorize the request.");
+                }
+            }
+
+            var forwardUri = GetForwardUri(requestedRoute);
+            var forwardRequest = await CreateForwardRequest(forwardUri);
             var response = await _http.SendAsync(forwardRequest);
-            
+
             return await HandleForwardedResponse(response);
+        }
+
+        private async Task<bool> AuthorizeRequest()
+        {
+             var request = await CreateForwardRequest(_authorizationUrl);
+            request.Method = HttpMethod.Post;
+            var result = await _http.SendAsync(request);
+
+            if (!result.IsSuccessStatusCode)
+            {
+                return false;
+            }
+
+            var token = await result.Content.ReadAsStringAsync();
+            this.HttpContext.Request.Headers.Add("MicroAC-JWT", token);
+
+            return true;
+        }
+
+        private EndpointRoute GetMatchingEndpointRoute()
+        {
+            var originalPath = this.HttpContext.Request.Path.ToString();
+            return _routesNew.FirstOrDefault(r => originalPath.StartsWith(r.ExternalRoute));
         }
 
         private async Task<IActionResult> HandleForwardedResponse(HttpResponseMessage response)
@@ -57,7 +116,7 @@ namespace MicroAC.RequestManager
                 if (!_headersToIgnore.Contains(header.Key))
                     this.HttpContext.Response.Headers.Add(header.Key, header.Value.ToString());
             }
-            
+
             this.HttpContext.Response.StatusCode = (int)response.StatusCode;
 
             return new ObjectResult(await response.Content.ReadAsStringAsync());
@@ -66,18 +125,18 @@ namespace MicroAC.RequestManager
         /// <summary>
         /// Creates HttpRequestMessage from HttpContext. Body string, headers and HTTP method are transfered,
         /// </summary>
-        private async Task<HttpRequestMessage> CreateForwardRequest()
+        private async Task<HttpRequestMessage> CreateForwardRequest(Uri uri)
         {
             var request = new HttpRequestMessage()
             {
                 Method = new HttpMethod(this.HttpContext.Request.Method),
                 Content = await GetForwardRequestContent(),
-                RequestUri = GetForwardUri()
+                RequestUri = uri
             };
 
             foreach (var header in this.HttpContext.Request.Headers)
             {
-                if(!_headersToIgnore.Contains(header.Key) && !header.Key.StartsWith("Content-"))
+                if (!_headersToIgnore.Contains(header.Key) && !header.Key.StartsWith("Content-"))
                     request.Headers.Add(header.Key, header.Value.ToString());
             }
 
@@ -89,7 +148,7 @@ namespace MicroAC.RequestManager
             var bodyStream = new StreamReader(this.Request.Body);
             var requestBody = await bodyStream.ReadToEndAsync();
             var content = new StringContent(requestBody);
-            
+
             foreach (var header in this.HttpContext.Request.Headers)
             {
                 if (!_headersToIgnore.Contains(header.Key) && header.Key.StartsWith("Content-"))
@@ -102,12 +161,11 @@ namespace MicroAC.RequestManager
             return content;
         }
 
-        private Uri GetForwardUri()
+        private Uri GetForwardUri(EndpointRoute requestedRoute)
         {
             var originalPath = this.HttpContext.Request.Path.ToString();
-            var forwardKey = _routes.Keys.FirstOrDefault(key => originalPath.StartsWith(key));
-            var forwardUri = _basePath 
-                + originalPath.Replace(forwardKey, _routes[forwardKey]) 
+            var forwardUri = _basePath
+                + originalPath.Replace(requestedRoute.ExternalRoute, requestedRoute.InternalRoute)
                 + this.Request.QueryString.ToUriComponent();
 
             return new Uri(forwardUri);

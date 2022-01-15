@@ -3,9 +3,8 @@ using MicroAC.Core.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Fabric;
-using System.IO;
-using System.Threading.Tasks;
 using System.Linq;
+using Microsoft.Extensions.Primitives;
 
 namespace MicroAC.Authorization
 {
@@ -43,11 +42,18 @@ namespace MicroAC.Authorization
         }
 
         [HttpPost("Authorize")]
-        public async Task<ActionResult> Authorize()
+        public ActionResult Authorize()
         {
-            var bodyStream = new StreamReader(Request.Body);
-            var bodyStr = await bodyStream.ReadToEndAsync();
-            var accessClaims = _accessExternalTokenHandler.Validate(bodyStr);
+            var hasToken = this.Request.Headers.TryGetValue("Authorization", out StringValues headerValues);
+            if (!hasToken)
+                return Unauthorized("Missing external access token.");
+
+            var token = headerValues.FirstOrDefault();
+
+            if (token is null)
+                return Unauthorized("Missing external access token.");
+
+            var accessClaims = _accessExternalTokenHandler.Validate(token);
 
             var roles = accessClaims.Claims.Where(c => c.Type == MicroACClaimTypes.Roles)
                                                            .Select(c => c.Value);
