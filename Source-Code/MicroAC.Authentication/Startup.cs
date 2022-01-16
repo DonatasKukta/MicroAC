@@ -5,14 +5,18 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MicroAC.Persistence;
-using System.Linq;
-using Microsoft.AspNetCore.Mvc.Formatters;
-using Newtonsoft.Json.Converters;
+using Microsoft.Extensions.Configuration;
+using MicroAC.Core.Common;
 
 namespace MicroAC.Authentication
 {
     public class Startup
     {
+        IConfiguration _config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables()
+                .Build();
+
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
@@ -27,7 +31,9 @@ namespace MicroAC.Authentication
             services.AddSingleton(typeof(IClaimBuilder<AccessExternal>), new ClaimBuilder<AccessExternal>(new AccessExternal()));
             services.AddSingleton(typeof(IClaimBuilder<RefreshExternal>), new ClaimBuilder<RefreshExternal>(new RefreshExternal()));
 
-            services.AddScoped< IUsersRepository, UsersRepository>();
+            services.AddScoped<IUsersRepository, UsersRepository>();
+
+            services.AddSingleton<IConfiguration>(_config);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -36,13 +42,19 @@ namespace MicroAC.Authentication
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger(); 
+                app.UseSwagger();
                 app.UseSwaggerUI(options =>
                 {
                     options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
                     options.RoutePrefix = string.Empty;
                 });
             }
+
+            if (_config.GetValue<bool>("Timestamp:Enabled"))
+            {
+                app.UseMiddleware<TimestampMiddleware>();
+            }
+
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {

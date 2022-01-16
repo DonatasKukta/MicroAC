@@ -12,19 +12,19 @@ namespace MicroAC.RequestManager
 {
     public class Startup
     {
-        // This method gets called by the runtime. Use this method to add services to the container.
-        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
-        public void ConfigureServices(IServiceCollection services)
-        {
-            IConfiguration config = new ConfigurationBuilder()
+        IConfiguration _config = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables()
                 .Build();
 
+        // This method gets called by the runtime. Use this method to add services to the container.
+        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
+        public void ConfigureServices(IServiceCollection services)
+        {
             services.AddRouting();
             services.AddControllers();
             services.AddSingleton<HttpClient>(new HttpClient());
-            services.AddSingleton<IConfiguration>(config);
+            services.AddSingleton<IConfiguration>(_config);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -34,7 +34,11 @@ namespace MicroAC.RequestManager
             {
                 app.UseDeveloperExceptionPage();
             }
-            app.UseMiddleware<TimestampMiddleware>();
+
+            if (_config.GetValue<bool>("Timestamp:Enabled"))
+            {
+                app.UseMiddleware<TimestampMiddleware>();
+            }
 
             app.UseRouting();
 

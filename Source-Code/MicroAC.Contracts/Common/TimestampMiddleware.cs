@@ -38,7 +38,7 @@ namespace MicroAC.Core.Common
     {
         static string _timestamp
         {
-            get { return DateTime.Now.ToString("hh.mm.ss.fffffff"); }
+            get { return DateTime.Now.ToString("hh.mm.ss.ffff"); }
         }
 
         internal static void AddStartTimestamp(this HttpContext context, string header, string name)

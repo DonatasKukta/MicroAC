@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Primitives;
 
 using System;
 using System.Collections.Generic;
@@ -23,13 +25,16 @@ namespace MicroAC.RequestManager
 
         readonly List<string> _headersToIgnore;
 
+        readonly string _timestampHeader;
+
         public RequestManagerController(HttpClient httpClient, IConfiguration config)
         {
             _http = httpClient;
             _routes = config.GetSection("EndpointRoutes").Get<List<EndpointRoute>>();
-            _basePath = config.GetSection("InternalGateway").Get<string>();
-            _authorizationUrl = new Uri(_basePath + config.GetSection("InternalAuthorizationRoute").Get<string>());
+            _basePath = config.GetValue<string>("InternalGateway");
+            _authorizationUrl = new Uri(_basePath + config.GetValue< string>("InternalAuthorizationRoute"));
             _headersToIgnore = config.GetSection("HeadersToIgnore").Get<List<string>>();
+            _timestampHeader = config.GetValue<string>("Timestamp:Header");
         }
 
         public async Task<IActionResult> Index()
@@ -90,10 +95,18 @@ namespace MicroAC.RequestManager
 
         private async Task<IActionResult> HandleForwardedResponse(HttpResponseMessage response)
         {
-            foreach (var header in Request.Headers)
+            foreach (var header in response.Headers)
             {
-                if (!_headersToIgnore.Contains(header.Key))
+                // TODO: Move to HttpContextTimestampExtensions
+                if (header.Key == _timestampHeader)
+                {
+                    this.HttpContext.Response.Headers.Append(header.Key, new StringValues(header.Value.ToArray()));
+                }
+                /* TODO: Fix header transfer
+                else if (!_headersToIgnore.Contains(header.Key))
+                {
                     this.HttpContext.Response.Headers.Add(header.Key, header.Value.ToString());
+                }*/
             }
 
             this.HttpContext.Response.StatusCode = (int)response.StatusCode;
