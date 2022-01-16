@@ -1,5 +1,7 @@
 using System.Net.Http;
 
+using MicroAC.Core.Common;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -32,6 +34,7 @@ namespace MicroAC.RequestManager
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseMiddleware<TimestampMiddleware>();
 
             app.UseRouting();
 
