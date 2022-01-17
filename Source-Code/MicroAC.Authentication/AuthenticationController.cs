@@ -7,6 +7,8 @@ using System.Fabric;
 using System.Linq;
 using System.IO;
 using System.Threading.Tasks;
+using MicroAC.Core.Common;
+using Microsoft.Extensions.Configuration;
 
 namespace MicroAC.Authentication
 {
@@ -16,12 +18,18 @@ namespace MicroAC.Authentication
         readonly StatelessServiceContext _serviceContext;
 
         readonly IJwtTokenHandler<AccessExternal> _accessTokenHandler;
+
         readonly IClaimBuilder<AccessExternal> _accessClaimBuilder;
 
         readonly IJwtTokenHandler<RefreshExternal> _refreshTokenHandler;
+
         readonly IClaimBuilder<RefreshExternal> _refreshClaimBuilder;
 
         readonly IUsersRepository _usersRepository;
+
+        readonly string _timestampHeader;
+
+        readonly string _serviceName;
 
         public AuthenticationController(
             StatelessServiceContext serviceContext,
@@ -29,7 +37,8 @@ namespace MicroAC.Authentication
             IClaimBuilder<AccessExternal> accessClaimBuiler,
             IJwtTokenHandler<RefreshExternal> refreshTokenHandler,
             IClaimBuilder<RefreshExternal> refreshClaimBuiler,
-            IUsersRepository usersRepository
+            IUsersRepository usersRepository,
+            IConfiguration config
             )
         {
             _serviceContext = serviceContext;
@@ -38,6 +47,8 @@ namespace MicroAC.Authentication
             _refreshTokenHandler = refreshTokenHandler;
             _refreshClaimBuilder = refreshClaimBuiler;
             _usersRepository = usersRepository;
+            _timestampHeader = config.GetSection("Timestamp:Header").Value;
+            _serviceName = config.GetSection("Timestamp:ServiceName").Value;
         }
 
         [HttpGet]
@@ -50,11 +61,17 @@ namespace MicroAC.Authentication
         public ActionResult Login([FromBody] LoginCredentials credentials)
         {
             if (credentials.Email == null /* || credentials.Password == null*/)
-                return Unauthorized("Login credentials not provided");
+            {
+                return Unauthorized("Login credentials not provided.");
+            }
 
+            this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "StartAuth");
             var user = _usersRepository.GetUser(credentials.Email, credentials.Password);
+            
             if (user == null)
-                return Unauthorized("Incorrect username or password");
+            {
+                return Unauthorized("Incorrect username or password.");
+            }
 
             var accessClaims = _accessClaimBuilder
              .AddCommonClaims()
@@ -69,6 +86,8 @@ namespace MicroAC.Authentication
              .Build();
             var refreshJwt = _accessTokenHandler.Create(refreshClaims);
 
+            this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Success");
+
             return Ok(new { accessJwt, refreshJwt });
         }
 
@@ -82,7 +101,9 @@ namespace MicroAC.Authentication
             var userId = refreshClaims.Claims.FirstOrDefault(c => c.Type == MicroACClaimTypes.UserId)?.Value;
             var user = _usersRepository.GetUser(new Guid(userId));
             if (user == null)
-                return Unauthorized("User Id could not be found.");
+            {
+                return UnauthorizedWithTimestamp("User Id could not be found.");
+            }
 
             var accessClaims = _accessClaimBuilder
              .AddCommonClaims()
@@ -92,6 +113,12 @@ namespace MicroAC.Authentication
             var accessJwt = _accessTokenHandler.Create(accessClaims);
 
             return Ok(accessJwt);
+        }
+
+        private ActionResult UnauthorizedWithTimestamp(string reason)
+        {
+            this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Unauthorized");
+            return Unauthorized(reason);
         }
     }
 }

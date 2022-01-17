@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using MicroAC.Core.Common;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Primitives;
 
 using System;
 using System.Collections.Generic;
@@ -18,12 +18,14 @@ namespace MicroAC.RequestManager
         readonly Uri _authorizationUrl;
 
         readonly string _basePath;
-        
+
         readonly HttpClient _http;
 
         readonly List<EndpointRoute> _routes;
 
         readonly List<string> _headersToIgnore;
+
+        readonly string _serviceName;
 
         readonly string _timestampHeader;
 
@@ -32,8 +34,9 @@ namespace MicroAC.RequestManager
             _http = httpClient;
             _routes = config.GetSection("EndpointRoutes").Get<List<EndpointRoute>>();
             _basePath = config.GetValue<string>("InternalGateway");
-            _authorizationUrl = new Uri(_basePath + config.GetValue< string>("InternalAuthorizationRoute"));
+            _authorizationUrl = new Uri(_basePath + config.GetValue<string>("InternalAuthorizationRoute"));
             _headersToIgnore = config.GetSection("HeadersToIgnore").Get<List<string>>();
+            _serviceName = config.GetValue<string>("Timestamp:ServiceName");
             _timestampHeader = config.GetValue<string>("Timestamp:Header");
         }
 
@@ -41,7 +44,7 @@ namespace MicroAC.RequestManager
         {
             var requestedRoute = GetMatchingEndpointRoute();
 
-            if(requestedRoute is null) 
+            if (requestedRoute is null)
                 return NotFound("Requested resource could not be found.");
 
             if (requestedRoute.RequiresAuhtentication)
@@ -49,6 +52,7 @@ namespace MicroAC.RequestManager
                 var containsExternalAccessToken = this.Request.Headers.ContainsKey("Authorization");
                 if (!containsExternalAccessToken)
                 {
+                    this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Unauthorized");
                     return Unauthorized("Access token is missing.");
                 }
             }
@@ -59,12 +63,22 @@ namespace MicroAC.RequestManager
 
                 if (!authorised)
                 {
+                    this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Unauthorized");
                     return Unauthorized("Unable to authorize the request.");
                 }
             }
 
+            var response = await ForwardRequest(requestedRoute);
+            return response;
+        }
+
+        private async Task<IActionResult> ForwardRequest(EndpointRoute requestedRoute)
+        {
             var forwardUri = GetForwardUri(requestedRoute);
             var forwardRequest = await CreateForwardRequest(forwardUri);
+
+            this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Forward");
+
             var response = await _http.SendAsync(forwardRequest);
 
             return await HandleForwardedResponse(response);
@@ -72,15 +86,17 @@ namespace MicroAC.RequestManager
 
         private async Task<bool> AuthorizeRequest()
         {
-             var request = await CreateForwardRequest(_authorizationUrl);
+            var request = await CreateForwardRequest(_authorizationUrl);
             request.Method = HttpMethod.Post;
             var result = await _http.SendAsync(request);
 
             if (!result.IsSuccessStatusCode)
             {
+                this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Unauthorized");
                 return false;
             }
 
+            this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Authorized");
             var token = await result.Content.ReadAsStringAsync();
             this.HttpContext.Request.Headers.Add("MicroAC-JWT", token);
 
@@ -95,19 +111,17 @@ namespace MicroAC.RequestManager
 
         private async Task<IActionResult> HandleForwardedResponse(HttpResponseMessage response)
         {
+            this.HttpContext.AppendeTimestampHeaders(_timestampHeader, response.Headers);
+            /* TODO: Fix header transfer
             foreach (var header in response.Headers)
             {
-                // TODO: Move to HttpContextTimestampExtensions
-                if (header.Key == _timestampHeader)
-                {
-                    this.HttpContext.Response.Headers.Append(header.Key, new StringValues(header.Value.ToArray()));
-                }
-                /* TODO: Fix header transfer
-                else if (!_headersToIgnore.Contains(header.Key))
+                if (!_headersToIgnore.Contains(header.Key) && header.Key != _timestampHeader)
                 {
                     this.HttpContext.Response.Headers.Add(header.Key, header.Value.ToString());
-                }*/
+                }
             }
+            */
+            this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Receive");
 
             this.HttpContext.Response.StatusCode = (int)response.StatusCode;
 

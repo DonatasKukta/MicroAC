@@ -5,6 +5,8 @@ using System;
 using System.Fabric;
 using System.Linq;
 using Microsoft.Extensions.Primitives;
+using MicroAC.Core.Common;
+using Microsoft.Extensions.Configuration;
 
 namespace MicroAC.Authorization
 {
@@ -16,16 +18,22 @@ namespace MicroAC.Authorization
         readonly IJwtTokenHandler<AccessExternal> _accessExternalTokenHandler;
 
         readonly IJwtTokenHandler<AccessInternal> _accessInternalTokenHandler;
+
         readonly IClaimBuilder<AccessInternal> _accessInternalClaimBuilder;
 
         readonly IPermissionsRepository _permissionsRepository;
+
+        readonly string _timestampHeader;
+
+        readonly string _serviceName;
 
         public AuthorizationController(
             StatelessServiceContext serviceContext,
             IJwtTokenHandler<AccessExternal> accessExternalTokenHandler,
             IJwtTokenHandler<AccessInternal> accessInternalTokenHandler,
             IClaimBuilder<AccessInternal> accessInternalClaimBuiler,
-            IPermissionsRepository permissionsRepository
+            IPermissionsRepository permissionsRepository,
+            IConfiguration config
             )
         {
             _serviceContext = serviceContext;
@@ -33,6 +41,8 @@ namespace MicroAC.Authorization
             _accessInternalTokenHandler = accessInternalTokenHandler;
             _accessInternalClaimBuilder = accessInternalClaimBuiler;
             _permissionsRepository = permissionsRepository;
+            _timestampHeader = config.GetSection("Timestamp:Header").Value;
+            _serviceName = config.GetSection("Timestamp:ServiceName").Value;
         }
 
         [HttpGet]
@@ -46,12 +56,16 @@ namespace MicroAC.Authorization
         {
             var hasToken = this.Request.Headers.TryGetValue("Authorization", out StringValues headerValues);
             if (!hasToken)
-                return Unauthorized("Missing external access token.");
+            {
+                return UnauthorizedWithTimestamp("Missing external access token.");
+            }
 
             var token = headerValues.FirstOrDefault();
 
             if (token is null)
-                return Unauthorized("Missing external access token.");
+            {
+                return UnauthorizedWithTimestamp("Missing external access token.");
+            }
 
             var accessClaims = _accessExternalTokenHandler.Validate(token);
 
@@ -59,8 +73,11 @@ namespace MicroAC.Authorization
                                                            .Select(c => c.Value);
 
             if (roles.Count() < 1)
-                return Unauthorized("User has no roles assigned therefore cannot be authorized.");
+            {
+                return UnauthorizedWithTimestamp("User has no roles assigned therefore cannot be authorized.");
+            }
 
+            this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "AuthStart");
             var permissions = _permissionsRepository.GetRolePermissions(roles);
 
             var claims = _accessInternalClaimBuilder
@@ -69,8 +86,16 @@ namespace MicroAC.Authorization
                 .AddSubjectClaims(permissions)
                 .Build();
             var jwt = _accessInternalTokenHandler.Create(claims);
+            
+            this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Success");
 
             return Ok(jwt);
+        }
+
+        private ActionResult UnauthorizedWithTimestamp(string reason)
+        {
+            this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Unauthorized");
+            return Unauthorized(reason);
         }
     }
 }
