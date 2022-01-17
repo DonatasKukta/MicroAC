@@ -59,6 +59,8 @@ namespace MicroAC.RequestManager
 
             if (requestedRoute.RequiresAuthorization)
             {
+                this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "StartAuth");
+
                 var authorised = await AuthorizeRequest();
 
                 if (!authorised)
@@ -88,16 +90,17 @@ namespace MicroAC.RequestManager
         {
             var request = await CreateForwardRequest(_authorizationUrl);
             request.Method = HttpMethod.Post;
-            var result = await _http.SendAsync(request);
+            var response = await _http.SendAsync(request);
 
-            if (!result.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode)
             {
-                this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Unauthorized");
                 return false;
             }
 
+            this.HttpContext.AppendeTimestampHeaders(_timestampHeader, response.Headers);
             this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Authorized");
-            var token = await result.Content.ReadAsStringAsync();
+
+            var token = await response.Content.ReadAsStringAsync();
             this.HttpContext.Request.Headers.Add("MicroAC-JWT", token);
 
             return true;

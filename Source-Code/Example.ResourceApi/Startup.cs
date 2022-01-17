@@ -1,5 +1,6 @@
 using System.Threading;
 
+using MicroAC.Core.Auth;
 using MicroAC.Core.Common;
 
 using Microsoft.AspNetCore.Builder;
@@ -23,7 +24,9 @@ namespace Example.ResourceApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRouting();
-            services.AddSingleton<IConfiguration>(_config);
+            services.AddControllers();
+            services.AddSingleton<IConfiguration>(_config); 
+            services.AddSingleton(typeof(IJwtTokenHandler<AccessInternal>), new JwtTokenHandler<AccessInternal>(new AccessInternal()));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -43,12 +46,17 @@ namespace Example.ResourceApi
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllers();
+            });
+            /*
+            app.UseEndpoints(endpoints =>
+            {
                 endpoints.MapGet("/Action", async context =>
                 {
                     Thread.Sleep(1000);
                     await context.Response.WriteAsync("Hello World! 1s long response.");
                 });
-            });
+            });*/
         }
     }
 }

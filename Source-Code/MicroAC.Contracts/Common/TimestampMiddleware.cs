@@ -38,7 +38,7 @@ namespace MicroAC.Core.Common
         }
     }
 
-    //TODO: Refactor into non-static class
+    //TODO: This is basically debug logging implementation. Needs refactor (with DI).
     public static class HttpContextTimestampExtensions
     {
         static string _timeNow
