@@ -15,7 +15,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MicroAC.Core", "MicroAC.Con
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MicroAC.Persistence", "MicroAC.Persistence\MicroAC.Persistence.csproj", "{5ABCCC05-B6C3-45CE-9534-CCCDE317276D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.ResourceApi", "Example.ResourceApi\Example.ResourceApi.csproj", "{91A09064-C1DE-4231-B3F0-4ABCFB10B926}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.ResourceApi", "Example.ResourceApi\Example.ResourceApi.csproj", "{91A09064-C1DE-4231-B3F0-4ABCFB10B926}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3B7FF093-813F-4572-B39E-C4391C513BAC}"
+	ProjectSection(SolutionItems) = preProject
+		CodeMap.dgml = CodeMap.dgml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
