@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { BaseResult, defaultBaseResult, Token } from '../Domain/Models';
 import { parseResourceApiActionBody } from '../Domain/Parsing';
 import SendRequest from '../Domain/SendRequest';
-import RequestHandler from './RequestHandler';
+import RequestHandler from './CommonResponseFields';
 //TODO: Move to env config
 const resourceActionUrl =
   'http://localhost:19083/MicroAC.ServiceFabric/MicroAC.RequestManager/ResourceApi/Action';

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Credentials, defaultBaseResult, LoginResult, Token } from '../Domain/Models';
 import { parseLoginBody } from '../Domain/Parsing';
 import SendRequest from '../Domain/SendRequest';
-import RequestHandler from './RequestHandler';
+import RequestHandler from './CommonResponseFields';
 //TODO: Move to env config
 const authUrl =
   'http://localhost:19083/MicroAC.ServiceFabric/MicroAC.RequestManager/Authentication/Login';
