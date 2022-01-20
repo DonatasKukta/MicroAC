@@ -1,40 +1,43 @@
 import { TextField, Button } from '@mui/material';
 import { useState } from 'react';
-import { Credentials, LoginResult } from '../Domain/Models';
+import { Credentials, defaultBaseResult, LoginResult, Token } from '../Domain/Models';
 import { parseLoginBody } from '../Domain/Parsing';
-import SendRequest, { CreateRequest } from '../Domain/SendRequest';
+import SendRequest, { CreatePostRequest } from '../Domain/SendRequest';
 import RequestHandler from './RequestHandler';
 //TODO: Move to env config
 const authUrl =
   'http://localhost:19083/MicroAC.ServiceFabric/MicroAC.RequestManager/Authentication/Login';
-
-const defaultLoginResult: LoginResult = {
-  timestamps: [],
-  requestId: '',
-  statusCode: undefined,
-  body: undefined
-};
 
 const defaultCredentialsState: Credentials = {
   email: 'Jonas.Jonaitis@gmail.com',
   password: 'passwrd'
 };
 
-const LoginHandler = () => {
-  const [loginResult, setLoginResult] = useState(defaultLoginResult);
+interface IProps {
+  onAccessJwtChange(token: Token): void;
+  onRefreshJwtChange(token: Token): void;
+}
+
+const LoginHandler = (props: IProps) => {
+  const { onAccessJwtChange, onRefreshJwtChange } = props;
+
+  const [loginResult, setLoginResult] = useState(defaultBaseResult);
   const [credentials, setCredentials] = useState(defaultCredentialsState);
 
+  const cleanResultState = () => {
+    setLoginResult(defaultBaseResult);
+    onAccessJwtChange('');
+    onRefreshJwtChange('');
+  };
+  const setResultState = (result: LoginResult) => {
+    setLoginResult(result);
+    onAccessJwtChange(result.body?.accessJwt);
+    onRefreshJwtChange(result.body?.refreshJwt);
+  };
+
   const handleSendRequest = () => {
-    setLoginResult(defaultLoginResult);
-    SendRequest(
-      authUrl,
-      CreateRequest('POST', credentials),
-      defaultLoginResult,
-      parseLoginBody,
-      result => {
-        setLoginResult(result);
-      }
-    );
+    cleanResultState();
+    SendRequest(authUrl, CreatePostRequest(credentials), parseLoginBody, setResultState);
   };
 
   return (

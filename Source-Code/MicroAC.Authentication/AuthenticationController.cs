@@ -60,9 +60,9 @@ namespace MicroAC.Authentication
         [HttpPost("Login")]
         public ActionResult Login([FromBody] LoginCredentials credentials)
         {
-            if (credentials.Email == null /* || credentials.Password == null*/)
+            if (credentials == null || credentials.Email == null /* || credentials.Password == null*/)
             {
-                return Unauthorized("Login credentials not provided.");
+                return BadRequest("Login credentials not provided.");
             }
 
             this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "StartAuth");

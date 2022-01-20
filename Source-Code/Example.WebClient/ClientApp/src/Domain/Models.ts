@@ -5,8 +5,18 @@ export interface BaseResult<T> {
   body: T | undefined;
 }
 
+export const defaultBaseResult: BaseResult<any> = {
+  timestamps: [],
+  requestId: '',
+  statusCode: undefined,
+  body: undefined
+};
+
 export interface LoginResult extends BaseResult<LoginBody> {}
+
 export interface RefreshResult extends BaseResult<RefreshBody> {}
+
+export interface ResouceApiAction extends BaseResult<string> {}
 
 export interface LoginBody {
   accessJwt: Token;
@@ -17,7 +27,7 @@ export interface LoginBody {
 
 export interface RefreshBody extends LoginBody {}
 
-type Token = string;
+export type Token = string | undefined;
 
 export interface Credentials {
   email: string;

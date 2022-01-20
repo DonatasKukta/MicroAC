@@ -1,44 +1,59 @@
-import { BaseResult } from './Models';
+import { BaseResult, defaultBaseResult, Token } from './Models';
 import { parseTimestamp } from './Parsing';
-
-export function CreateRequest(method: string, body: any): RequestInit {
-  return {
-    method: method,
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(body)
-  };
-}
 
 function SendRequest<T>(
   url: string,
   request: RequestInit,
-  initial: BaseResult<T>,
   parseBody: (body: any) => T,
   responseCallback: (result: BaseResult<T>) => void
 ) {
-  let result: BaseResult<T> = { ...initial };
+  let result: BaseResult<T> = { ...defaultBaseResult };
 
   fetch(url, request)
     .then(response => {
       result.statusCode = response.status;
       result.requestId = response.headers.get('X-ServiceFabricRequestId') ?? '';
 
-      var timestampsHeaders = response.headers.get('MicroAC-Timestamp')?.split(',');
+      const timestampsHeaders = response.headers.get('MicroAC-Timestamp')?.split(',');
       result.timestamps = timestampsHeaders
         ? timestampsHeaders?.map(t => parseTimestamp(t))
         : [];
 
+      if (!response.ok) {
+        console.error(response, response.text());
+        throw new Error();
+      }
+
       return response;
     })
-    .then(response => response.json())
-    .then(body => {
-      result.body = parseBody(body);
+    .then(response => response.text())
+    .then(bodyStr => {
+      result.body = parseBody(bodyStr);
     })
+    .catch(error => console.error('Error from SendRequest.', url, request, result, error))
     .finally(() => {
       responseCallback(result);
     });
 }
 
 export default SendRequest;
+
+export const CreatePostRequest = (body: any): RequestInit => {
+  return {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  };
+};
+
+export const CreateGetRequest = (authToken: Token): RequestInit => {
+  return {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: authToken ?? ''
+    }
+  };
+};

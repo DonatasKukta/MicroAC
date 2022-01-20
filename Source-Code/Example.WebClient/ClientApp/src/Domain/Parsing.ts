@@ -24,11 +24,12 @@ export function parseTimestamp(timestamp: string): Timestamp {
 }
 
 export function parseLoginBody(body: any): LoginBody {
+  var json = JSON.parse(body);
   return {
-    accessJwt: body.accessJwt,
-    decodedAccessJwt: parseJwt(body.accessJwt),
-    refreshJwt: body.refreshJwt,
-    decodedRefreshJwt: parseJwt(body.refreshJwt)
+    accessJwt: json.accessJwt,
+    decodedAccessJwt: parseJwt(json.accessJwt),
+    refreshJwt: json.refreshJwt,
+    decodedRefreshJwt: parseJwt(json.refreshJwt)
   };
 }
 

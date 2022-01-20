@@ -1,8 +1,4 @@
-import { useState } from 'react';
 import { BaseResult } from '../Domain/Models';
-import { parseLoginBody } from '../Domain/Parsing';
-import { Button, TextField } from '@mui/material';
-import SendRequest, { CreateRequest } from '../Domain/SendRequest';
 
 interface IProps<T> {
   response: BaseResult<T>;
