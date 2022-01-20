@@ -1,23 +1,18 @@
 import { Button } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { Credentials, defaultBaseResult, LoginResult, Token } from '../Domain/Models';
-import { parseLoginBody } from '../Domain/Parsing';
+import { defaultBaseResult, RefreshResult, Token } from '../Domain/Models';
+import { parseJwt, parseRefreshBody } from '../Domain/Parsing';
 import SendRequest from '../Domain/SendRequest';
-import RequestHandler from './CommonResponseFields';
+import RequestHandler from '../Components/CommonResponseFields';
 //TODO: Move to env config
 const authUrl =
-  'http://localhost:19083/MicroAC.ServiceFabric/MicroAC.RequestManager/Authentication/Login';
-
-const defaultCredentialsState: Credentials = {
-  email: 'Jonas.Jonaitis@gmail.com',
-  password: 'passwrd'
-};
+  'http://localhost:19083/MicroAC.ServiceFabric/MicroAC.RequestManager/Authentication/Refresh';
 
 interface IProps {
   refreshJwt: Token;
 }
 
-const LoginHandler = (props: IProps) => {
+const RefreshHandler = (props: IProps) => {
   const { refreshJwt } = props;
 
   const [refreshResult, setRefreshResult] = useState(defaultBaseResult);
@@ -34,38 +29,38 @@ const LoginHandler = (props: IProps) => {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(refreshJwt)
+      body: refreshJwt ?? ''
     };
   };
 
   const handleSendRequest = () => {
-    SendRequest(authUrl, createRequest(), parseLoginBody, setRefreshResult);
+    setIsButtonDisabled(true);
+    SendRequest<Token>(authUrl, createRequest(), parseRefreshBody, onResultReceived);
+  };
+
+  const onResultReceived = (result: RefreshResult) => {
+    setIsButtonDisabled(false);
+    setRefreshResult(result);
   };
 
   return (
     <div>
-      <h1> Resurso mikropaslaugos kvietimas </h1>
+      <h1> Kliento autentifikavimo atnaujinimas </h1>
       <p>Įvestis - atnaujinimo žetonas: {refreshJwt}</p>
       <Button variant="contained" onClick={handleSendRequest} disabled={isButtonDisabled}>
         Siųsti
       </Button>
       <RequestHandler response={refreshResult}>
         <p style={{ overflowWrap: 'anywhere' }}>
-          Gautas išorinis priegos žetonas: {refreshResult?.body?.accessJwt}
+          Gautas išorinis priegos žetonas: {refreshResult?.body}
         </p>
         Dekoduotas išorinis preigos žetonas:
         <pre style={{ textAlign: 'left', overflowWrap: 'anywhere' }}>
-          {JSON.stringify(refreshResult?.body?.decodedAccessJwt, null, '\t')}
-        </pre>
-        <p style={{ overflowWrap: 'anywhere' }}>
-          Gautas išorinis atnaujinimo žetonas: {refreshResult?.body?.refreshJwt}
-        </p>
-        Dekoduotas išorinis atnaujinimo žetonas:
-        <pre style={{ textAlign: 'left', overflowWrap: 'anywhere' }}>
-          {JSON.stringify(refreshResult?.body?.decodedRefreshJwt, null, '\t')}
+          {refreshResult?.body &&
+            JSON.stringify(parseJwt(refreshResult.body), null, '\t')}
         </pre>
       </RequestHandler>
     </div>
   );
 };
-export default LoginHandler;
+export default RefreshHandler;

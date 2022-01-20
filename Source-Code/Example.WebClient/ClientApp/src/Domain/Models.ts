@@ -14,7 +14,7 @@ export const defaultBaseResult: BaseResult<any> = {
 
 export interface LoginResult extends BaseResult<LoginBody> {}
 
-export interface RefreshResult extends BaseResult<RefreshBody> {}
+export interface RefreshResult extends BaseResult<Token> {}
 
 export interface ResouceApiAction extends BaseResult<string> {}
 
@@ -24,8 +24,6 @@ export interface LoginBody {
   refreshJwt: Token;
   decodedRefreshJwt: string;
 }
-
-export interface RefreshBody extends LoginBody {}
 
 export type Token = string | undefined;
 
