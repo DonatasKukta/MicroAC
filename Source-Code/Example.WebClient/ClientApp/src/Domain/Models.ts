@@ -1,19 +1,22 @@
-export interface Timestamp {
-  serviceName: string;
-  message: string;
-  time: string;
-}
-
-export interface IAuthenticationState {
+export interface ResponseResult {
   token: string;
   decodedToken: any;
-  credentials: Credentials;
   timestamps: Timestamp[];
+  requestId: string;
+  statusCode: number | undefined;
 }
+
+export interface LoginResult extends ResponseResult {}
 
 export interface Credentials {
   email: string;
   password: string;
+}
+
+export interface Timestamp {
+  serviceName: string;
+  message: string;
+  time: string;
 }
 
 export interface ResouceResult {
