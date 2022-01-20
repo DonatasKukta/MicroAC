@@ -1,19 +1,20 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { LoginResult, Credentials } from '../Domain/Models';
-import { parseJwt, parseTimestamp } from '../Domain/Parsing';
+import { parseLoginBody } from '../Domain/Parsing';
 import { Button, TextField } from '@mui/material';
+import SendRequest, { CreateRequest } from '../Domain/SendRequest';
 
 //TODO: Move to env config
 const authUrl =
   'http://localhost:19083/MicroAC.ServiceFabric/MicroAC.RequestManager/Authentication/Login';
 
 const defaultLoginResult: LoginResult = {
-  token: '',
-  decodedToken: '',
   timestamps: [],
   requestId: '',
-  statusCode: undefined
+  statusCode: undefined,
+  body: undefined
 };
+
 const defaultCredentialsState: Credentials = {
   email: 'Jonas.Jonaitis@gmail.com',
   password: 'passwrd'
@@ -23,58 +24,17 @@ export default function RequestHandler() {
   const [loginResult, setLoginResult] = useState(defaultLoginResult);
   const [credentials, setCredentials] = useState(defaultCredentialsState);
 
-  const sendLoginRequest = () => {
-    let result: LoginResult = {
-      token: '',
-      decodedToken: '',
-      timestamps: [],
-      requestId: '',
-      statusCode: undefined
-    };
+  const handleSendRequest = () => {
     setLoginResult(defaultLoginResult);
-    const requestOptions = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(credentials)
-    };
-
-    fetch(authUrl, requestOptions)
-      .then(response => {
-        result.statusCode = response.status;
-        result.requestId = response.headers.get('X-ServiceFabricRequestId') ?? '';
-        var timestampsHeaders = response.headers.get('MicroAC-Timestamp')?.split(',');
-        result.timestamps = timestampsHeaders
-          ? timestampsHeaders?.map(t => parseTimestamp(t))
-          : [];
-        return response;
-      })
-      .then(response => response.json())
-      .then(data => {
-        result.token = data.accessJwt;
-        result.decodedToken = parseJwt(data.accessJwt);
-      })
-      .finally(() => {
+    SendRequest(
+      authUrl,
+      CreateRequest('POST', credentials),
+      defaultLoginResult,
+      parseLoginBody,
+      result => {
         setLoginResult(result);
-      });
-  };
-
-  void function SendResourceRequest() {
-    const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(credentials)
-    };
-
-    fetch(authUrl, requestOptions)
-      .then(response => response.json())
-      .then(data =>
-        setLoginResult({
-          ...loginResult,
-          token: data.accessJwt
-        })
-      );
+      }
+    );
   };
 
   return (
@@ -93,17 +53,17 @@ export default function RequestHandler() {
         value={credentials.password}
         onChange={d => setCredentials({ ...credentials, password: d.target.value })}
       />
-      <Button variant="contained" onClick={() => sendLoginRequest()}>
+      <Button variant="contained" onClick={() => handleSendRequest()}>
         Siųsti
       </Button>
       <p>HTTP Būsenos kodas: {loginResult.statusCode}</p>
       <p>Užklausos ID: {loginResult.requestId}</p>
       <p style={{ overflowWrap: 'anywhere' }}>
-        Gautas išorinis žetonas: {loginResult.token}
+        Gautas išorinis žetonas: {loginResult?.body?.accessJwt}
       </p>
       Dekoduotas išorinis preigos žetonas:
       <pre style={{ textAlign: 'left', overflowWrap: 'anywhere' }}>
-        {JSON.stringify(loginResult.decodedToken, null, '\t')}
+        {JSON.stringify(loginResult?.body?.decodedAccessJwt, null, '\t')}
       </pre>
       <div>
         Užklausos žymos:

@@ -1,4 +1,4 @@
-import { Timestamp } from './Models';
+import { LoginBody, RefreshBody, Timestamp } from './Models';
 
 export function parseJwt(token: string): any {
   var base64Url = token.split('.')[1];
@@ -21,4 +21,21 @@ export function parseTimestamp(timestamp: string): Timestamp {
     message: split[1],
     time: split[2]
   };
+}
+
+export function parseLoginBody(body: any): LoginBody {
+  return {
+    accessJwt: body.accessJwt,
+    decodedAccessJwt: parseJwt(body.accessJwt),
+    refreshJwt: body.refreshJwt,
+    decodedRefreshJwt: parseJwt(body.refreshJwt)
+  };
+}
+
+export function parseRefreshBody(body: any): RefreshBody {
+  return parseLoginBody(body);
+}
+
+export function parseResourceApiActionBody(body: any): string {
+  return body;
 }
