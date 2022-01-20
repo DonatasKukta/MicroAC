@@ -19,7 +19,7 @@ const defaultCredentialsState: Credentials = {
   password: 'passwrd'
 };
 
-function AuthenticationToken() {
+export default function RequestHandler() {
   const [loginResult, setLoginResult] = useState(defaultLoginResult);
   const [credentials, setCredentials] = useState(defaultCredentialsState);
 
@@ -116,5 +116,3 @@ function AuthenticationToken() {
     </div>
   );
 }
-
-export default AuthenticationToken;

@@ -1,4 +1,4 @@
-import AuthenticationToken from './Containers/AuthenticationToken';
+import AuthenticationToken from './Containers/RequestHandler';
 
 function App() {
   return (
