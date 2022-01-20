@@ -1,4 +1,4 @@
-import { BaseResult, defaultBaseResult, Token } from './Models';
+import { BaseResult, defaultBaseResult } from './Models';
 import { parseTimestamp } from './Parsing';
 
 function SendRequest<T>(
@@ -37,23 +37,3 @@ function SendRequest<T>(
 }
 
 export default SendRequest;
-
-export const CreatePostRequest = (body: any): RequestInit => {
-  return {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(body)
-  };
-};
-
-export const CreateGetRequest = (authToken: Token): RequestInit => {
-  return {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: authToken ?? ''
-    }
-  };
-};

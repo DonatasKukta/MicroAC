@@ -2,7 +2,7 @@ import { TextField, Button } from '@mui/material';
 import { useState } from 'react';
 import { Credentials, defaultBaseResult, LoginResult, Token } from '../Domain/Models';
 import { parseLoginBody } from '../Domain/Parsing';
-import SendRequest, { CreatePostRequest } from '../Domain/SendRequest';
+import SendRequest from '../Domain/SendRequest';
 import RequestHandler from './RequestHandler';
 //TODO: Move to env config
 const authUrl =
@@ -24,6 +24,16 @@ const LoginHandler = (props: IProps) => {
   const [loginResult, setLoginResult] = useState(defaultBaseResult);
   const [credentials, setCredentials] = useState(defaultCredentialsState);
 
+  const createRequest = (): RequestInit => {
+    return {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(credentials)
+    };
+  };
+
   const cleanResultState = () => {
     setLoginResult(defaultBaseResult);
     onAccessJwtChange('');
@@ -37,7 +47,7 @@ const LoginHandler = (props: IProps) => {
 
   const handleSendRequest = () => {
     cleanResultState();
-    SendRequest(authUrl, CreatePostRequest(credentials), parseLoginBody, setResultState);
+    SendRequest(authUrl, createRequest(), parseLoginBody, setResultState);
   };
 
   return (

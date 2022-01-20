@@ -2,7 +2,7 @@ import { Button } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { BaseResult, defaultBaseResult, Token } from '../Domain/Models';
 import { parseResourceApiActionBody } from '../Domain/Parsing';
-import SendRequest, { CreateGetRequest } from '../Domain/SendRequest';
+import SendRequest from '../Domain/SendRequest';
 import RequestHandler from './RequestHandler';
 //TODO: Move to env config
 const resourceActionUrl =
@@ -23,11 +23,21 @@ const ResourceApiActionHandler = (props: IProps) => {
     else setIsButtonDisabled(true);
   }, [accessJwt]);
 
+  const createRequest = (): RequestInit => {
+    return {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: accessJwt ?? ''
+      }
+    };
+  };
+
   const handleSendRequest = () => {
     setActionResult(defaultBaseResult);
     SendRequest(
       resourceActionUrl,
-      CreateGetRequest(accessJwt),
+      createRequest(),
       parseResourceApiActionBody,
       onResultReceived
     );
