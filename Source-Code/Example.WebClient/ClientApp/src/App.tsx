@@ -1,10 +1,10 @@
-import AuthenticationToken from './Containers/RequestHandler';
+import LoginHandler from './Containers/LoginHandler';
 
 function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <AuthenticationToken />
+        <LoginHandler />
       </header>
     </div>
   );
