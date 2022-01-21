@@ -42,8 +42,8 @@ namespace MicroAC.Core.Common
     public static class HttpContextTimestampExtensions
     {
         static string _timeNow
-        {
-            get { return DateTime.Now.ToString("hh.mm.ss.ffff"); }
+        { 
+            get { return DateTime.Now.ToString("yyyy/MM/ddThh:mm:ss.fff+02:00"); }
         }
 
         internal static void AddStartTimestamp(this HttpContext context, string header, string name)

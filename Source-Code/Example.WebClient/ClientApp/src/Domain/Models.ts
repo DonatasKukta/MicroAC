@@ -41,5 +41,14 @@ export interface Credentials {
 export interface Timestamp {
   serviceName: string;
   message: string;
-  time: string;
+  date: Date;
+}
+
+export interface ProcessedTimestamp {
+  origin: Timestamp;
+  minutes: number;
+  seconds: number;
+  ms: number;
+  msFromPrevTimestamp: number;
+  accumulatingMsSum: number;
 }

@@ -19,7 +19,7 @@ export function parseTimestamp(timestamp: string): Timestamp {
   return {
     serviceName: split[0],
     message: split[1],
-    time: split[2]
+    date: new Date(split[2].replaceAll('/', '-'))
   };
 }
 

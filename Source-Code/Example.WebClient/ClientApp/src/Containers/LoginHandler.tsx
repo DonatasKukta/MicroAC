@@ -4,6 +4,7 @@ import { Credentials, defaultBaseResult, LoginResult, Token } from '../Domain/Mo
 import { parseLoginBody } from '../Domain/Parsing';
 import SendRequest from '../Domain/SendRequest';
 import RequestHandler from '../Components/CommonResponseFields';
+
 //TODO: Move to env config
 const authUrl =
   'http://localhost:19083/MicroAC.ServiceFabric/MicroAC.RequestManager/Authentication/Login';
