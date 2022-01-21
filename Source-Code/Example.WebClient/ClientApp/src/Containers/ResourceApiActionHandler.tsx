@@ -1,6 +1,6 @@
 import { Button } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { BaseResult, defaultBaseResult, Token } from '../Domain/Models';
+import { BaseResult, defaultBaseResult, ResouceApiResult, Token } from '../Domain/Models';
 import { parseResourceApiActionBody } from '../Domain/Parsing';
 import SendRequest from '../Domain/SendRequest';
 import RequestHandler from '../Components/CommonResponseFields';
@@ -43,7 +43,7 @@ const ResourceApiActionHandler = (props: IProps) => {
     );
   };
 
-  const onResultReceived = (result: BaseResult<string>) => {
+  const onResultReceived = (result: ResouceApiResult) => {
     setIsButtonDisabled(false);
     setActionResult(result);
   };
@@ -56,9 +56,14 @@ const ResourceApiActionHandler = (props: IProps) => {
         Siųsti
       </Button>
       <RequestHandler response={actionResult}>
-        <div>
-          Gautas atsakymas: <p>{actionResult.body}</p>
-        </div>
+        <p>Gauta žinutė: {actionResult?.body?.message}</p>
+        <p style={{ overflowWrap: 'anywhere' }}>
+          Gautas vidinis priegos žetonas: {actionResult?.body?.internalAccessToken}
+        </p>
+        Dekoduotas vidinis preigos žetonas:
+        <pre style={{ textAlign: 'left', overflowWrap: 'anywhere' }}>
+          {JSON.stringify(actionResult?.body?.decodedInternalAccessToken, null, '\t')}
+        </pre>
       </RequestHandler>
     </div>
   );

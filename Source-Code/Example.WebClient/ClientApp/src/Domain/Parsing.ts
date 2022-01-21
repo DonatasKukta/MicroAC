@@ -1,4 +1,4 @@
-import { LoginBody, Timestamp, Token } from './Models';
+import { LoginBody, ResourceApiBody, Timestamp, Token } from './Models';
 
 export function parseJwt(token: string): any {
   var base64Url = token.split('.')[1];
@@ -37,6 +37,11 @@ export function parseRefreshBody(body: any): Token {
   return body;
 }
 
-export function parseResourceApiActionBody(body: any): string {
-  return body;
+export function parseResourceApiActionBody(body: any): ResourceApiBody {
+  var json = JSON.parse(body);
+  return {
+    message: json.message,
+    internalAccessToken: json.internalAccessToken,
+    decodedInternalAccessToken: parseJwt(json.internalAccessToken)
+  };
 }

@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
+﻿using System.Linq;
 using System.Threading.Tasks;
 
 using MicroAC.Core.Auth;
 using MicroAC.Core.Common;
 
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
@@ -47,12 +43,18 @@ namespace Example.ResourceApi
                 return UnauthorizedWithTimestamp("Missing internal access token.");
             }
 
-            var accessClaims = _accessInternalTokenHandler.Validate(token);
+            _accessInternalTokenHandler.Validate(token);
 
             await Task.Delay(1000);
+            var response = new
+            {
+                message = "Hello World! 1s long response.",
+                internalAccessToken = token
+            };
 
-            return Ok("Hello World! 1s long response. user has these claims:" + accessClaims);
+            return Ok(response);
         }
+
         private ActionResult UnauthorizedWithTimestamp(string reason)
         {
             this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Unauthorized");

@@ -16,13 +16,19 @@ export interface LoginResult extends BaseResult<LoginBody> {}
 
 export interface RefreshResult extends BaseResult<Token> {}
 
-export interface ResouceApiAction extends BaseResult<string> {}
+export interface ResouceApiResult extends BaseResult<ResourceApiBody> {}
+
+export interface ResourceApiBody {
+  message: string;
+  internalAccessToken: Token;
+  decodedInternalAccessToken: Token;
+}
 
 export interface LoginBody {
   accessJwt: Token;
-  decodedAccessJwt: string;
+  decodedAccessJwt: Token;
   refreshJwt: Token;
-  decodedRefreshJwt: string;
+  decodedRefreshJwt: Token;
 }
 
 export type Token = string | undefined;

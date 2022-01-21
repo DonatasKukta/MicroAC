@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using System.Threading;
 
 using MicroAC.Core.Auth;
@@ -24,7 +25,9 @@ namespace Example.ResourceApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRouting();
-            services.AddControllers();
+            services.AddControllers()
+                    .AddJsonOptions(x =>
+                        x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
             services.AddSingleton<IConfiguration>(_config); 
             services.AddSingleton(typeof(IJwtTokenHandler<AccessInternal>), new JwtTokenHandler<AccessInternal>(new AccessInternal()));
         }
