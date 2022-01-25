@@ -43,13 +43,13 @@ namespace Example.ResourceApi
                 return UnauthorizedWithTimestamp("Missing internal access token.");
             }
 
-            _accessInternalTokenHandler.Validate(token);
-
+            var permissions = _accessInternalTokenHandler.GetValidatedPermissions(token);
+           
             await Task.Delay(1000);
             var response = new
             {
                 message = "Hello World! 1s long response.",
-                internalAccessToken = token
+                permissions
             };
 
             return Ok(response);

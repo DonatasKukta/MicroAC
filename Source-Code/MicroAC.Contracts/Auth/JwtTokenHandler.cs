@@ -1,9 +1,13 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using MicroAC.Core.Models;
+
+using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 
 namespace MicroAC.Core.Auth
 {
@@ -11,7 +15,10 @@ namespace MicroAC.Core.Auth
         where TokenType : IDefaultTokenClaims
     {
         string Create(Dictionary<string, object> claims);
+
         ClaimsPrincipal Validate(string token);
+
+        IEnumerable<Permission> GetValidatedPermissions(string token);
     }
 
     public class JwtTokenHandler<TokenType> : IJwtTokenHandler<TokenType>
@@ -52,10 +59,19 @@ namespace MicroAC.Core.Auth
             return tokenHandler.WriteToken(token);
         }
 
-        //TODO: Additional validation parameters?
         public ClaimsPrincipal Validate(string token) =>
              _jwtHandler.ValidateToken(token, _validationParameters, out SecurityToken validatedToken);
-        
+
+        public IEnumerable<Permission> GetValidatedPermissions(string token)
+        {
+            var claimsPrincipal = _jwtHandler.ValidateToken(token, _validationParameters, out SecurityToken stoken);
+
+            var sClaims = claimsPrincipal.Claims.Where(c => c.Type == MicroACClaimTypes.SubjectClaims);
+            var result = sClaims.Select(c => JsonSerializer.Deserialize<Permission>(c.Value));
+
+            return result;
+        }
+
         private TokenValidationParameters GetValidationParameters()
         {
             return new TokenValidationParameters()

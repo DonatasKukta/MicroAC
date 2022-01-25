@@ -25,9 +25,7 @@ namespace Example.ResourceApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRouting();
-            services.AddControllers()
-                    .AddJsonOptions(x =>
-                        x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
+            services.AddControllers(); ;
             services.AddSingleton<IConfiguration>(_config); 
             services.AddSingleton(typeof(IJwtTokenHandler<AccessInternal>), new JwtTokenHandler<AccessInternal>(new AccessInternal()));
         }
