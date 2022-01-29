@@ -7,6 +7,8 @@ using Microsoft.Extensions.Hosting;
 using MicroAC.Persistence;
 using Microsoft.Extensions.Configuration;
 using MicroAC.Core.Common;
+using MicroAC.Persistence.DbDTOs;
+using Microsoft.EntityFrameworkCore;
 
 namespace MicroAC.Authentication
 {
@@ -34,6 +36,9 @@ namespace MicroAC.Authentication
             services.AddScoped<IUsersRepository, UsersRepository>();
 
             services.AddSingleton<IConfiguration>(_config);
+
+            services.AddDbContext<MicroACContext>(
+                options => options.UseSqlServer(_config.GetConnectionString("MicroACDatabase")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

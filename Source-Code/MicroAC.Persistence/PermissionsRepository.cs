@@ -12,12 +12,11 @@ namespace MicroAC.Persistence
 {
     public class PermissionsRepository : IPermissionsRepository
     {
-        private static DTO.MicroACContext Context;
+        private readonly DTO.MicroACContext Context;
 
-        public PermissionsRepository()
+        public PermissionsRepository(DTO.MicroACContext context)
         {
-            //TODO: Implement DI
-            Context = new DTO.MicroACContext();
+            Context = context;
         }
 
         public IEnumerable<Domain.Permission> GetRolePermissions(IEnumerable<string> roles) => 

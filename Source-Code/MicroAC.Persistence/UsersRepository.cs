@@ -11,17 +11,19 @@ namespace MicroAC.Persistence
 {
     public class UsersRepository : IUsersRepository
     {
-        private static DTO.MicroACContext Context;
+        private readonly DTO.MicroACContext Context;
 
-        public UsersRepository()
+        public UsersRepository(DTO.MicroACContext context)
         {
-            //TODO: Implement DI
-            Context = new DTO.MicroACContext();
+            Context = context;
         }
 
         public Domain.User GetUser(string email, string password)
         {
             var user = Context.Users.Where(u => u.Email == email).FirstOrDefault();
+
+            var allUsers = Context.Users.ToList();
+
             var roles = GetUserRoles(user.Id);
 
             return Map(user, roles);
