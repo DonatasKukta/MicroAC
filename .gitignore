@@ -1,6 +1,7 @@
 *.7z
 Notes
 GenerateDbDTOs.bat
+/reports
 
 # Ignore React App files
 

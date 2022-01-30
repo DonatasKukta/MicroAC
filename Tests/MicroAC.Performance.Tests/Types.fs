@@ -8,11 +8,10 @@ type LoginResult = {
     refreshJwt: string
 }
 
-type ApiResponse<'bodyType> = {
-    status: int
-    timestamps: IEnumerable
-    body: 'bodyType
-}
+type ApiResponse<'bodyType>(status: int, timestamps: IEnumerable, body:'bodyType) =
+    member x.body = body
+    member x.status = status
+    member x.timestamps = timestamps
 
 type LoginResponse = ApiResponse<LoginResult>
 
