@@ -27,9 +27,13 @@ namespace MicroAC.Authorization
             services.AddRouting();
             services.AddControllers();
 
-            services.AddSingleton(typeof(IJwtTokenHandler<AccessExternal>), new JwtTokenHandler<AccessExternal>(new AccessExternal()));
-            services.AddSingleton(typeof(IJwtTokenHandler<AccessInternal>), new JwtTokenHandler<AccessInternal>(new AccessInternal()));
-            services.AddSingleton(typeof(IClaimBuilder<AccessInternal>), new ClaimBuilder<AccessInternal>(new AccessInternal()));
+            services.AddScoped<AccessExternal>();
+            services.AddScoped<AccessInternal>();
+
+            services.AddScoped(typeof(IClaimBuilder<AccessInternal>), typeof(ClaimBuilder<AccessInternal>));
+
+            services.AddScoped(typeof(IJwtTokenHandler<AccessExternal>), typeof(JwtTokenHandler<AccessExternal>));
+            services.AddScoped(typeof(IJwtTokenHandler<AccessInternal>), typeof(JwtTokenHandler<AccessInternal>));
 
             services.AddScoped<IPermissionsRepository, PermissionsRepository>();
 

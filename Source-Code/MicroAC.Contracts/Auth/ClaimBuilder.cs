@@ -32,7 +32,6 @@ namespace MicroAC.Core.Auth
     public class ClaimBuilder<TokenType> : IClaimBuilder<TokenType>
         where TokenType : IDefaultTokenClaims
     {
-        Dictionary<string, object> _defaultClaims;
         Dictionary<string, object> _claims;
         readonly TokenType _token;
 
@@ -40,7 +39,6 @@ namespace MicroAC.Core.Auth
         {
             _token = token;
             _claims = new Dictionary<string, object>(5);
-            SetDefaultClaims();
         }
 
         /// <summary>
@@ -56,8 +54,10 @@ namespace MicroAC.Core.Auth
 
         public IClaimBuilder<TokenType> AddCommonClaims()
         {
-            foreach (var defaultClaim in _defaultClaims)
-                _claims.Add(defaultClaim.Key, defaultClaim.Value);
+            AddJwtId(Guid.NewGuid().ToString());
+            AddIssuer(_token.Issuer);
+            AddAudience(_token.Audience);
+            AddSubject(_token.Subject);
             return this;
         }
 
@@ -107,24 +107,6 @@ namespace MicroAC.Core.Auth
         {
             _claims.Add(JwtRegisteredClaimNames.Jti, value);
             return this;
-        }
-
-        public Dictionary<string, object> GetDefaulClaims()
-        {
-            return _defaultClaims;
-        }
-
-        private void SetDefaultClaims()
-        {
-            var temp = _claims;
-            _claims = new Dictionary<string, object>();
-
-            AddJwtId(Guid.NewGuid().ToString());
-            AddIssuer(_token.Issuer);
-            AddAudience(_token.Audience);
-            AddSubject(_token.Subject);
-            _defaultClaims = _claims;
-            _claims = temp;
         }
     }
 }

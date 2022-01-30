@@ -28,10 +28,15 @@ namespace MicroAC.Authentication
                     .AddNewtonsoftJson();
             //services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
-            services.AddSingleton(typeof(IJwtTokenHandler<AccessExternal>), new JwtTokenHandler<AccessExternal>(new AccessExternal()));
-            services.AddSingleton(typeof(IJwtTokenHandler<RefreshExternal>), new JwtTokenHandler<RefreshExternal>(new RefreshExternal()));
-            services.AddSingleton(typeof(IClaimBuilder<AccessExternal>), new ClaimBuilder<AccessExternal>(new AccessExternal()));
-            services.AddSingleton(typeof(IClaimBuilder<RefreshExternal>), new ClaimBuilder<RefreshExternal>(new RefreshExternal()));
+
+            services.AddScoped<AccessExternal>();
+            services.AddScoped<RefreshExternal>();
+
+            services.AddScoped(typeof(IJwtTokenHandler<AccessExternal>), typeof(JwtTokenHandler<AccessExternal>));
+            services.AddScoped(typeof(IJwtTokenHandler<RefreshExternal>), typeof(JwtTokenHandler<RefreshExternal>));
+
+            services.AddScoped(typeof(IClaimBuilder<AccessExternal>), typeof(ClaimBuilder<AccessExternal>));
+            services.AddScoped(typeof(IClaimBuilder<RefreshExternal>), typeof(ClaimBuilder<RefreshExternal>));
 
             services.AddScoped<IUsersRepository, UsersRepository>();
 

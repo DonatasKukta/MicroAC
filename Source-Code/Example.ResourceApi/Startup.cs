@@ -26,7 +26,13 @@ namespace Example.ResourceApi
         {
             services.AddRouting();
             services.AddControllers(); ;
+
+            services.AddScoped<AccessInternal>();
+
+            services.AddScoped(typeof(IJwtTokenHandler<AccessInternal>), typeof(JwtTokenHandler<AccessInternal>));
+
             services.AddSingleton<IConfiguration>(_config); 
+
             services.AddSingleton(typeof(IJwtTokenHandler<AccessInternal>), new JwtTokenHandler<AccessInternal>(new AccessInternal()));
         }
 
