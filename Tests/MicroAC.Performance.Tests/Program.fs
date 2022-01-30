@@ -7,61 +7,30 @@ open MicroAC.Core.Models;
 open FSharp.Control.Tasks
 open System.Net.Http
 open System.Threading.Tasks
+open Serilog
 
 //TODO: Move to config
-let loginUrl = "http://localhost:19083/MicroAC.ServiceFabric/MicroAC.Authentication/Login";
-let refreshUrl = "http://localhost:19083/MicroAC.ServiceFabric/MicroAC.Authentication/Refresh";
+let loginUrl = "http://localhost:19083/MicroAC.ServiceFabric/MicroAC.RequestManager/Authentication/Login";
+let refreshUrl = "http://localhost:19083/MicroAC.ServiceFabric/MicroAC.RequestManager/Authentication/Refresh";
+let resourceUrl = "http://localhost:19083/MicroAC.ServiceFabric/MicroAC.RequestManager/ResourceApi/Action";
 
 //TODO: Setup data feed.
 let credentials  = new LoginCredentials( Email= "Jonas.Jonaitis@gmail.com", Password= "")
-
-type RefreshResult = { 
-    accessJwt: string
-    refreshJwt: string
-}
-
-let postHandling (response : HttpResponseMessage) : Task<Response> = 
-    task {
-        let! y = response.Content.ReadAsStringAsync()
-        return if response.IsSuccessStatusCode 
-                then Response.ok(response, (int) response.StatusCode)
-                else 
-                Response.fail( error = y,
-                                    statusCode = (int) response.StatusCode)
-        }
 
 [<EntryPoint>]
 let main argv =
     let httpFactory = HttpClientFactory.create()
 
-    let login = Step.create("login",
-                           clientFactory = httpFactory,
-                           execute = fun context ->
-                                Http.createRequest "POST" loginUrl
-                                |> Http.withHeader "Content-Type" "application/json"
-                                |> Http.withBody (JsonContent.Create credentials)
-                                |> Http.withCheck postHandling
-                                |> Http.send context
-    )
-    let refresh = Step.create("refresh",
-                           clientFactory = httpFactory,
-                           execute = fun context ->  task {
-                                let response = context.GetPreviousStepResponse<HttpResponseMessage>()
-                                let! content = response.Content.ReadFromJsonAsync(typedefof<RefreshResult>) 
-                                let refreshJwt = (content :?> RefreshResult).refreshJwt
-                                return! Http.createRequest "POST" refreshUrl
-                                        |> Http.withBody (new StringContent(refreshJwt))
-                                        |> Http.withCheck postHandling
-                                        |> Http.send context
-                           }
-    )
+    let login =     Steps.createLogin           httpFactory loginUrl    credentials
+    let resource =  Steps.createResourceAction  httpFactory resourceUrl 
+    let refresh =   Steps.createRefresh         httpFactory refreshUrl 
+    let final =     Steps.postScenarioHandling
 
-    Scenario.create "login_and_refresh" [login; refresh]
-    |> Scenario.withWarmUpDuration(seconds 5)
-    |> Scenario.withLoadSimulations [InjectPerSec(rate = 10, during = seconds 10)]
+    Scenario.create "debug" [login; resource; refresh; final]
+    |> Scenario.withLoadSimulations [KeepConstant(copies = 1, during = seconds 20)]
     |> NBomberRunner.registerScenario
     |> NBomberRunner.withTestSuite "http"
-    |> NBomberRunner.withTestName "simple_test"
+    |> NBomberRunner.withLoggerConfig(fun () -> LoggerConfiguration().MinimumLevel.Verbose())
     |> NBomberRunner.run
     |> ignore
     0
