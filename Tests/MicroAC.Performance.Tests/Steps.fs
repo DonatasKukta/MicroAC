@@ -9,7 +9,7 @@ open FSharp.Control.Tasks
 open System.Net.Http
 open Types
 open StepDataHandling
-
+open Timestamps
 let private globalTimeout = seconds 10
 
 let createLogin httpFactory url credentials = 
@@ -63,5 +63,7 @@ let postScenarioHandling =
         let refreshResponse = getApiResponse<string> "refreshResult" context
         let resourceResponse = getApiResponse<string> "resourceApi" context
         // TODO: Post-Scenario processing logic. Analyse headers, log data to files...
+        let loginTimestamps = parseTimestamps loginResponse.timestamps
+
         return Response.ok()
     })

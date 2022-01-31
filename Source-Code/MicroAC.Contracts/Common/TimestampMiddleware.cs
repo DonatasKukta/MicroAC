@@ -43,7 +43,7 @@ namespace MicroAC.Core.Common
     {
         static string _timeNow
         { 
-            get { return DateTime.Now.ToString("yyyy/MM/ddThh:mm:ss.fff+02:00"); }
+            get { return DateTime.Now.ToString(); }
         }
 
         internal static void AddStartTimestamp(this HttpContext context, string header, string name)

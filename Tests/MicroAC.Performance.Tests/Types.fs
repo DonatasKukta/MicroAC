@@ -1,6 +1,7 @@
 ﻿module Types
 
 open System.Collections
+open System
 
 
 type LoginResult = { 
@@ -12,9 +13,12 @@ type ApiResponse<'bodyType>(status: int, timestamps: IEnumerable, body:'bodyType
     member x.body = body
     member x.status = status
     member x.timestamps = timestamps
-
-type LoginResponse = ApiResponse<LoginResult>
-
-type RefreshResponse = ApiResponse<string>
-
-type ResourceResponse = ApiResponse<string>
+    
+type Timestamp = {
+    service : string;
+    action : string;
+    date : DateTime;
+    ms: int;
+    msSum : int;
+    prevDiff: int;
+}
