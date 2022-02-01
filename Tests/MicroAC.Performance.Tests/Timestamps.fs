@@ -27,7 +27,6 @@ let calcTimestamp index current prev sum =
     ((index,{current with msSum = msSum; prevDiff=msDiff}), msSum)
 
 let mapWithPrev seq sum (it: int * Timestamp) = 
-    printfn "mapWithPrev"
     let i, current = it
     let prev = Seq.tryItem (i - 1) seq
     match prev with
