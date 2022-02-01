@@ -2,6 +2,7 @@
 open NBomber.Contracts
 open NBomber.FSharp
 open NBomber.Plugins.Http.FSharp
+open System.Net
 open System.Net.Http.Json
 open MicroAC.Core.Models;
 open FSharp.Control.Tasks
@@ -17,8 +18,7 @@ let resourceUrl = "http://localhost:19083/MicroAC.ServiceFabric/MicroAC.RequestM
 //TODO: Setup data feed.
 let credentials  = new LoginCredentials( Email= "Jonas.Jonaitis@gmail.com", Password= "")
 
-[<EntryPoint>]
-let main argv =
+let runTests () =
     let httpFactory = HttpClientFactory.create()
 
     let login =     Steps.createLogin           httpFactory loginUrl    credentials
@@ -34,5 +34,21 @@ let main argv =
     |> NBomberRunner.withLoggerConfig(fun () -> LoggerConfiguration().MinimumLevel.Verbose())
     |> NBomberRunner.run
     |> ignore
+
+let debug () =
+    printf "Debug send operation"
+    let http = new HttpClient()
+    let req = new HttpRequestMessage(HttpMethod.Post, loginUrl)
+    let json = JsonContent.Create(credentials)
+    req.Content <- json :> HttpContent
+    let response = http.Send(req)
+    let headers = response.Headers.GetValues("MicroAC-Timestamp")
+    let timestamps = Timestamps.parseTimestamps headers 
+    timestamps |> Seq.iter (fun x -> printfn "%A " x)
+
+
+[<EntryPoint>]
+let main argv =
+    debug() |> ignore
+    //runTests() |> ignore
     0
-        

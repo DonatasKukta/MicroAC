@@ -9,12 +9,13 @@ type LoginResult = {
     refreshJwt: string
 }
 
-type ApiResponse<'bodyType>(status: int, timestamps: IEnumerable, body:'bodyType) =
-    member x.body = body
-    member x.status = status
-    member x.timestamps = timestamps
+type ApiResponse<'bodyType> = {
+    status: int;
+    timestamps: IEnumerable;
+    body:'bodyType;
+}
     
-type Timestamp = {
+type Timestamp = {   
     service : string;
     action : string;
     date : DateTime;
@@ -22,3 +23,4 @@ type Timestamp = {
     msSum : int;
     prevDiff: int;
 }
+    

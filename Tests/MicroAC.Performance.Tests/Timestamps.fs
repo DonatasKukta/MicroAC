@@ -1,7 +1,6 @@
 ﻿module Timestamps
 
 open System
-open System.Collections
 open System.Globalization
 open MicroAC.Core.Common
 open Types
@@ -22,36 +21,30 @@ let fromStrTimestamp (timestamp:string) =
         prevDiff = 0;
     }
 
-let updateMsSum current prev = 
-    let diff =  current.date - prev.date 
-    let newSum = prev.msSum + diff.Milliseconds
-    {current with msSum = newSum}
-    
-let updatePrevDiff current prev = 
-    let diff =  current.date - prev.date 
-    {current with prevDiff = diff.Milliseconds}
+let calcTimestamp index current prev sum = 
+    let msDiff = (current.date - prev.date).Milliseconds
+    let msSum = sum + msDiff
+    ((index,{current with msSum = msSum; prevDiff=msDiff}), msSum)
 
-let mapWithPrev seq func (it: int * Timestamp) = 
+let mapWithPrev seq sum (it: int * Timestamp) = 
+    printfn "mapWithPrev"
     let i, current = it
     let prev = Seq.tryItem (i - 1) seq
     match prev with
-        | None -> (0, current)
-        | Some prevu ->
-            let p, prev = prevu
-            (i, func current prev)
+        | None -> ((0, current), 0)
+        | Some prevu -> let p, prev = prevu
+                        calcTimestamp i current prev sum
 
-let removeIndex (i, x) = x
-let ignoreAcumulator (seq, acc) = seq
-let seqMapSumWithPrev seq = Seq.map (mapWithPrev seq updateMsSum) seq 
-let seqMapDiffWithPrev seq = Seq.map (mapWithPrev seq updatePrevDiff) seq 
+let ignoreIndex (i, x) = x
+let ignoreAccumulator (x, a) = x
+let mapTimestamps seq = Seq.mapFold (mapWithPrev seq) 0 seq 
 
 let parseTimestamps timestamps = 
     timestamps
     |> Seq.cast<string>
     |> Seq.map fromStrTimestamp 
     |> Seq.indexed
-    |> seqMapSumWithPrev
-    //TODO: Understand why seqMapSumWithPrev and seqMapDiffWithPrev won't work together
-    //|> seqMapDiffWithPrev
-    |> Seq.map removeIndex
+    |> mapTimestamps
+    |> ignoreAccumulator
+    |> Seq.map ignoreIndex
 
