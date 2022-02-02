@@ -9,6 +9,7 @@
   <ItemGroup>
     <Compile Include="Types.fs" />
     <Compile Include="Timestamps.fs" />
+    <Compile Include="Csv.fs" />
     <Compile Include="StepDataHandling.fs" />
     <Compile Include="Steps.fs" />
     <Compile Include="Program.fs" />

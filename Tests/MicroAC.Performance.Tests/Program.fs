@@ -2,13 +2,12 @@
 open NBomber.Contracts
 open NBomber.FSharp
 open NBomber.Plugins.Http.FSharp
-open System.Net
 open System.Net.Http.Json
 open MicroAC.Core.Models;
 open FSharp.Control.Tasks
 open System.Net.Http
-open System.Threading.Tasks
 open Serilog
+open Types
 
 //TODO: Move to config
 let loginUrl = "http://localhost:19083/MicroAC.ServiceFabric/MicroAC.RequestManager/Authentication/Login";
@@ -36,19 +35,25 @@ let runTests () =
     |> ignore
 
 let debug () =
-    printf "Debug send operation"
-    let http = new HttpClient()
-    let req = new HttpRequestMessage(HttpMethod.Post, loginUrl)
-    let json = JsonContent.Create(credentials)
-    req.Content <- json :> HttpContent
-    let response = http.Send(req)
-    let headers = response.Headers.GetValues("MicroAC-Timestamp")
-    let timestamps = Timestamps.parseTimestamps headers 
-    timestamps |> Seq.iter (fun x -> printfn "%A " x)
-
+    task {
+        printf "Debug send operation"
+        let http = new HttpClient()
+        let req = new HttpRequestMessage(HttpMethod.Post, loginUrl)
+        let json = JsonContent.Create(credentials)
+        req.Content <- json :> HttpContent
+        let result = http.Send(req)
+        let! response = StepDataHandling.readApiResponse<LoginResult> result 
+        response.timestamps 
+        |> Seq.cast<string> 
+        |> Seq.iter (fun x -> printfn "%A " x)
+        Csv.appendTimestampsToCsv response
+    }
 
 [<EntryPoint>]
 let main argv =
+    Csv.deleteCsv()
     debug() |> ignore
+    debug() |> ignore
+    let fromFile = Csv.readTimestampsFromFile()
     //runTests() |> ignore
     0

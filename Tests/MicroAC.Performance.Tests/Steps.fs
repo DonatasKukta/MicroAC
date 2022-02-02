@@ -9,7 +9,7 @@ open FSharp.Control.Tasks
 open System.Net.Http
 open Types
 open StepDataHandling
-open Timestamps
+
 let private globalTimeout = seconds 10
 
 let createLogin httpFactory url credentials = 
@@ -59,11 +59,16 @@ let postScenarioHandling =
     Step.create("post_scenario_handling", 
         doNotTrack = true,
         execute = fun context ->  task {
-        let loginResponse = getApiResponse<LoginResult> "loginResult" context 
-        let refreshResponse = getApiResponse<string> "refreshResult" context
-        let resourceResponse = getApiResponse<string> "resourceApi" context
-        // TODO: Post-Scenario processing logic. Analyse headers, log data to files...
-        let loginTimestamps = parseTimestamps loginResponse.timestamps
+        let loginResponse =     getApiResponse<LoginResult> "loginResult" context 
+        let refreshResponse =   getApiResponse<string> "refreshResult" context
+        let resourceResponse =  getApiResponse<string> "resourceApi" context
+        [|
+         (getApiResponse "loginResult"   context);
+         (getApiResponse "refreshResult" context);
+         (getApiResponse "resourceApi"   context);
+        |] 
+        |> Seq.iter Csv.appendTimestampsToCsv
+        |>ignore
 
         return Response.ok()
     })

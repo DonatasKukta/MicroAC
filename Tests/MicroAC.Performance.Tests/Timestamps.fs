@@ -5,21 +5,25 @@ open System.Globalization
 open MicroAC.Core.Common
 open Types
 
-let fromStrTimestamp (timestamp:string) = 
-    let split = timestamp.Split("-")
-    let parsed, date = DateTime.TryParseExact(
-                        split.[2], 
-                        Constants.TimestampFormat, 
-                        CultureInfo.InvariantCulture, 
-                        DateTimeStyles.None);
+let parseDate (str : string)= 
+    DateTime.ParseExact(
+     str.Replace("-","/"), 
+     Constants.TimestampFormat, 
+     CultureInfo.InvariantCulture, 
+     DateTimeStyles.None);
+
+let fromSplitStr (split:seq<string>) =
+    let date = split |> Seq.item 2 |> parseDate 
     {
-        service = split.[0]; 
-        action = split.[1]; 
+        service =  split |> Seq.item 0; 
+        action =  split |> Seq.item 1; 
         date = date;
         ms = date.Millisecond;
         msSum = 0;
         prevDiff = 0;
     }
+
+let fromStrTimestamp (timestamp:string) = timestamp.Split("-") |> fromSplitStr
 
 let calcTimestamp index current prev sum = 
     let msDiff = (current.date - prev.date).Milliseconds

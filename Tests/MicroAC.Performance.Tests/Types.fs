@@ -11,12 +11,12 @@ type LoginResult = {
 
 type ApiResponse<'bodyType> = {
     id: Guid;
-    status: int;
+    success: bool;
     timestamps: IEnumerable;
     body:'bodyType;
 }
     
-type Timestamp = {  
+type Timestamp = {
     service : string;
     action : string;
     date : DateTime;

@@ -24,7 +24,7 @@ let readApiResponse<'content> (response: HttpResponseMessage) =
         let foundt, timestamps = response.Headers.TryGetValues "MicroAC-Timestamp"
         let foundr, ids = response.Headers.TryGetValues "X-ServiceFabricRequestId" 
         let id = ids |> Seq.head |> Guid.Parse
-        return { id = id; status = int response.StatusCode;  body = body; timestamps = timestamps;}
+        return { id = id; success = response.IsSuccessStatusCode;  body = body; timestamps = timestamps;}
     }
 
 let postHandling<'content> dataKey (stepContext : IStepContext<HttpClient, obj>) ( response: HttpResponseMessage)  = 
