@@ -54,6 +54,7 @@ let main argv =
     Csv.deleteCsv()
     debug() |> ignore
     debug() |> ignore
-    let fromFile = Csv.readTimestampsFromFile()
+    let timestamps = Csv.readTimestampsFromFile()
+    let durations = Csv.calcRequestDurations timestamps
     //runTests() |> ignore
     0
