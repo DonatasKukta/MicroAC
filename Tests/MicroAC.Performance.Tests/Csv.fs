@@ -43,8 +43,9 @@ let getServiceDurations (timestamps:seq<Timestamp>) =
                          (s.service, duration) )
 
 let mapResult (guid, durations) = 
-    Seq.map (fun sd -> let service, duration = sd
-                       $"{guid};{service};{duration}") durations
+    let map guid (service, duration) = (guid, service , duration)
+    durations
+    |> Seq.map (fun sd -> map guid sd) 
 
 let readTimestampsFromFile() =
     File.ReadAllLines(csv)
@@ -58,3 +59,13 @@ let calcRequestDurations guidTimestamps =
     |> Seq.map mapResult
     |> Seq.reduce Seq.append
     
+let calcMsAverage (durations: seq<string * int>) = 
+    durations 
+    |> Seq.map (fun (s,ms) -> double ms)
+    |> Seq.average
+
+let calcRequestAverages (durations : seq<Guid * string * int>) =
+    durations 
+    |> Seq.map (fun (guid,s,d) -> (s,d))
+    |> Seq.groupBy (fun (s,d) -> s)
+    |> Seq.map (fun (s,d) -> (s,calcMsAverage d))

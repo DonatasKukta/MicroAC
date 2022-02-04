@@ -17,11 +17,10 @@ type ApiResponse<'bodyType> = {
 }
     
 type Timestamp = {
-    service : string;
-    action : string;
-    date : DateTime;
+    service: string;
+    action: string;
+    date: DateTime;
     ms: int;
-    msSum : int;
+    msSum: int;
     prevDiff: int;
 }
-    

@@ -56,5 +56,6 @@ let main argv =
     debug() |> ignore
     let timestamps = Csv.readTimestampsFromFile()
     let durations = Csv.calcRequestDurations timestamps
+    let averages = Csv.calcRequestAverages durations
     //runTests() |> ignore
     0
