@@ -62,13 +62,10 @@ let postScenarioHandling =
         let loginResponse =     getApiResponse<LoginResult> "loginResult" context 
         let refreshResponse =   getApiResponse<string> "refreshResult" context
         let resourceResponse =  getApiResponse<string> "resourceApi" context
-        [|
-         (getApiResponse "loginResult"   context);
-         (getApiResponse "refreshResult" context);
-         (getApiResponse "resourceApi"   context);
-        |] 
-        |> Seq.iter Csv.appendTimestampsToCsv
-        |>ignore
+
+        Csv.appendTimestampsToCsv loginResponse
+        Csv.appendTimestampsToCsv refreshResponse
+        Csv.appendTimestampsToCsv resourceResponse
 
         return Response.ok()
     })

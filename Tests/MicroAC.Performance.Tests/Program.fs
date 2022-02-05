@@ -49,13 +49,18 @@ let debug () =
         Csv.appendTimestampsToCsv response
     }
 
-[<EntryPoint>]
-let main argv =
-    Csv.deleteCsv()
-    debug() |> ignore
-    debug() |> ignore
+let postTestCalculations() = 
     let timestamps = Csv.readTimestampsFromFile()
     let durations = Csv.calcRequestDurations timestamps
     let averages = Csv.calcRequestAverages durations
-    //runTests() |> ignore
+    Csv.writeDurationsToCsv durations
+    Csv.writeRequestAveragesToCsv averages
+
+[<EntryPoint>]
+let main argv =
+    Csv.deleteCsvFiles()
+    //debug() |> ignore
+    //debug() |> ignore
+    runTests() |> ignore
+    postTestCalculations()
     0

@@ -8,9 +8,17 @@ open MicroAC.Core.Common
 
 type TimestampCsv = (Guid * Timestamp)
 
-let csv = "timestamps.csv"
+let timestampsCsv = "_timestamps.csv"
+let durationsCsv  = "_durations.csv"
+let averagesCsv   = "_averages.csv"
 
-let deleteCsv() = File.Delete csv
+let deleteFile file =
+    if (File.Exists file) then File.Delete file
+
+let deleteCsvFiles() = 
+    File.Delete timestampsCsv
+    File.Delete durationsCsv
+    File.Delete averagesCsv
 
 let formatDate (date:DateTime) = date.ToString(Constants.TimestampFormat)
 
@@ -26,14 +34,27 @@ let toTimestampCsvStr id t = $"{id};{t.service};{t.action};{formatDate t.date};{
 /// </summary>
 let appendTimestampsToCsv (response:ApiResponse<'bodyType> ) = 
     if (not response.success) then ()
-    File.AppendAllLines(csv , response.timestamps 
-                              |> parseTimestamps 
-                              |> Seq.map (toTimestampCsvStr response.id))
+    File.AppendAllLines(timestampsCsv , response.timestamps 
+                                        |> parseTimestamps 
+                                        |> Seq.map (toTimestampCsvStr response.id))
     |> ignore
+
+let writeDurationsToCsv (durations: seq<Guid * string * int >) = 
+    let str = durations |> Seq.map (fun (g, s, d) -> $"{g};{s};{d};")
+    File.WriteAllLines(durationsCsv, str)
+    
+let writeRequestAveragesToCsv (averages: seq<string * double >) = 
+    let str = averages |> Seq.map (fun (s, a) -> $"{s};{a};")
+    File.WriteAllLines(averagesCsv, str)
 
 let find (timestamps: seq<Timestamp>) action service = 
     timestamps |> Seq.find (fun t -> t.action = action && t.service = service) 
 
+let readTimestampsFromFile() =
+    File.ReadAllLines(timestampsCsv)
+    |> Seq.cast<string>
+    |> Seq.map fromTimestampCsvStr
+   
 let getServiceDurations (timestamps:seq<Timestamp>) = 
     let findEndOf = find timestamps "End"
     timestamps 
@@ -43,15 +64,10 @@ let getServiceDurations (timestamps:seq<Timestamp>) =
                          (s.service, duration) )
 
 let mapResult (guid, durations) = 
-    let map guid (service, duration) = (guid, service , duration)
-    durations
-    |> Seq.map (fun sd -> map guid sd) 
+       let map guid (service, duration) = (guid, service , duration)
+       durations
+       |> Seq.map (fun sd -> map guid sd)  
 
-let readTimestampsFromFile() =
-    File.ReadAllLines(csv)
-    |> Seq.cast<string>
-    |> Seq.map fromTimestampCsvStr
-    
 let calcRequestDurations guidTimestamps =
     guidTimestamps
     |> Seq.groupBy (fun (guid, timestamp) -> guid)
