@@ -46,7 +46,7 @@ let debug () =
         response.timestamps 
         |> Seq.cast<string> 
         |> Seq.iter (fun x -> printfn "%A " x)
-        Csv.appendTimestampsToCsv response
+        Csv.appendTimestampsToCsv response |> ignore
     }
 
 let postTestCalculations() = 

@@ -25,8 +25,11 @@ let fromSplitStr (split:seq<string>) =
 
 let fromStrTimestamp (timestamp:string) = timestamp.Split("-") |> fromSplitStr
 
+let getDurationDiff (future:DateTime) (past:DateTime) = 
+    int (future - past).TotalMilliseconds
+
 let calcTimestamp index current prev sum = 
-    let msDiff = (current.date - prev.date).Milliseconds
+    let msDiff = getDurationDiff current.date prev.date
     let msSum = sum + msDiff
     ((index,{current with msSum = msSum; prevDiff=msDiff}), msSum)
 

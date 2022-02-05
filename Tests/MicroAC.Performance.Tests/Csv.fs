@@ -16,9 +16,9 @@ let deleteFile file =
     if (File.Exists file) then File.Delete file
 
 let deleteCsvFiles() = 
-    File.Delete timestampsCsv
-    File.Delete durationsCsv
-    File.Delete averagesCsv
+    deleteFile timestampsCsv
+    deleteFile durationsCsv
+    deleteFile averagesCsv
 
 let formatDate (date:DateTime) = date.ToString(Constants.TimestampFormat)
 
@@ -34,10 +34,11 @@ let toTimestampCsvStr id t = $"{id};{t.service};{t.action};{formatDate t.date};{
 /// </summary>
 let appendTimestampsToCsv (response:ApiResponse<'bodyType> ) = 
     if (not response.success) then ()
-    File.AppendAllLines(timestampsCsv , response.timestamps 
-                                        |> parseTimestamps 
-                                        |> Seq.map (toTimestampCsvStr response.id))
-    |> ignore
+    let timestampsStr = response.timestamps 
+                        |> parseTimestamps 
+                        |> Seq.map (toTimestampCsvStr response.id)
+    File.AppendAllLines(timestampsCsv , timestampsStr)
+    timestampsStr
 
 let writeDurationsToCsv (durations: seq<Guid * string * int >) = 
     let str = durations |> Seq.map (fun (g, s, d) -> $"{g};{s};{d};")
@@ -60,7 +61,7 @@ let getServiceDurations (timestamps:seq<Timestamp>) =
     timestamps 
     |> Seq.filter (fun t -> t.action = "Start")
     |> Seq.map (fun(s)-> let e = findEndOf s.service
-                         let duration = (e.date - s.date).Milliseconds
+                         let duration = getDurationDiff e.date s.date
                          (s.service, duration) )
 
 let mapResult (guid, durations) = 
