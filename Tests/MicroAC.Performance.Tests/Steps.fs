@@ -32,9 +32,12 @@ let createResourceAction httpFactory url =
         execute = fun context ->  task {
              let postHandlingWithContext = postHandling<string> "resourceApi" context
              let loginResponse = getApiResponse<LoginResult> "loginResult" context
-
+             
+             if(Option.isNone loginResponse) then return Response.fail("Refresh step couldn't get LoginResult", -1)
+             else 
+             let accessJwt = loginResponse.Value.body.accessJwt
              return! Http.createRequest "GET" url
-                     |> Http.withHeader "Authorization" loginResponse.body.accessJwt
+                     |> Http.withHeader "Authorization" accessJwt
                      |> Http.withCheck postHandlingWithContext
                      |> Http.send context
         }
@@ -48,24 +51,30 @@ let createRefresh httpFactory url =
              let postHandlingWithContext = postHandling<string> "refreshResult" context
              let loginResponse = getApiResponse<LoginResult> "loginResult" context 
 
-             return! Http.createRequest "POST" url
-                     |> Http.withBody (new StringContent(loginResponse.body.refreshJwt))
-                     |> Http.withCheck postHandlingWithContext
-                     |> Http.send context
+             if(Option.isNone loginResponse) then return Response.fail("Refresh step couldn't get LoginResult", -1)
+             else 
+             let refreshJwt = loginResponse.Value.body.refreshJwt
+             return!  Http.createRequest "POST" url
+                         |> Http.withBody (new StringContent(refreshJwt))
+                         |> Http.withCheck postHandlingWithContext
+                         |> Http.send context
         }
 )
 
-let postScenarioHandling = 
+let postScenarioHandling mutex = 
     Step.create("post_scenario_handling", 
         doNotTrack = true,
         execute = fun context ->  task {
-        let loginResponse =     getApiResponse<LoginResult> "loginResult" context 
-        let refreshResponse =   getApiResponse<string> "refreshResult" context
-        let resourceResponse =  getApiResponse<string> "resourceApi" context
+        let login =     getApiResponse<LoginResult> "loginResult" context 
+        let refresh =   getApiResponse<string> "refreshResult" context
+        let resource =  getApiResponse<string> "resourceApi" context
 
-        let login =     Csv.appendTimestampsToCsv loginResponse
-        let refresh =   Csv.appendTimestampsToCsv refreshResponse
-        let resource =  Csv.appendTimestampsToCsv resourceResponse
+        if(Option.isSome login)     
+            then Csv.appendTimestampsToCsv mutex login.Value |> ignore
+        if(Option.isSome refresh) 
+            then Csv.appendTimestampsToCsv mutex refresh.Value |> ignore
+        if(Option.isSome resource) 
+            then Csv.appendTimestampsToCsv mutex resource.Value |> ignore
 
         return Response.ok()
     })

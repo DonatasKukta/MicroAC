@@ -8,6 +8,7 @@ open FSharp.Control.Tasks
 open System.Net.Http
 open Serilog
 open Types
+open System.Threading
 
 //TODO: Move to config
 let loginUrl = "http://localhost:19083/MicroAC.ServiceFabric/MicroAC.RequestManager/Authentication/Login";
@@ -19,18 +20,20 @@ let credentials  = new LoginCredentials( Email= "Jonas.Jonaitis@gmail.com", Pass
 
 let runTests () =
     let httpFactory = HttpClientFactory.create()
+    let csvMutex = new Mutex();
 
     let login =     Steps.createLogin           httpFactory loginUrl    credentials
     let resource =  Steps.createResourceAction  httpFactory resourceUrl 
     let refresh =   Steps.createRefresh         httpFactory refreshUrl 
-    let final =     Steps.postScenarioHandling
+    let final =     Steps.postScenarioHandling  csvMutex
 
     Scenario.create "debug" [login; resource; refresh; final]
-    |> Scenario.withLoadSimulations [KeepConstant(copies = 1, during = seconds 10)]
-    //|> Scenario.withLoadSimulations [InjectPerSec(rate = 60, during = minutes 5)]
+    //|> Scenario.withLoadSimulations [KeepConstant(copies = 1, during = seconds 10)]
+    |> Scenario.withLoadSimulations [InjectPerSec(rate = 50, during = minutes 5)]
+    |> Scenario.withoutWarmUp
     |> NBomberRunner.registerScenario
     |> NBomberRunner.withTestSuite "http"
-    |> NBomberRunner.withLoggerConfig(fun () -> LoggerConfiguration().MinimumLevel.Verbose())
+    //|> NBomberRunner.withLoggerConfig(fun () -> LoggerConfiguration().MinimumLevel.Warning())
     |> NBomberRunner.run
     |> ignore
 
@@ -46,7 +49,7 @@ let debug () =
         response.timestamps 
         |> Seq.cast<string> 
         |> Seq.iter (fun x -> printfn "%A " x)
-        Csv.appendTimestampsToCsv response |> ignore
+        Csv.appendTimestampsToCsv (new Mutex()) response |> ignore
     }
 
 let postTestCalculations() = 
@@ -59,7 +62,6 @@ let postTestCalculations() =
 [<EntryPoint>]
 let main argv =
     Csv.deleteCsvFiles()
-    //debug() |> ignore
     //debug() |> ignore
     runTests() |> ignore
     postTestCalculations()

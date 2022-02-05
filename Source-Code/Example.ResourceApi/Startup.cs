@@ -55,15 +55,6 @@ namespace Example.ResourceApi
             {
                 endpoints.MapControllers();
             });
-            /*
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapGet("/Action", async context =>
-                {
-                    Thread.Sleep(1000);
-                    await context.Response.WriteAsync("Hello World! 1s long response.");
-                });
-            });*/
         }
     }
 }

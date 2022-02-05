@@ -5,6 +5,7 @@ open Timestamps
 open System.IO
 open System
 open MicroAC.Core.Common
+open System.Threading
 
 type TimestampCsv = (Guid * Timestamp)
 
@@ -32,12 +33,14 @@ let toTimestampCsvStr id t = $"{id};{t.service};{t.action};{formatDate t.date};{
 /// Appends timestamps to csv file.
 /// Ignores timestamps where response.success is false.
 /// </summary>
-let appendTimestampsToCsv (response:ApiResponse<'bodyType> ) = 
+let appendTimestampsToCsv (mutex : Mutex) (response:ApiResponse<'bodyType> ) = 
     if (not response.success) then ()
     let timestampsStr = response.timestamps 
                         |> parseTimestamps 
                         |> Seq.map (toTimestampCsvStr response.id)
+    mutex.WaitOne() |> ignore
     File.AppendAllLines(timestampsCsv , timestampsStr)
+    mutex.ReleaseMutex() 
     timestampsStr
 
 let writeDurationsToCsv (durations: seq<Guid * string * int >) = 
@@ -74,7 +77,7 @@ let calcRequestDurations guidTimestamps =
     |> Seq.groupBy (fun (guid, timestamp) -> guid)
     |> Seq.map (fun (guid, gt) -> ( (guid, getServiceDurations (Seq.map (fun(g,t)-> t) gt))))
     |> Seq.map mapResult
-    |> Seq.reduce Seq.append
+    |> Seq.concat
     
 let calcMsAverage (durations: seq<string * int>) = 
     durations 
