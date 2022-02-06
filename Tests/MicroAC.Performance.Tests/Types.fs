@@ -3,7 +3,6 @@
 open System.Collections
 open System
 
-
 type LoginResult = { 
     accessJwt: string
     refreshJwt: string
@@ -11,12 +10,15 @@ type LoginResult = {
 
 type ApiResponse<'bodyType> = {
     id: Guid;
+    step : string;
     success: bool;
     timestamps: IEnumerable;
     body:'bodyType;
 }
     
 type Timestamp = {
+    id: Guid;
+    step:string;
     service: string;
     action: string;
     date: DateTime;

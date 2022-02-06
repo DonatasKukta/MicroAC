@@ -44,7 +44,7 @@ let debug () =
         let json = JsonContent.Create(credentials)
         req.Content <- json :> HttpContent
         let result = http.Send(req)
-        let! response = StepDataHandling.readApiResponse<LoginResult> result 
+        let! response = StepDataHandling.readApiResponse<LoginResult> result "debugStep" 
         response.timestamps 
         |> Seq.cast<string> 
         |> Seq.iter (fun x -> printfn "%A " x)
@@ -57,11 +57,12 @@ let postTestCalculations() =
     let averages = Csv.calcRequestAverages durations
     Csv.writeDurationsToCsv durations
     Csv.writeRequestAveragesToCsv averages
-
+    
 [<EntryPoint>]
 let main argv =
     Csv.deleteCsvFiles()
-    //debug() |> ignore
+    debug() |> ignore
+    debug() |> ignore
     runTests() |> ignore
     postTestCalculations()
     0

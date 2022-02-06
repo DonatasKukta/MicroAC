@@ -18,27 +18,33 @@ let readContent<'content> (response : HttpResponseMessage) =
             else return Json.deserialize<'content> bodyStr
     }
 
-let readApiResponse<'content> (response: HttpResponseMessage) = 
+let readApiResponse<'content> (response: HttpResponseMessage) step = 
     task {
         let! body = readContent<'content> response
         let foundt, timestamps = response.Headers.TryGetValues "MicroAC-Timestamp"
         let foundr, ids = response.Headers.TryGetValues "X-ServiceFabricRequestId" 
         let id = ids |> Seq.head |> Guid.Parse
-        return { id = id; success = response.IsSuccessStatusCode;  body = body; timestamps = timestamps;}
+        return { 
+            id = id; 
+            success = response.IsSuccessStatusCode;  
+            body = body; 
+            timestamps = timestamps;
+            step = step;
+            }
     }
 
-let postHandling<'content> dataKey (stepContext : IStepContext<HttpClient, obj>) ( response: HttpResponseMessage)  = 
+let saveResponseInContext<'content> stepKey (stepContext : IStepContext<HttpClient, obj>) ( response: HttpResponseMessage)  = 
     task {
-        let! apiResponse = readApiResponse<'content> response
-        let added = stepContext.Data.TryAdd(dataKey, apiResponse)
+        let! apiResponse = readApiResponse<'content> response stepKey
+        let added = stepContext.Data.TryAdd(stepKey, apiResponse)
         
         match added with 
             | true -> return Response.ofHttp(response)
-            | false -> return Response.fail($"Error.PostHandling: Unable to add {dataKey} to context data.", -2)
+            | false -> return Response.fail($"Error.PostHandling: Unable to add {stepKey} to context data.", -2)
     }
 
-let getApiResponse<'content> key (stepContext : IStepContext<HttpClient, obj>) = 
-    let found, value = stepContext.Data.TryGetValue key
+let getApiResponse<'content> stepKey (stepContext : IStepContext<HttpClient, obj>) = 
+    let found, value = stepContext.Data.TryGetValue stepKey
     match found with
         | true -> Some (value :?> ApiResponse<'content>)
         | false -> None

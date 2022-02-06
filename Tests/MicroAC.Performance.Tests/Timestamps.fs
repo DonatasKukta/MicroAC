@@ -12,10 +12,12 @@ let parseDate (str : string)=
      CultureInfo.InvariantCulture, 
      DateTimeStyles.None);
 
-let fromSplitStr (split:seq<string>) =
+let fromSplitStr guid step (split:seq<string>) =
     let date = split |> Seq.item 2 |> parseDate 
     {
-        service =  split |> Seq.item 0; 
+        id = guid;
+        step = step;
+        service =  split |> Seq.item 0;
         action =  split |> Seq.item 1; 
         date = date;
         ms = date.Millisecond;
@@ -23,7 +25,7 @@ let fromSplitStr (split:seq<string>) =
         prevDiff = 0;
     }
 
-let fromStrTimestamp (timestamp:string) = timestamp.Split("-") |> fromSplitStr
+let fromStrTimestamp guid step (timestamp:string) = timestamp.Split("-") |> fromSplitStr guid step
 
 let getDurationDiff (future:DateTime) (past:DateTime) = 
     int (future - past).TotalMilliseconds
@@ -43,14 +45,14 @@ let mapWithPrev seq sum (it: int * Timestamp) =
 
 let ignoreIndex (i, x) = x
 let ignoreAccumulator (x, a) = x
-let mapTimestamps seq = Seq.mapFold (mapWithPrev seq) 0 seq 
+let mapTimestampsWithPrev seq = Seq.mapFold (mapWithPrev seq) 0 seq 
 
-let parseTimestamps timestamps = 
+let parseRawTimestamps guid step timestamps = 
     timestamps
     |> Seq.cast<string>
-    |> Seq.map fromStrTimestamp 
+    |> Seq.map (fromStrTimestamp guid step)
     |> Seq.indexed
-    |> mapTimestamps
+    |> mapTimestampsWithPrev
     |> ignoreAccumulator
     |> Seq.map ignoreIndex
 

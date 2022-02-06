@@ -25,9 +25,9 @@ let formatDate (date:DateTime) = date.ToString(Constants.TimestampFormat)
 
 let fromTimestampCsvStr (str : string) = 
     let split = str.Split(";")
-    ( Guid.Parse(split.[0]), split |> Seq.skip 1 |> fromSplitStr)
+    fromSplitStr (Guid.Parse(split.[0])) split.[1] (Seq.skip 2 split)
 
-let toTimestampCsvStr id t = $"{id};{t.service};{t.action};{formatDate t.date};{t.ms};{t.msSum};{t.prevDiff}"
+let toTimestampCsvStr t = $"{t.id};{t.step};{t.service};{t.action};{formatDate t.date};{t.ms};{t.msSum};{t.prevDiff}"
 
 /// <summary>
 /// Appends timestamps to csv file.
@@ -36,8 +36,8 @@ let toTimestampCsvStr id t = $"{id};{t.service};{t.action};{formatDate t.date};{
 let appendTimestampsToCsv (mutex : Mutex) (response:ApiResponse<'bodyType> ) = 
     if (not response.success) then ()
     let timestampsStr = response.timestamps 
-                        |> parseTimestamps 
-                        |> Seq.map (toTimestampCsvStr response.id)
+                        |> (parseRawTimestamps response.id response.step)
+                        |> Seq.map toTimestampCsvStr
     mutex.WaitOne() |> ignore
     File.AppendAllLines(timestampsCsv , timestampsStr)
     mutex.ReleaseMutex() 
@@ -58,25 +58,19 @@ let readTimestampsFromFile() =
     File.ReadAllLines(timestampsCsv)
     |> Seq.cast<string>
     |> Seq.map fromTimestampCsvStr
-   
+
 let getServiceDurations (timestamps:seq<Timestamp>) = 
     let findEndOf = find timestamps "End"
     timestamps 
     |> Seq.filter (fun t -> t.action = "Start")
     |> Seq.map (fun(s)-> let e = findEndOf s.service
                          let duration = getDurationDiff e.date s.date
-                         (s.service, duration) )
+                         (s.id, s.service, duration) )
 
-let mapResult (guid, durations) = 
-       let map guid (service, duration) = (guid, service , duration)
-       durations
-       |> Seq.map (fun sd -> map guid sd)  
-
-let calcRequestDurations guidTimestamps =
-    guidTimestamps
-    |> Seq.groupBy (fun (guid, timestamp) -> guid)
-    |> Seq.map (fun (guid, gt) -> ( (guid, getServiceDurations (Seq.map (fun(g,t)-> t) gt))))
-    |> Seq.map mapResult
+let calcRequestDurations timestamps =
+    timestamps
+    |> Seq.groupBy (fun (timestamp) -> timestamp.id)
+    |> Seq.map (fun (guid, t) -> ( (getServiceDurations t(*(Seq.map (fun(g,t)-> t) gt)*))))
     |> Seq.concat
     
 let calcMsAverage (durations: seq<string * int>) = 
