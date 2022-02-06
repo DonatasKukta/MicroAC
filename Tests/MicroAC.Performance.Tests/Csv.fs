@@ -43,12 +43,12 @@ let appendTimestampsToCsv (mutex : Mutex) (response:ApiResponse<'bodyType> ) =
     mutex.ReleaseMutex() 
     timestampsStr
 
-let writeDurationsToCsv (durations: seq<Guid * string * int >) = 
-    let str = durations |> Seq.map (fun (g, s, d) -> $"{g};{s};{d};")
-    File.WriteAllLines(durationsCsv, str)
+let writeDurationsToCsv (durations: seq<Duration>) = 
+    let lines = durations |> Seq.map (fun d -> $"{d.requestId};{d.step};{d.service};{d.duration};")
+    File.WriteAllLines(durationsCsv, lines)
     
-let writeRequestAveragesToCsv (averages: seq<string * double >) = 
-    let str = averages |> Seq.map (fun (s, a) -> $"{s};{a};")
+let writeRequestAveragesToCsv (averages: seq<Average>) = 
+    let str = averages |> Seq.map (fun a -> $"{a.step};{a.service};{a.average};")
     File.WriteAllLines(averagesCsv, str)
 
 let find (timestamps: seq<Timestamp>) action service = 
@@ -65,7 +65,7 @@ let getServiceDurations (timestamps:seq<Timestamp>) =
     |> Seq.filter (fun t -> t.action = "Start")
     |> Seq.map (fun(s)-> let e = findEndOf s.service
                          let duration = getDurationDiff e.date s.date
-                         (s.id, s.service, duration) )
+                         {requestId = s.id; step = s.step; service = s.service; duration = duration}   )
 
 let calcRequestDurations timestamps =
     timestamps
@@ -73,13 +73,13 @@ let calcRequestDurations timestamps =
     |> Seq.map (fun (guid, t) -> ( (getServiceDurations t(*(Seq.map (fun(g,t)-> t) gt)*))))
     |> Seq.concat
     
-let calcMsAverage (durations: seq<string * int>) = 
+let calcMsAverage (durations: seq<Duration>) = 
     durations 
-    |> Seq.map (fun (s,ms) -> double ms)
+    |> Seq.map (fun d -> double d.duration)
     |> Seq.average
 
-let calcRequestAverages (durations : seq<Guid * string * int>) =
+let calcRequestAverages (durations : seq<Duration>) =
     durations 
-    |> Seq.map (fun (guid,s,d) -> (s,d))
-    |> Seq.groupBy (fun (s,d) -> s)
-    |> Seq.map (fun (s,d) -> (s,calcMsAverage d))
+    |> Seq.groupBy (fun d -> (d.step, d.service))
+    |> Seq.map (fun (ss,d) -> let step, service = ss
+                              {step = step; service = service; average = calcMsAverage d})

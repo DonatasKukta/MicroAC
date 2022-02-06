@@ -10,7 +10,7 @@ type LoginResult = {
 
 type ApiResponse<'bodyType> = {
     id: Guid;
-    step : string;
+    step: string;
     success: bool;
     timestamps: IEnumerable;
     body:'bodyType;
@@ -25,4 +25,17 @@ type Timestamp = {
     ms: int;
     msSum: int;
     prevDiff: int;
+}
+
+type Duration = {
+    requestId: Guid;
+    step: string;
+    service: string;
+    duration: int
+}
+
+type Average = {
+    step: string;
+    service: string;
+    average: double;
 }
