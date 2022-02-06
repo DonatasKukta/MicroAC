@@ -25,7 +25,7 @@ namespace MicroAC.Core.Auth
         where TokenType : IDefaultTokenClaims
     {
         //TODO: Take from config
-        TimeSpan _expiration = TimeSpan.FromDays(10);
+        readonly TimeSpan _expiration = TimeSpan.FromDays(200);
 
         readonly SigningCredentials _credentials;
         readonly JwtSecurityTokenHandler _jwtHandler;
@@ -60,11 +60,11 @@ namespace MicroAC.Core.Auth
         }
 
         public ClaimsPrincipal Validate(string token) =>
-             _jwtHandler.ValidateToken(token, _validationParameters, out SecurityToken validatedToken);
+             _jwtHandler.ValidateToken(token, _validationParameters, out _);
 
         public IEnumerable<Permission> GetValidatedPermissions(string token)
         {
-            var claimsPrincipal = _jwtHandler.ValidateToken(token, _validationParameters, out SecurityToken stoken);
+            var claimsPrincipal = _jwtHandler.ValidateToken(token, _validationParameters, out var stoken);
 
             var sClaims = claimsPrincipal.Claims.Where(c => c.Type == MicroACClaimTypes.SubjectClaims);
             var result = sClaims.Select(c => JsonSerializer.Deserialize<Permission>(c.Value));

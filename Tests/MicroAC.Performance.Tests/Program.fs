@@ -30,10 +30,9 @@ let runTests () =
     Scenario.create "debug" [login; resource; refresh; final]
     //|> Scenario.withLoadSimulations [KeepConstant(copies = 1, during = seconds 10)]
     |> Scenario.withLoadSimulations [InjectPerSec(rate = 50, during = minutes 5)]
-    |> Scenario.withoutWarmUp
     |> NBomberRunner.registerScenario
     |> NBomberRunner.withTestSuite "http"
-    //|> NBomberRunner.withLoggerConfig(fun () -> LoggerConfiguration().MinimumLevel.Warning())
+    //|> NBomberRunner.withLoggerConfig(fun () -> LoggerConfiguration().MinimumLevel.Verbose())
     |> NBomberRunner.run
     |> ignore
 

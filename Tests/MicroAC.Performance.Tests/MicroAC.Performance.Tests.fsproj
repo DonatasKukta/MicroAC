@@ -24,4 +24,8 @@
     <ProjectReference Include="..\..\Source-Code\MicroAC.Contracts\MicroAC.Core.csproj" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
 </Project>

@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 using System.Net.Http.Headers;
-using System.Web.Mvc;
 
 namespace MicroAC.Core.Common
 {
