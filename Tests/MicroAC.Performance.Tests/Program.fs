@@ -29,7 +29,7 @@ let runTests () =
 
     Scenario.create "debug" [login; resource; refresh; final]
     //|> Scenario.withLoadSimulations [KeepConstant(copies = 1, during = seconds 10)]
-    |> Scenario.withLoadSimulations [InjectPerSec(rate = 50, during = minutes 5)]
+    |> Scenario.withLoadSimulations [InjectPerSec(rate = 30, during = minutes 1)]
     |> NBomberRunner.registerScenario
     |> NBomberRunner.withTestSuite "http"
     //|> NBomberRunner.withLoggerConfig(fun () -> LoggerConfiguration().MinimumLevel.Verbose())
@@ -44,7 +44,7 @@ let debug () =
         let json = JsonContent.Create(credentials)
         req.Content <- json :> HttpContent
         let result = http.Send(req)
-        let! response = StepDataHandling.readApiResponse<LoginResult> result "debugStep" 
+        let! response = StepDataHandling.readApiResponse<LoginResult> result "debugResponse" 
         response.timestamps 
         |> Seq.cast<string> 
         |> Seq.iter (fun x -> printfn "%A " x)
@@ -57,12 +57,13 @@ let postTestCalculations() =
     let averages = Csv.calcRequestAverages durations
     Csv.writeDurationsToCsv durations
     Csv.writeRequestAveragesToCsv averages
-    
+    Csv.calcAverageMatrixToCsv averages
+
 [<EntryPoint>]
 let main argv =
     Csv.deleteCsvFiles()
-    debug() |> ignore
-    debug() |> ignore
+    //debug() |> ignore
+    //debug() |> ignore
     runTests() |> ignore
     postTestCalculations()
     0

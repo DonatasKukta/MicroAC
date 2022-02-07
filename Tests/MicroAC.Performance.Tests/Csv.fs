@@ -12,6 +12,7 @@ type TimestampCsv = (Guid * Timestamp)
 let timestampsCsv = "_timestamps.csv"
 let durationsCsv  = "_durations.csv"
 let averagesCsv   = "_averages.csv"
+let matrixAvgCsv  = "_matrixAvg.csv" 
 
 let deleteFile file =
     if (File.Exists file) then File.Delete file
@@ -20,6 +21,7 @@ let deleteCsvFiles() =
     deleteFile timestampsCsv
     deleteFile durationsCsv
     deleteFile averagesCsv
+    deleteFile matrixAvgCsv
 
 let formatDate (date:DateTime) = date.ToString(Constants.TimestampFormat)
 
@@ -83,3 +85,21 @@ let calcRequestAverages (durations : seq<Duration>) =
     |> Seq.groupBy (fun d -> (d.step, d.service))
     |> Seq.map (fun (ss,d) -> let step, service = ss
                               {step = step; service = service; average = calcMsAverage d})
+
+let calcAverageMatrixToCsv averages =
+    let rows    = Seq.map (fun a -> a.step)    averages |> Seq.distinct
+    let columns = Seq.map (fun a -> a.service) averages |> Seq.distinct
+    let matrix = Array2D.zeroCreate (Seq.length rows)  (Seq.length columns)
+    
+    let getRow step = Seq.findIndex (fun s -> s.Equals(step)) rows
+    let getCol col  = Seq.findIndex (fun c -> c.Equals(col)) columns
+
+    Seq.iter (fun a -> matrix.[getRow a.step, getCol a.service] <- a.average) averages
+    
+    let rowStr row = Seq.fold (fun f a -> $"{f};{a}") "" matrix.[row,*]
+    let strLines = seq{0..1..(Seq.length rows)-1}
+                    |> Seq.map (fun i -> $"{Seq.item i rows}{rowStr i};")
+    let firstLine = Seq.fold (fun f r -> $"{f}{r};") ";" columns
+    let allLines = strLines |> Seq.append [firstLine]
+
+    File.WriteAllLines(matrixAvgCsv, allLines)
