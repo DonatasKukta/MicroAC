@@ -30,7 +30,7 @@ namespace Example.ResourceApi
         public async Task<ActionResult> Index()
         {
             // TODO: Move Extraction and validation of token to common code
-            var hasToken = this.Request.Headers.TryGetValue("MicroAC-JWT", out StringValues headerValues);
+            var hasToken = this.Request.Headers.TryGetValue("MicroAC-JWT", out var headerValues);
             if (!hasToken)
             {
                 return UnauthorizedWithTimestamp("Missing internal access token.");

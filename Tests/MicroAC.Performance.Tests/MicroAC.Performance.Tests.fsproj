@@ -16,12 +16,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NBomber.FSharp" Version="0.0.5" />
+    <PackageReference Include="NBomber.FSharp" Version="0.0.4" />
     <PackageReference Include="NBomber.Http" Version="2.0.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Source-Code\MicroAC.Contracts\MicroAC.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="FSharp.Core" Version="5.0.1" />
   </ItemGroup>
 
   <PropertyGroup>
