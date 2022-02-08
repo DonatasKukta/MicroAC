@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 using MicroAC.Core.Persistence;
+
+using Microsoft.EntityFrameworkCore;
 
 using Domain = MicroAC.Core.Models;
 using DTO = MicroAC.Persistence.DbDTOs;
@@ -18,28 +21,28 @@ namespace MicroAC.Persistence
             Context = context;
         }
 
-        public Domain.User GetUser(string email, string password)
+        public async Task<Domain.User> GetUser(string email, string password)
         {
-            var user = Context.Users.Where(u => u.Email == email).FirstOrDefault();
+            var user = await Context.Users.Where(u => u.Email == email).FirstOrDefaultAsync();
 
-            var allUsers = Context.Users.ToList();
-
-            var roles = GetUserRoles(user.Id);
+            var roles = await GetUserRoles(user.Id);
 
             return Map(user, roles);
         }
 
-        public Domain.User GetUser(Guid guid)
+        public async Task<Domain.User> GetUser(Guid guid)
         {
-            var user = Context.Users.Where(u => u.Id == guid).FirstOrDefault(); ;
-            var roles = GetUserRoles(user.Id);
+            var user = Context.Users.Where(u => u.Id == guid).FirstOrDefault();
+
+            var roles = await GetUserRoles(user.Id);
 
             return Map(user, roles);
         }
 
-        private IEnumerable<string> GetUserRoles(Guid userId) => 
-            Context.UsersRoles.Where(ur => ur.User == userId)
-                              .Select(ur => ur.Role);
+        private async Task<IEnumerable<string>> GetUserRoles(Guid userId) => 
+            await Context.UsersRoles.Where(ur => ur.User == userId)
+                                    .Select(ur => ur.Role)
+                                    .ToListAsync();
 
         //TODO: Implement Automapping
         private static Domain.User Map(DTO.User user, IEnumerable<string> roles)

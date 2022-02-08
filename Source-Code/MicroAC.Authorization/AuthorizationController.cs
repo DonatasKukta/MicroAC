@@ -7,6 +7,7 @@ using System.Linq;
 using Microsoft.Extensions.Primitives;
 using MicroAC.Core.Common;
 using Microsoft.Extensions.Configuration;
+using System.Threading.Tasks;
 
 namespace MicroAC.Authorization
 {
@@ -52,7 +53,7 @@ namespace MicroAC.Authorization
         }
 
         [HttpPost("Authorize")]
-        public ActionResult Authorize()
+        public async Task<ActionResult> Authorize()
         {
             var hasToken = this.Request.Headers.TryGetValue("Authorization", out StringValues headerValues);
             if (!hasToken)
@@ -78,7 +79,7 @@ namespace MicroAC.Authorization
             }
 
             this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "AuthStart");
-            var permissions = _permissionsRepository.GetRolePermissions(roles);
+            var permissions = await _permissionsRepository.GetRolePermissions(roles);
 
             var claims = _accessInternalClaimBuilder
                 .AddCommonClaims()

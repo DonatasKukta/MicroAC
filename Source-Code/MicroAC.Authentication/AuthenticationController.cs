@@ -58,7 +58,7 @@ namespace MicroAC.Authentication
         }
 
         [HttpPost("Login")]
-        public ActionResult Login([FromBody] LoginCredentials credentials)
+        public async Task<ActionResult> Login([FromBody] LoginCredentials credentials)
         {
             if (credentials == null || credentials.Email == null /* || credentials.Password == null*/)
             {
@@ -66,7 +66,7 @@ namespace MicroAC.Authentication
             }
 
             this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "StartAuth");
-            var user = _usersRepository.GetUser(credentials.Email, credentials.Password);
+            var user = await _usersRepository.GetUser(credentials.Email, credentials.Password);
             
             if (user == null)
             {
@@ -99,7 +99,7 @@ namespace MicroAC.Authentication
             var refreshClaims  = _refreshTokenHandler.Validate(await bodyStream.ReadToEndAsync());
 
             var userId = refreshClaims.Claims.FirstOrDefault(c => c.Type == MicroACClaimTypes.UserId)?.Value;
-            var user = _usersRepository.GetUser(new Guid(userId));
+            var user = await _usersRepository.GetUser(new Guid(userId));
             if (user == null)
             {
                 return UnauthorizedWithTimestamp("User Id could not be found.");
