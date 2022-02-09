@@ -2,13 +2,16 @@
 
 open System
 open System.Globalization
-open MicroAC.Core.Common
 open Types
+
+let timestampFormat = "yyyy/MM/ddThh:mm:ss.fffzzz"
+
+let formatDate (date:DateTime) = date.ToString(timestampFormat)
 
 let parseDate (str : string)= 
     DateTime.ParseExact(
      str.Replace("-","/"), 
-     Constants.TimestampFormat, 
+     timestampFormat, 
      CultureInfo.InvariantCulture, 
      DateTimeStyles.None);
 

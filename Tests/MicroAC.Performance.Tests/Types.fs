@@ -8,6 +8,11 @@ type LoginResult = {
     refreshJwt: string
 }
 
+type LoginInput = {
+    Email: string;
+    Password: string;
+}
+
 type ApiResponse<'bodyType> = {
     id: Guid;
     step: string;

@@ -4,7 +4,6 @@ open Types
 open Timestamps
 open System.IO
 open System
-open MicroAC.Core.Common
 open System.Threading
 
 type TimestampCsv = (Guid * Timestamp)
@@ -22,8 +21,6 @@ let deleteCsvFiles() =
     deleteFile durationsCsv
     deleteFile averagesCsv
     deleteFile matrixAvgCsv
-
-let formatDate (date:DateTime) = date.ToString(Constants.TimestampFormat)
 
 let fromTimestampCsvStr (str : string) = 
     let split = str.Split(";")

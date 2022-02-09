@@ -3,7 +3,6 @@ open NBomber.Contracts
 open NBomber.FSharp
 open NBomber.Plugins.Http.FSharp
 open System.Net.Http.Json
-open MicroAC.Core.Models;
 open FSharp.Control.Tasks
 open System.Net.Http
 open Serilog
@@ -16,7 +15,7 @@ let refreshUrl = "http://localhost:19083/MicroAC.ServiceFabric/MicroAC.RequestMa
 let resourceUrl = "http://localhost:19083/MicroAC.ServiceFabric/MicroAC.RequestManager/ResourceApi/Action";
 
 //TODO: Setup data feed.
-let credentials  = new LoginCredentials( Email= "Jonas.Jonaitis@gmail.com", Password= "")
+let credentials  = { Email= "Jonas.Jonaitis@gmail.com"; Password= "" }
 
 let runTests () =
     let httpFactory = HttpClientFactory.create()
@@ -29,7 +28,7 @@ let runTests () =
 
     Scenario.create "debug" [login; resource; refresh; final]
     //|> Scenario.withLoadSimulations [KeepConstant(copies = 1, during = seconds 10)]
-    |> Scenario.withLoadSimulations [InjectPerSec(rate = 120, during = minutes 5)]
+    |> Scenario.withLoadSimulations [InjectPerSec(rate = 30, during = minutes 20)]
     |> NBomberRunner.registerScenario
     |> NBomberRunner.withTestSuite "http"
     //|> NBomberRunner.withLoggerConfig(fun () -> LoggerConfiguration().MinimumLevel.Verbose())
