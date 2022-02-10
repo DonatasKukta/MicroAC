@@ -2,6 +2,7 @@
 Notes
 GenerateDbDTOs.bat
 /reports
+appsettings.persistance.json
 
 # Ignore React App files
 

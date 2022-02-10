@@ -28,7 +28,7 @@ let runTests () =
 
     Scenario.create "debug" [login; resource; refresh; final]
     //|> Scenario.withLoadSimulations [KeepConstant(copies = 1, during = seconds 10)]
-    |> Scenario.withLoadSimulations [InjectPerSec(rate = 30, during = minutes 20)]
+    |> Scenario.withLoadSimulations [InjectPerSec(rate = 60, during = minutes 5)]
     |> NBomberRunner.registerScenario
     |> NBomberRunner.withTestSuite "http"
     //|> NBomberRunner.withLoggerConfig(fun () -> LoggerConfiguration().MinimumLevel.Verbose())

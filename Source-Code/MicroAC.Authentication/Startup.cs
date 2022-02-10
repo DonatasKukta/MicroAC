@@ -16,6 +16,7 @@ namespace MicroAC.Authentication
     {
         IConfiguration _config = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
+                .AddJsonFile("appsettings.persistance.json")
                 .AddEnvironmentVariables()
                 .Build();
 

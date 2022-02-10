@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 using System.Net.Http.Headers;
+using System.Fabric;
 
 namespace MicroAC.Core.Common
 {
@@ -17,15 +18,22 @@ namespace MicroAC.Core.Common
 
         readonly string _serviceName;
 
-        public TimestampMiddleware(RequestDelegate next, IConfiguration config)
+        readonly StatelessServiceContext _serviceContext;
+
+        public TimestampMiddleware(
+            RequestDelegate next, 
+            IConfiguration config, 
+            StatelessServiceContext serviceContext)
         {
             _next = next;
             _timestampHeader = config.GetSection("Timestamp:Header").Value;
             _serviceName = config.GetSection("Timestamp:ServiceName").Value;
+            _serviceContext = serviceContext;
         }
 
         public async Task InvokeAsync(HttpContext context)
         {
+            context.AddActionMessage(_timestampHeader, _serviceName, _serviceContext.NodeContext.NodeName);
             context.AddStartTimestamp(_timestampHeader, _serviceName);
             context.Response.OnStarting(state =>
             {
