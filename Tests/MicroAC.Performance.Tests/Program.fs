@@ -2,12 +2,16 @@
 open NBomber.Contracts
 open NBomber.FSharp
 open NBomber.Plugins.Http.FSharp
-open System.Net.Http.Json
 open FSharp.Control.Tasks
-open System.Net.Http
 open Serilog
-open Types
+
+open System
+open System.IO
+open System.Net.Http
+open System.Net.Http.Json
 open System.Threading
+
+open Types
 
 //TODO: Move to config
 let loginUrl = "http://localhost:19083/MicroAC.ServiceFabric/MicroAC.RequestManager/Authentication/Login";
@@ -17,25 +21,26 @@ let resourceUrl = "http://localhost:19083/MicroAC.ServiceFabric/MicroAC.RequestM
 //TODO: Setup data feed.
 let credentials  = { Email= "Jonas.Jonaitis@gmail.com"; Password= "" }
 
-let runTests () =
+let runTests reportsFolder =
     let httpFactory = HttpClientFactory.create()
     let csvMutex = new Mutex();
 
     let login =     Steps.createLogin           httpFactory loginUrl    credentials
     let resource =  Steps.createResourceAction  httpFactory resourceUrl 
     let refresh =   Steps.createRefresh         httpFactory refreshUrl 
-    let final =     Steps.postScenarioHandling  csvMutex
+    let final =     Steps.postScenarioHandling  reportsFolder csvMutex
 
     Scenario.create "debug" [login; resource; refresh; final]
     //|> Scenario.withLoadSimulations [KeepConstant(copies = 1, during = seconds 10)]
-    |> Scenario.withLoadSimulations [InjectPerSec(rate = 60, during = minutes 5)]
+    |> Scenario.withLoadSimulations [InjectPerSec(rate = 60, during = seconds 10)]
     |> NBomberRunner.registerScenario
     |> NBomberRunner.withTestSuite "http"
+    |> NBomberRunner.withReportFolder reportsFolder
     //|> NBomberRunner.withLoggerConfig(fun () -> LoggerConfiguration().MinimumLevel.Verbose())
     |> NBomberRunner.run
     |> ignore
 
-let debug () =
+let debug reportsFolder =
     task {
         printf "Debug send operation"
         let http = new HttpClient()
@@ -47,22 +52,23 @@ let debug () =
         response.timestamps 
         |> Seq.cast<string> 
         |> Seq.iter (fun x -> printfn "%A " x)
-        Csv.appendTimestampsToCsv (new Mutex()) response |> ignore
+        Csv.appendTimestampsToCsv reportsFolder (new Mutex()) response |> ignore
     }
 
-let postTestCalculations() = 
-    let timestamps = Csv.readTimestampsFromFile()
-    let durations = Csv.calcRequestDurations timestamps
-    let averages = Csv.calcRequestAverages durations
-    Csv.writeDurationsToCsv durations
-    Csv.writeRequestAveragesToCsv averages
-    Csv.calcAverageMatrixToCsv averages
+let postTestCalculations reportsFolder = 
+    let timestamps =  Csv.readTimestampsFromFile reportsFolder
+    let durations =   Csv.calcRequestDurations timestamps
+    let averages =    Csv.calcRequestAverages durations
+    Csv.writeDurationsToCsv       reportsFolder durations
+    Csv.writeRequestAveragesToCsv reportsFolder averages
+    Csv.calcAverageMatrixToCsv    reportsFolder averages
 
 [<EntryPoint>]
 let main argv =
-    Csv.deleteCsvFiles()
+    let reportsFolder = Directory.GetCurrentDirectory() + $"/reports/{DateTime.Now.ToString().Replace(':', '.')}"
+    Csv.deleteCsvFiles(reportsFolder)
     //debug() |> ignore
     //debug() |> ignore
-    runTests() |> ignore
-    postTestCalculations()
+    runTests(reportsFolder) |> ignore
+    postTestCalculations(reportsFolder)
     0

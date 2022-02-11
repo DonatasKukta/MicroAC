@@ -65,7 +65,7 @@ let createRefresh httpFactory url =
         }
 )
 
-let postScenarioHandling mutex = 
+let postScenarioHandling reportsFolder mutex = 
     Step.create("post_scenario_handling", 
         doNotTrack = true,
         execute = fun context ->  task {
@@ -74,11 +74,11 @@ let postScenarioHandling mutex =
         let resource =  getApiResponse<string> resourceApiStep context
 
         if(Option.isSome login)     
-            then Csv.appendTimestampsToCsv mutex login.Value |> ignore
+            then Csv.appendTimestampsToCsv reportsFolder mutex login.Value |> ignore
         if(Option.isSome refresh) 
-            then Csv.appendTimestampsToCsv mutex refresh.Value |> ignore
+            then Csv.appendTimestampsToCsv reportsFolder mutex refresh.Value |> ignore
         if(Option.isSome resource) 
-            then Csv.appendTimestampsToCsv mutex resource.Value |> ignore
+            then Csv.appendTimestampsToCsv reportsFolder mutex resource.Value |> ignore
 
         return Response.ok()
     })
