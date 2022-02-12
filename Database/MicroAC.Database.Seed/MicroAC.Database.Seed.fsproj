@@ -8,14 +8,14 @@
 
   <ItemGroup>
     <Content Include="appsettings.example.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+    <Content Include="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Compile Include="Generate.fs" />
     <Compile Include="Config.fs" />
     <Compile Include="Database.fs" />
-    <Content Include="appsettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Compile Include="Program.fs" />
   </ItemGroup>
 
