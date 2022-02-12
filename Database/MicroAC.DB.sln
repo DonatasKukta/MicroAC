@@ -5,6 +5,10 @@ VisualStudioVersion = 16.0.31702.278
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Database", "Database\Database.sqlproj", "{4A743D4A-46C1-4899-8992-02164BDA8815}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MicroAC.Persistence", "..\Source-Code\MicroAC.Persistence\MicroAC.Persistence.csproj", "{E992B98F-D56B-43D4-B0C2-0A46D25B10A0}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "MicroAC.Database.Seed", "MicroAC.Database.Seed\MicroAC.Database.Seed.fsproj", "{1B64BBEC-C0D8-4D93-91FE-74560E045F07}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,6 +21,14 @@ Global
 		{4A743D4A-46C1-4899-8992-02164BDA8815}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4A743D4A-46C1-4899-8992-02164BDA8815}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4A743D4A-46C1-4899-8992-02164BDA8815}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{E992B98F-D56B-43D4-B0C2-0A46D25B10A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E992B98F-D56B-43D4-B0C2-0A46D25B10A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E992B98F-D56B-43D4-B0C2-0A46D25B10A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E992B98F-D56B-43D4-B0C2-0A46D25B10A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B64BBEC-C0D8-4D93-91FE-74560E045F07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B64BBEC-C0D8-4D93-91FE-74560E045F07}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B64BBEC-C0D8-4D93-91FE-74560E045F07}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B64BBEC-C0D8-4D93-91FE-74560E045F07}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
