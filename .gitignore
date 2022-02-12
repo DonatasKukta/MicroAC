@@ -9,6 +9,8 @@ appsettings.persistance.json
 */MicroAC.Database.Seed/appsettings.json
 */MicroAC.Database.Seed/results/
 
+*-users.sql
+
 # Ignore React App files
 
 # dependencies

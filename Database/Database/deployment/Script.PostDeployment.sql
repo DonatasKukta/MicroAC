@@ -10,4 +10,5 @@ Post-Deployment Script Template
 --------------------------------------------------------------------------------------
 */
 
-:r ..\data\test-users.sql
+:r ..\data\test-data.sql
+:r ..\users\local-users.sql

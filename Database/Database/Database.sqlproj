@@ -122,6 +122,7 @@
     <Folder Include="dbo\Tables\" />
     <Folder Include="data" />
     <Folder Include="deployment" />
+    <Folder Include="users" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Services.sql">
@@ -148,15 +149,19 @@
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
-    <None Include="data\test-users.sql">
+    <None Include="data\test-data.sql">
       <CopyToOutputDirectory>DoNotCopy</CopyToOutputDirectory>
     </None>
     <Build Include="dbo\Tables\Users_Roles.sql" />
+    <None Include="users\local-users.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="deployment\Script.PostDeployment.sql" />
   </ItemGroup>
   <ItemGroup>
     <PreDeploy Include="deployment\Script.PreDeployment.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Local.publish.xml" />
   </ItemGroup>
 </Project>
