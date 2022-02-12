@@ -5,9 +5,9 @@ GenerateDbDTOs.bat
 
 #Ignore appsettings with secrets
 appsettings.persistance.json
-/MicroAC.RequestManager/appsettings.json
-/MicroAC.Database.Seed/appsettings.json
-/MicroAC.Database.Seed/results/
+*/MicroAC.RequestManager/appsettings.json
+*/MicroAC.Database.Seed/appsettings.json
+*/MicroAC.Database.Seed/results/
 
 # Ignore React App files
 
@@ -20,7 +20,7 @@ appsettings.persistance.json
 /coverage
 
 # production
-/build
+build/
 
 # misc
 .DS_Store
