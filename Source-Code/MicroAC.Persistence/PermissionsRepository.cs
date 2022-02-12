@@ -9,15 +9,15 @@ using MicroAC.Core.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 using Domain = MicroAC.Core.Models;
-using DTO = MicroAC.Persistence.DbDTOs;
+using DTO = MicroAC.Persistence.Entities;
 
 namespace MicroAC.Persistence
 {
     public class PermissionsRepository : IPermissionsRepository
     {
-        private readonly DTO.MicroACContext Context;
+        private readonly MicroACContext Context;
 
-        public PermissionsRepository(DTO.MicroACContext context)
+        public PermissionsRepository(MicroACContext context)
         {
             Context = context;
         }

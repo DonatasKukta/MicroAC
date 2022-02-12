@@ -2,7 +2,6 @@ using MicroAC.Core.Auth;
 using MicroAC.Core.Common;
 using MicroAC.Core.Persistence;
 using MicroAC.Persistence;
-using MicroAC.Persistence.DbDTOs;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

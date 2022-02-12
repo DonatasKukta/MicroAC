@@ -1,6 +1,6 @@
 ﻿module Generate
 
-open MicroAC.Persistence.DbDTOs
+open MicroAC.Persistence.Entities
 
 open System
 

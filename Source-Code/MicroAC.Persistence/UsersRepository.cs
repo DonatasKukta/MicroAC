@@ -8,15 +8,15 @@ using MicroAC.Core.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 using Domain = MicroAC.Core.Models;
-using DTO = MicroAC.Persistence.DbDTOs;
+using DTO = MicroAC.Persistence.Entities;
 
 namespace MicroAC.Persistence
 {
     public class UsersRepository : IUsersRepository
     {
-        private readonly DTO.MicroACContext Context;
+        private readonly MicroACContext Context;
 
-        public UsersRepository(DTO.MicroACContext context)
+        public UsersRepository(MicroACContext context)
         {
             Context = context;
         }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 #nullable disable
 
-namespace MicroAC.Persistence.DbDTOs
+namespace MicroAC.Persistence.Entities
 {
     public partial class Role
     {

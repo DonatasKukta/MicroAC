@@ -7,7 +7,6 @@ using Microsoft.Extensions.Hosting;
 using MicroAC.Persistence;
 using Microsoft.Extensions.Configuration;
 using MicroAC.Core.Common;
-using MicroAC.Persistence.DbDTOs;
 using Microsoft.EntityFrameworkCore;
 
 namespace MicroAC.Authentication

@@ -8,7 +8,8 @@ open Microsoft.SqlServer.Management.Smo
 open System.Collections
 open System.IO
 
-open MicroAC.Persistence.DbDTOs
+open MicroAC.Persistence
+open MicroAC.Persistence.Entities
 
 exception SeedingError of string
 

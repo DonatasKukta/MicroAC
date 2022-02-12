@@ -1,4 +1,4 @@
-﻿open MicroAC.Persistence.DbDTOs
+﻿open MicroAC.Persistence.Entities
 
 let printEmail (user: User) = printfn "User email: %A" (user.Email)
 

@@ -1,10 +1,10 @@
-﻿using System;
+﻿using MicroAC.Persistence.Entities;
+
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
-namespace MicroAC.Persistence.DbDTOs
+namespace MicroAC.Persistence
 {
     public partial class MicroACContext : DbContext
     {
