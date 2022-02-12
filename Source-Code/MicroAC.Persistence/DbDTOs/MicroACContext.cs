@@ -72,22 +72,20 @@ namespace MicroAC.Persistence.DbDTOs
 
             modelBuilder.Entity<RolesPermission>(entity =>
             {
-                entity.HasNoKey();
+                entity.HasKey(e => new { e.Role, e.Permission });
 
                 entity.ToTable("Roles_Permissions");
 
-                entity.Property(e => e.Role)
-                    .IsRequired()
-                    .HasMaxLength(42);
+                entity.Property(e => e.Role).HasMaxLength(42);
 
                 entity.HasOne(d => d.PermissionNavigation)
-                    .WithMany()
+                    .WithMany(p => p.RolesPermissions)
                     .HasForeignKey(d => d.Permission)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Roles_Permissions_Permissions");
 
                 entity.HasOne(d => d.RoleNavigation)
-                    .WithMany()
+                    .WithMany(p => p.RolesPermissions)
                     .HasForeignKey(d => d.Role)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Roles_Permissions_Roles");
@@ -136,22 +134,20 @@ namespace MicroAC.Persistence.DbDTOs
 
             modelBuilder.Entity<UsersRole>(entity =>
             {
-                entity.HasNoKey();
+                entity.HasKey(e => new { e.User, e.Role });
 
                 entity.ToTable("Users_Roles");
 
-                entity.Property(e => e.Role)
-                    .IsRequired()
-                    .HasMaxLength(42);
+                entity.Property(e => e.Role).HasMaxLength(42);
 
                 entity.HasOne(d => d.RoleNavigation)
-                    .WithMany()
+                    .WithMany(p => p.UsersRoles)
                     .HasForeignKey(d => d.Role)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Users_Roles_Roles");
 
                 entity.HasOne(d => d.UserNavigation)
-                    .WithMany()
+                    .WithMany(p => p.UsersRoles)
                     .HasForeignKey(d => d.User)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Users_Roles_Users");

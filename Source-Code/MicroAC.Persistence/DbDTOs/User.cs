@@ -7,6 +7,11 @@ namespace MicroAC.Persistence.DbDTOs
 {
     public partial class User
     {
+        public User()
+        {
+            UsersRoles = new HashSet<UsersRole>();
+        }
+
         public Guid Id { get; set; }
         public string Name { get; set; }
         public string Surname { get; set; }
@@ -18,5 +23,6 @@ namespace MicroAC.Persistence.DbDTOs
         public byte[] Salt { get; set; }
 
         public virtual Organisation OrganisationNavigation { get; set; }
+        public virtual ICollection<UsersRole> UsersRoles { get; set; }
     }
 }

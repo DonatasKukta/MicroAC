@@ -7,6 +7,11 @@ namespace MicroAC.Persistence.DbDTOs
 {
     public partial class Permission
     {
+        public Permission()
+        {
+            RolesPermissions = new HashSet<RolesPermission>();
+        }
+
         public Guid Id { get; set; }
         public string Action { get; set; }
         public string Value { get; set; }
@@ -14,5 +19,6 @@ namespace MicroAC.Persistence.DbDTOs
         public string Description { get; set; }
 
         public virtual Service ServiceNameNavigation { get; set; }
+        public virtual ICollection<RolesPermission> RolesPermissions { get; set; }
     }
 }
