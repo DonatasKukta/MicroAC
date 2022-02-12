@@ -1,8 +1,13 @@
 *.7z
 Notes
 GenerateDbDTOs.bat
-/reports
+/results
+
+#Ignore appsettings with secrets
 appsettings.persistance.json
+/MicroAC.RequestManager/appsettings.json
+/MicroAC.Database.Seed/appsettings.json
+/MicroAC.Database.Seed/results/
 
 # Ignore React App files
 
