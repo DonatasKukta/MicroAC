@@ -6,21 +6,18 @@ open System.IO
 open System
 open System.Threading
 
-type TimestampCsv = (Guid * Timestamp)
+let deleteFile file =
+    if (File.Exists file) then File.Delete (file)
 
-let timestampsCsv = "/_timestamps.csv"
-let durationsCsv  = "/_durations.csv"
-let averagesCsv   = "/_averages.csv"
-let matrixAvgCsv  = "/_matrixAvg.csv" 
-
-let deleteFile folder file =
-    if (File.Exists file) then File.Delete (folder + file)
-
-let deleteCsvFiles(folder) = 
-    deleteFile folder timestampsCsv
-    deleteFile folder durationsCsv
-    deleteFile folder averagesCsv
-    deleteFile folder matrixAvgCsv
+let deleteCsvFiles() = 
+    printfn "%s" Config.timestampsCsv
+    printfn "%s" Config.durationsCsv 
+    printfn "%s" Config.averagesCsv  
+    printfn "%s" Config.matrixAvgCsv 
+    deleteFile Config.timestampsCsv
+    deleteFile Config.durationsCsv
+    deleteFile Config.averagesCsv
+    deleteFile Config.matrixAvgCsv
 
 let fromTimestampCsvStr (str : string) = 
     let split = str.Split(";")
@@ -32,29 +29,29 @@ let toTimestampCsvStr t = $"{t.id};{t.step};{t.service};{t.action};{formatDate t
 /// Appends timestamps to csv file.
 /// Ignores timestamps where response.success is false.
 /// </summary>
-let appendTimestampsToCsv reportsFolder (mutex : Mutex) (response:ApiResponse<'bodyType> ) = 
+let appendTimestampsToCsv (mutex : Mutex) (response:ApiResponse<'bodyType> ) = 
     if (not response.success) then ()
     let timestampsStr = response.timestamps 
                         |> (parseRawTimestamps response.id response.step)
                         |> Seq.map toTimestampCsvStr
     mutex.WaitOne() |> ignore
-    File.AppendAllLines(reportsFolder + timestampsCsv , timestampsStr)
+    File.AppendAllLines(Config.timestampsCsv , timestampsStr)
     mutex.ReleaseMutex() 
     timestampsStr
 
-let writeDurationsToCsv reportsFolder (durations: seq<Duration>) = 
+let writeDurationsToCsv (durations: seq<Duration>) = 
     let lines = durations |> Seq.map (fun d -> $"{d.requestId};{d.step};{d.service};{d.duration};")
-    File.WriteAllLines(reportsFolder + durationsCsv, lines)
+    File.WriteAllLines(Config.durationsCsv, lines)
     
-let writeRequestAveragesToCsv reportsFolder (averages: seq<Average>) = 
+let writeRequestAveragesToCsv (averages: seq<Average>) = 
     let str = averages |> Seq.map (fun a -> $"{a.step};{a.service};{a.average};")
-    File.WriteAllLines(reportsFolder + averagesCsv, str)
+    File.WriteAllLines(Config.averagesCsv, str)
 
 let find (timestamps: seq<Timestamp>) action service = 
     timestamps |> Seq.find (fun t -> t.action = action && t.service = service) 
 
-let readTimestampsFromFile folder =
-    File.ReadAllLines(folder + timestampsCsv)
+let readTimestampsFromFile() =
+    File.ReadAllLines(Config.timestampsCsv)
     |> Seq.cast<string>
     |> Seq.map fromTimestampCsvStr
 
@@ -83,7 +80,7 @@ let calcRequestAverages (durations : seq<Duration>) =
     |> Seq.map (fun (ss,d) -> let step, service = ss
                               {step = step; service = service; average = calcMsAverage d})
 
-let calcAverageMatrixToCsv reportsFolder averages =
+let calcAverageMatrixToCsv averages =
     let rows    = Seq.map (fun a -> a.step)    averages |> Seq.distinct
     let columns = Seq.map (fun a -> a.service) averages |> Seq.distinct
     let matrix = Array2D.zeroCreate (Seq.length rows)  (Seq.length columns)
@@ -99,4 +96,4 @@ let calcAverageMatrixToCsv reportsFolder averages =
     let firstLine = Seq.fold (fun f r -> $"{f}{r};") ";" columns
     let allLines = strLines |> Seq.append [firstLine]
 
-    File.WriteAllLines(reportsFolder + matrixAvgCsv, allLines)
+    File.WriteAllLines(Config.matrixAvgCsv, allLines)

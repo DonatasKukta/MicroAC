@@ -16,20 +16,20 @@ let private refreshStep = "Refresh"
 let private resourceApiStep = "ResourceApi"
 
 
-let createLogin httpFactory url credentials = 
-    Step.create("login",
+let createLogin httpFactory credentials = 
+    Step.create(loginStep,
         clientFactory = httpFactory,
         timeout = globalTimeout,
         execute = fun context ->
              let saveResponse = saveResponseInContext<LoginResult> loginStep context
-             Http.createRequest "POST" url
+             Http.createRequest "POST" Config.loginUrl
              |> Http.withHeader "Content-Type" "application/json"
              |> Http.withBody (JsonContent.Create credentials)
              |> Http.withCheck saveResponse 
              |> Http.send context
 )
 
-let createResourceAction httpFactory url = 
+let createResource httpFactory = 
     Step.create(resourceApiStep,
         clientFactory = httpFactory,
         timeout = globalTimeout,
@@ -40,14 +40,14 @@ let createResourceAction httpFactory url =
              if(Option.isNone loginResponse) then return Response.fail("Refresh step couldn't get LoginResult", -1)
              else 
              let accessJwt = loginResponse.Value.body.accessJwt
-             return! Http.createRequest "GET" url
+             return! Http.createRequest "GET" Config.resourceActionUrl
                      |> Http.withHeader "Authorization" accessJwt
                      |> Http.withCheck saveResponse
                      |> Http.send context
         }
 )
 
-let createRefresh httpFactory url = 
+let createRefresh httpFactory = 
     Step.create(refreshStep,
         clientFactory = httpFactory,
         timeout = globalTimeout,
@@ -58,27 +58,27 @@ let createRefresh httpFactory url =
              if(Option.isNone loginResponse) then return Response.fail("Refresh step couldn't get LoginResult", -1)
              else 
              let refreshJwt = loginResponse.Value.body.refreshJwt
-             return!  Http.createRequest "POST" url
+             return!  Http.createRequest "POST" Config.refreshUrl
                          |> Http.withBody (new StringContent(refreshJwt))
                          |> Http.withCheck saveResponse
                          |> Http.send context
         }
 )
 
-let postScenarioHandling reportsFolder mutex = 
+let postScenarioHandling mutex = 
     Step.create("post_scenario_handling", 
         doNotTrack = true,
         execute = fun context ->  task {
-        let login =     getApiResponse<LoginResult> loginStep context 
-        let refresh =   getApiResponse<string> "Refresh" context
-        let resource =  getApiResponse<string> resourceApiStep context
+        let login =     getApiResponse<LoginResult> loginStep       context 
+        let refresh =   getApiResponse<string>      refreshStep     context
+        let resource =  getApiResponse<string>      resourceApiStep context
 
         if(Option.isSome login)     
-            then Csv.appendTimestampsToCsv reportsFolder mutex login.Value |> ignore
+            then Csv.appendTimestampsToCsv mutex login.Value |> ignore
         if(Option.isSome refresh) 
-            then Csv.appendTimestampsToCsv reportsFolder mutex refresh.Value |> ignore
+            then Csv.appendTimestampsToCsv mutex refresh.Value |> ignore
         if(Option.isSome resource) 
-            then Csv.appendTimestampsToCsv reportsFolder mutex resource.Value |> ignore
+            then Csv.appendTimestampsToCsv mutex resource.Value |> ignore
 
         return Response.ok()
     })

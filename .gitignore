@@ -8,6 +8,7 @@ appsettings.persistance.json
 */MicroAC.RequestManager/appsettings.json
 */MicroAC.Database.Seed/appsettings.json
 */MicroAC.Database.Seed/results/
+*/MicroAC.Performance.Tests/appsettings.json
 
 *-users.sql
 

@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="appsettings.example.json" />
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Compile Include="Config.fs" />
     <Compile Include="Types.fs" />
     <Compile Include="Timestamps.fs" />
     <Compile Include="Csv.fs" />
@@ -16,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="FSharp.Data" Version="4.2.7" />
     <PackageReference Include="NBomber.FSharp" Version="0.0.4" />
     <PackageReference Include="NBomber.Http" Version="2.0.1" />
   </ItemGroup>
