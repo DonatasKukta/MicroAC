@@ -9,14 +9,14 @@ let main argv =
 
     Database.saveStateToScript("backup.sql")
     
-    let organisations =     Generate.organisations    40
-    let roles =             Generate.roles            20
-    let services =          Generate.services         10
-    let permissions =       Generate.permissions      70   services
-    let rolesPermissions =  Generate.rolesPermissions 120  roles permissions
-    let users =             Generate.users            1000 organisations
-    let usersRoles =        Generate.usersRoles       10   users roles
-
+    let organisations =    Generate.organisations    40
+    let roles =            Generate.roles            20
+    let services =         Generate.services         10
+    let permissions =      Generate.permissions      70   services
+    let rolesPermissions = Generate.rolesPermissions roles permissions
+    let users =            Generate.users            1000 organisations
+    let usersRoles =       Generate.usersRoles       users roles
+    
     // Clean database from previously seeded values.
     Database.removeSeededValues()
     Database.saveStateToScript("after_removing_seeded_data.sql")
@@ -30,6 +30,8 @@ let main argv =
     Database.seed usersRoles     
 
     Database.saveStateToScript("after_seeding_data.sql")
+    
+    users |> Seq.iter (fun u -> (Database.printUserRoles u.Id) )
     
     printfn "Seeding completed succesfully."
     0

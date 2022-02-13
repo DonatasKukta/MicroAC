@@ -1,15 +1,17 @@
 ﻿module Database
 
 open Microsoft.Data.SqlClient
-open Microsoft.EntityFrameworkCore
 open Microsoft.SqlServer.Management.Common
 open Microsoft.SqlServer.Management.Smo
 
+open System
 open System.Collections
 open System.IO
+open System.Linq
 
 open MicroAC.Persistence
 open MicroAC.Persistence.Entities
+open Microsoft.EntityFrameworkCore
 
 exception SeedingError of string
 
@@ -85,3 +87,23 @@ let saveStateToScript(filename) =
 
     File.WriteAllLines(Config.getPath "_backup-output.txt", result)    
     
+let printUserRoles (guid: Guid) = 
+    let uroles = 
+        context.UsersRoles.ToList() 
+        |> Seq.where (fun ur -> ur.User.Equals(guid)) 
+        |> Seq.map (fun ur -> ur.Role)
+    let permissions = 
+        context.RolesPermissions.ToList() 
+        |> Seq.where (fun rp -> Seq.contains rp.Role uroles)
+        |> Seq.map (fun rp -> rp.Permission)
+    
+    let print list = Seq.iter (fun i -> printfn "   %A;" i) list
+
+    //TODO: Print to file.
+    printfn "================================"
+    printfn "User: %A" guid
+    printfn "Roles:" 
+    print uroles
+    printfn "Permissions:" 
+    print permissions
+    printfn "================================"

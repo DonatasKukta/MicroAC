@@ -7,6 +7,7 @@ open System
 let dataSeed = "SeedTestData"
 let data str (i:int) =  $"{str}{i}_{dataSeed}"
 let generate count map = Seq.map map { 1 .. 1 .. count }
+let infinite seq = Seq.initInfinite (fun _ -> seq) |> Seq.concat
 
 let users (count: int) (organisations:seq<Organisation>) = 
     let oc = Seq.length organisations
@@ -22,20 +23,15 @@ let users (count: int) (organisations:seq<Organisation>) =
                                 )) 
     |> Seq.cache
 
-let usersRoles count (users:seq<User>) (roles:seq<Role>) = 
-    let uc = Seq.length users
-    let rc = Seq.length roles
-    let getU i = (Seq.item (i % uc) users).Id
-    let getR i = (Seq.item (i % rc) roles).Name
-    generate count (fun i -> new UsersRole ( User = getU i, Role = getR i))
+let usersRoles (users:seq<User>) (roles:seq<Role>) = 
+    infinite roles
+    |> Seq.zip users
+    |> Seq.map(fun (u, r) -> new UsersRole ( User = u.Id, Role = r.Name))
 
-let rolesPermissions count (roles:seq<Role>) (permissions:seq<Permission>) =
-    let rc = Seq.length roles
-    let pc = Seq.length permissions
-    let getP i = (Seq.item (i % pc) permissions).Id
-    let getR i = (Seq.item (i % rc) roles).Name
-    printfn "Generating role permissions"
-    generate count (fun i -> new RolesPermission(Role = getR i, Permission = getP i))
+let rolesPermissions (roles:seq<Role>) (permissions:seq<Permission>) =
+    infinite roles
+    |> Seq.zip permissions
+    |> Seq.map(fun (p, r) -> new RolesPermission(Role = r.Name, Permission = p.Id))
 
 let permissions count (services: seq<Service>) = 
     let sc = Seq.length services
@@ -50,9 +46,7 @@ let permissions count (services: seq<Service>) =
                                 )) 
     |> Seq.cache
 
-let roles c = generate c (fun i -> new Role(Name = data "Role" i))  
-
-let services c = generate c (fun i -> new Service(Name = data "Service" i))
-
-let organisations c = generate c (fun i -> new Organisation(Name = data "Organisation" i))
+let roles c =         generate c (fun i -> new Role         (Name = data "Role" i))  
+let services c =      generate c (fun i -> new Service      (Name = data "Service" i))
+let organisations c = generate c (fun i -> new Organisation (Name = data "Organisation" i))
 

@@ -1,0 +1,7 @@
+Login;RequestManager;64,93712121212121;
+Login;Authentication;42,211868686868684;
+Refresh;RequestManager;64,46055555555556;
+Refresh;Authentication;42,024040404040406;
+ResourceApi;RequestManager;1115,229595959596;
+ResourceApi;Authorization;40,67121212121212;
+ResourceApi;ResourceApi;1018,0038888888889;

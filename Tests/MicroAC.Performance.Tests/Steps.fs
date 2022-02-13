@@ -16,15 +16,16 @@ let private refreshStep = "Refresh"
 let private resourceApiStep = "ResourceApi"
 
 
-let createLogin httpFactory credentials = 
+let createLogin httpFactory (users: IFeed<LoginInput>) = 
     Step.create(loginStep,
+        feed = users,
         clientFactory = httpFactory,
         timeout = globalTimeout,
         execute = fun context ->
-             let saveResponse = saveResponseInContext<LoginResult> loginStep context
+             let saveResponse = saveResponseInContext<LoginResult, LoginInput> loginStep context
              Http.createRequest "POST" Config.loginUrl
              |> Http.withHeader "Content-Type" "application/json"
-             |> Http.withBody (JsonContent.Create credentials)
+             |> Http.withBody (JsonContent.Create context.FeedItem)
              |> Http.withCheck saveResponse 
              |> Http.send context
 )
@@ -34,8 +35,8 @@ let createResource httpFactory =
         clientFactory = httpFactory,
         timeout = globalTimeout,
         execute = fun context ->  task {
-             let saveResponse = saveResponseInContext<string> resourceApiStep context
-             let loginResponse = getApiResponse<LoginResult> loginStep context
+             let saveResponse = saveResponseInContext<string, obj> resourceApiStep context
+             let loginResponse = getApiResponse<LoginResult, obj> loginStep context
              
              if(Option.isNone loginResponse) then return Response.fail("Refresh step couldn't get LoginResult", -1)
              else 
@@ -52,8 +53,8 @@ let createRefresh httpFactory =
         clientFactory = httpFactory,
         timeout = globalTimeout,
         execute = fun context ->  task {
-             let saveResponse = saveResponseInContext<string> refreshStep context
-             let loginResponse = getApiResponse<LoginResult> loginStep context 
+             let saveResponse = saveResponseInContext<string, obj> refreshStep context
+             let loginResponse = getApiResponse<LoginResult, obj> loginStep context 
 
              if(Option.isNone loginResponse) then return Response.fail("Refresh step couldn't get LoginResult", -1)
              else 
@@ -69,9 +70,9 @@ let postScenarioHandling mutex =
     Step.create("post_scenario_handling", 
         doNotTrack = true,
         execute = fun context ->  task {
-        let login =     getApiResponse<LoginResult> loginStep       context 
-        let refresh =   getApiResponse<string>      refreshStep     context
-        let resource =  getApiResponse<string>      resourceApiStep context
+        let login =     getApiResponse<LoginResult, obj> loginStep       context 
+        let refresh =   getApiResponse<string, obj>      refreshStep     context
+        let resource =  getApiResponse<string, obj>      resourceApiStep context
 
         if(Option.isSome login)     
             then Csv.appendTimestampsToCsv mutex login.Value |> ignore

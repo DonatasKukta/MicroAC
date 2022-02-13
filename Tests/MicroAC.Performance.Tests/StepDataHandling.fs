@@ -33,7 +33,7 @@ let readApiResponse<'content> (response: HttpResponseMessage) step =
             }
     }
 
-let saveResponseInContext<'content> stepKey (stepContext : IStepContext<HttpClient, obj>) ( response: HttpResponseMessage)  = 
+let saveResponseInContext<'content,'a> stepKey (stepContext : IStepContext<HttpClient, 'a>) ( response: HttpResponseMessage)  = 
     task {
         let! apiResponse = readApiResponse<'content> response stepKey
         let added = stepContext.Data.TryAdd(stepKey, apiResponse)
@@ -43,7 +43,7 @@ let saveResponseInContext<'content> stepKey (stepContext : IStepContext<HttpClie
             | false -> return Response.fail($"Error.PostHandling: Unable to add {stepKey} to context data.", -2)
     }
 
-let getApiResponse<'content> stepKey (stepContext : IStepContext<HttpClient, obj>) = 
+let getApiResponse<'content, 'a> stepKey (stepContext : IStepContext<HttpClient, 'a>) = 
     let found, value = stepContext.Data.TryGetValue stepKey
     match found with
         | true -> Some (value :?> ApiResponse<'content>)

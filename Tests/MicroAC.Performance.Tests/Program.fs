@@ -15,12 +15,16 @@ open Types
 
 //TODO: Setup data feed.
 let credentials  = { Email= "Jonas.Jonaitis@gmail.com"; Password= "" }
+let users = 
+    { 1 .. 1 .. 1000} 
+    |> Seq.map(fun i -> { Email= $"testemail{i}@SeedTestData.com"; Password= "" })
+    |> Feed.createCircular "users"
 
 let runTests() =
     let httpFactory = HttpClientFactory.create()
     let csvMutex = new Mutex();
 
-    let login =     Steps.createLogin          httpFactory credentials
+    let login =     Steps.createLogin          httpFactory users
     let resource =  Steps.createResource       httpFactory 
     let refresh =   Steps.createRefresh        httpFactory 
     let final =     Steps.postScenarioHandling csvMutex
