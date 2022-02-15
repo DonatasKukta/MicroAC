@@ -25,19 +25,20 @@ namespace MicroAC.RequestManager
 
         readonly List<string> _headersToIgnore;
 
-        readonly string _serviceName;
+        readonly ITimestampHandler _timestampHandler;
 
-        readonly string _timestampHeader;
-
-        public RequestManagerController(HttpClient httpClient, IConfiguration config)
+        public RequestManagerController(
+            HttpClient httpClient, 
+            IConfiguration config,
+            ITimestampHandler timestampHandler
+            )
         {
             _http = httpClient;
             _routes = config.GetSection("EndpointRoutes").Get<List<EndpointRoute>>();
             _basePath = config.GetValue<string>("InternalGateway");
             _authorizationUrl = new Uri(_basePath + config.GetValue<string>("InternalAuthorizationRoute"));
             _headersToIgnore = config.GetSection("HeadersToIgnore").Get<List<string>>();
-            _serviceName = config.GetValue<string>("Timestamp:ServiceName");
-            _timestampHeader = config.GetValue<string>("Timestamp:Header");
+            _timestampHandler = timestampHandler.SetHttpContext(this.HttpContext);
         }
 
         public async Task<IActionResult> Index()
@@ -52,20 +53,20 @@ namespace MicroAC.RequestManager
                 var containsExternalAccessToken = this.Request.Headers.ContainsKey("Authorization");
                 if (!containsExternalAccessToken)
                 {
-                    this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Unauthorized");
+                    _timestampHandler.AddActionMessage("Unauthorized");
                     return Unauthorized("Access token is missing.");
                 }
             }
 
             if (requestedRoute.RequiresAuthorization)
             {
-                this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "StartAuth");
+                _timestampHandler.AddActionMessage("StartAuth");
 
                 var authorised = await AuthorizeRequest();
 
                 if (!authorised)
                 {
-                    this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Unauthorized");
+                    _timestampHandler.AddActionMessage("Unauthorized");
                     return Unauthorized("Unable to authorize the request.");
                 }
             }
@@ -79,7 +80,7 @@ namespace MicroAC.RequestManager
             var forwardUri = GetForwardUri(requestedRoute);
             var forwardRequest = await CreateForwardRequest(forwardUri);
 
-            this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Forward");
+            _timestampHandler.AddActionMessage("Forward");
 
             var response = await _http.SendAsync(forwardRequest);
 
@@ -97,8 +98,8 @@ namespace MicroAC.RequestManager
                 return false;
             }
 
-            this.HttpContext.AppendeTimestampHeaders(_timestampHeader, response.Headers);
-            this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Authorized");
+            _timestampHandler.AppendeTimestampHeaders(response.Headers);
+            _timestampHandler.AddActionMessage("Authorized");
 
             var token = await response.Content.ReadAsStringAsync();
             this.HttpContext.Request.Headers.Add("MicroAC-JWT", token);
@@ -114,7 +115,7 @@ namespace MicroAC.RequestManager
 
         private async Task<IActionResult> HandleForwardedResponse(HttpResponseMessage response)
         {
-            this.HttpContext.AppendeTimestampHeaders(_timestampHeader, response.Headers);
+            _timestampHandler.AppendeTimestampHeaders(response.Headers);
             /* TODO: Fix header transfer
             foreach (var header in response.Headers)
             {
@@ -124,7 +125,7 @@ namespace MicroAC.RequestManager
                 }
             }
             */
-            this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Receive");
+            _timestampHandler.AddActionMessage("Receive");
 
             this.HttpContext.Response.StatusCode = (int)response.StatusCode;
 

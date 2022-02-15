@@ -15,15 +15,14 @@ namespace Example.ResourceApi
     {
         readonly IJwtTokenHandler<AccessInternal> _accessInternalTokenHandler;
 
-        readonly string _timestampHeader;
+        readonly ITimestampHandler _timestampHandler;
 
-        readonly string _serviceName;
-
-        public ResourceApiController(IJwtTokenHandler<AccessInternal> accessInternalTokenHandler, IConfiguration config)
+        public ResourceApiController(
+            IJwtTokenHandler<AccessInternal> accessInternalTokenHandler, 
+            ITimestampHandler timestampHandler)
         {
             _accessInternalTokenHandler = accessInternalTokenHandler;
-            _timestampHeader = config.GetSection("Timestamp:Header").Value;
-            _serviceName = config.GetSection("Timestamp:ServiceName").Value;
+            _timestampHandler = timestampHandler;
         }
 
         [HttpGet("/Action")]
@@ -57,7 +56,7 @@ namespace Example.ResourceApi
 
         private ActionResult UnauthorizedWithTimestamp(string reason)
         {
-            this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Unauthorized");
+            _timestampHandler.AddActionMessage("Unauthorized");
             return Unauthorized(reason);
         }
     }

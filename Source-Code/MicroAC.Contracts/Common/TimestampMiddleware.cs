@@ -30,17 +30,17 @@ namespace MicroAC.Core.Common
             _serviceName = config.GetSection("Timestamp:ServiceName").Value;
             _serviceContext = serviceContext;
         }
-
+        //TODO: Use TimestampHandler
         public async Task InvokeAsync(HttpContext context)
         {
             context.AddActionMessage(_timestampHeader, _serviceName, _serviceContext.NodeContext.NodeName);
             context.AddStartTimestamp(_timestampHeader, _serviceName);
             context.Response.OnStarting(state =>
-            {
+            {   // TODO: Test if this works
                 (state as HttpContext).AddEndTimestamp(_timestampHeader, _serviceName);
+                //_timestampHandler.AddEndTimestamp();
                 return Task.CompletedTask;
             }, context);
-
             await _next(context);
         }
     }
@@ -49,7 +49,7 @@ namespace MicroAC.Core.Common
     public static class HttpContextTimestampExtensions
     {
         static string _timeNow
-        { 
+        {
             get { return DateTime.Now.ToString(Constants.TimestampFormat); }
         }
 

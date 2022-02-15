@@ -24,9 +24,7 @@ namespace MicroAC.Authorization
 
         readonly IPermissionsRepository _permissionsRepository;
 
-        readonly string _timestampHeader;
-
-        readonly string _serviceName;
+        readonly ITimestampHandler _timestampHandler;
 
         public AuthorizationController(
             StatelessServiceContext serviceContext,
@@ -34,7 +32,7 @@ namespace MicroAC.Authorization
             IJwtTokenHandler<AccessInternal> accessInternalTokenHandler,
             IClaimBuilder<AccessInternal> accessInternalClaimBuiler,
             IPermissionsRepository permissionsRepository,
-            IConfiguration config
+            ITimestampHandler timestampHandler
             )
         {
             _serviceContext = serviceContext;
@@ -42,8 +40,7 @@ namespace MicroAC.Authorization
             _accessInternalTokenHandler = accessInternalTokenHandler;
             _accessInternalClaimBuilder = accessInternalClaimBuiler;
             _permissionsRepository = permissionsRepository;
-            _timestampHeader = config.GetSection("Timestamp:Header").Value;
-            _serviceName = config.GetSection("Timestamp:ServiceName").Value;
+            _timestampHandler = timestampHandler.SetHttpContext(this.HttpContext);
         }
 
         [HttpGet]
@@ -55,7 +52,7 @@ namespace MicroAC.Authorization
         [HttpPost("Authorize")]
         public async Task<ActionResult> Authorize()
         {
-            var hasToken = this.Request.Headers.TryGetValue("Authorization", out StringValues headerValues);
+            var hasToken = this.Request.Headers.TryGetValue("Authorization", out var headerValues);
             if (!hasToken)
             {
                 return UnauthorizedWithTimestamp("Missing external access token.");
@@ -73,12 +70,12 @@ namespace MicroAC.Authorization
             var roles = accessClaims.Claims.Where(c => c.Type == MicroACClaimTypes.Roles)
                                                            .Select(c => c.Value);
 
-            if (roles.Count() < 1)
+            if (!roles.Any())
             {
                 return UnauthorizedWithTimestamp("User has no roles assigned therefore cannot be authorized.");
             }
 
-            this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "AuthStart");
+            _timestampHandler.AddActionMessage("AuthStart");
             var permissions = await _permissionsRepository.GetRolePermissions(roles);
 
             var claims = _accessInternalClaimBuilder
@@ -86,16 +83,17 @@ namespace MicroAC.Authorization
                 .AddRoles(roles)
                 .AddSubjectClaims(permissions)
                 .Build();
+
             var jwt = _accessInternalTokenHandler.Create(claims);
-            
-            this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Success");
+
+            _timestampHandler.AddActionMessage("Success");
 
             return Ok(jwt);
         }
 
         private ActionResult UnauthorizedWithTimestamp(string reason)
         {
-            this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Unauthorized");
+            _timestampHandler.AddActionMessage("Unauthorized");
             return Unauthorized(reason);
         }
     }

@@ -27,9 +27,7 @@ namespace MicroAC.Authentication
 
         readonly IUsersRepository _usersRepository;
 
-        readonly string _timestampHeader;
-
-        readonly string _serviceName;
+        readonly ITimestampHandler _timestampHandler;
 
         public AuthenticationController(
             StatelessServiceContext serviceContext,
@@ -38,7 +36,7 @@ namespace MicroAC.Authentication
             IJwtTokenHandler<RefreshExternal> refreshTokenHandler,
             IClaimBuilder<RefreshExternal> refreshClaimBuiler,
             IUsersRepository usersRepository,
-            IConfiguration config
+            ITimestampHandler timestampHandler
             )
         {
             _serviceContext = serviceContext;
@@ -47,8 +45,7 @@ namespace MicroAC.Authentication
             _refreshTokenHandler = refreshTokenHandler;
             _refreshClaimBuilder = refreshClaimBuiler;
             _usersRepository = usersRepository;
-            _timestampHeader = config.GetSection("Timestamp:Header").Value;
-            _serviceName = config.GetSection("Timestamp:ServiceName").Value;
+            _timestampHandler = timestampHandler;
         }
 
         [HttpGet]
@@ -65,7 +62,7 @@ namespace MicroAC.Authentication
                 return BadRequest("Login credentials not provided.");
             }
 
-            this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "StartAuth");
+            _timestampHandler.AddActionMessage("StartAuth");
             var user = await _usersRepository.GetUser(credentials.Email, credentials.Password);
             
             if (user == null)
@@ -86,7 +83,7 @@ namespace MicroAC.Authentication
              .Build();
             var refreshJwt = _accessTokenHandler.Create(refreshClaims);
 
-            this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Success");
+            _timestampHandler.AddActionMessage("Success");
 
             return Ok(new { accessJwt, refreshJwt });
         }
@@ -117,7 +114,7 @@ namespace MicroAC.Authentication
 
         private ActionResult UnauthorizedWithTimestamp(string reason)
         {
-            this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Unauthorized");
+            _timestampHandler.AddActionMessage("Unauthorized");
             return Unauthorized(reason);
         }
     }

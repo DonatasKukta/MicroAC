@@ -1,6 +1,3 @@
-using System.Text.Json.Serialization;
-using System.Threading;
-
 using MicroAC.Core.Auth;
 using MicroAC.Core.Common;
 
@@ -25,15 +22,16 @@ namespace Example.ResourceApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRouting();
+
             services.AddControllers(); ;
 
             services.AddScoped<AccessInternal>();
 
             services.AddScoped(typeof(IJwtTokenHandler<AccessInternal>), typeof(JwtTokenHandler<AccessInternal>));
-
+            
             services.AddSingleton<IConfiguration>(_config); 
 
-            services.AddSingleton(typeof(IJwtTokenHandler<AccessInternal>), new JwtTokenHandler<AccessInternal>(new AccessInternal()));
+            services.AddTransient<ITimestampHandler, TimestampHandler>();;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,10 +42,7 @@ namespace Example.ResourceApi
                 app.UseDeveloperExceptionPage();
             }
 
-            if (_config.GetValue<bool>("Timestamp:Enabled"))
-            {
-                app.UseMiddleware<TimestampMiddleware>();
-            }
+            app.UseMiddleware<TimestampMiddleware>();
 
             app.UseRouting();
 

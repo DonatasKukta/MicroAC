@@ -13,7 +13,7 @@ namespace MicroAC.Authentication
 {
     public class Startup
     {
-        IConfiguration _config = new ConfigurationBuilder()
+        readonly IConfiguration _config = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .AddJsonFile("appsettings.persistance.json")
                 .AddEnvironmentVariables()
@@ -40,6 +40,8 @@ namespace MicroAC.Authentication
 
             services.AddScoped<IUsersRepository, UsersRepository>();
 
+            services.AddTransient<ITimestampHandler, TimestampHandler>();;
+            
             services.AddSingleton<IConfiguration>(_config);
 
             services.AddDbContext<MicroACContext>(
@@ -60,10 +62,7 @@ namespace MicroAC.Authentication
                 });
             }
 
-            if (_config.GetValue<bool>("Timestamp:Enabled"))
-            {
-                app.UseMiddleware<TimestampMiddleware>();
-            }
+            app.UseMiddleware<TimestampMiddleware>();
 
             app.UseRouting();
             app.UseEndpoints(endpoints =>

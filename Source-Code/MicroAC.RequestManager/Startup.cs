@@ -29,6 +29,8 @@ namespace MicroAC.RequestManager
 
             services.AddSingleton<HttpClient>(new HttpClient());
 
+            services.AddTransient<ITimestampHandler, TimestampHandler>();;
+
             services.AddSingleton<IConfiguration>(_config);
         }
 
