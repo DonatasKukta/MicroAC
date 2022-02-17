@@ -13,8 +13,8 @@
     <Content Include="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Compile Include="Generate.fs" />
     <Compile Include="Config.fs" />
+    <Compile Include="Generate.fs" />
     <Compile Include="Database.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

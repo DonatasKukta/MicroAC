@@ -59,8 +59,9 @@ let seed<'T> (data: seq<'T>) =
         | :? seq<UsersRole>       as s -> context.UsersRoles.AddRange(s)
         | :? seq<Organisation>    as s -> context.Organisations.AddRange(s)
         | _ -> raise (SeedingError($"Data type {data.GetType().Name} not found during seeding."))
-
-    printfn "Created %i  rows of %A entity." (context.SaveChanges()) typeof<'T> 
+    let rowsCreated = context.SaveChanges()
+    printfn "Created %i  rows of %A entity." rowsCreated typeof<'T> 
+    rowsCreated
    
 let saveStateToScript(filename) = 
     let rec copy (enumerator: IEnumerator) (array: SqlSmoObject[]) (i:int) = 
@@ -84,8 +85,8 @@ let saveStateToScript(filename) =
     
     let recArray = copy (tables.GetEnumerator()) (Array.zeroCreate<SqlSmoObject> tables.Count) 0 
     let result = scripter.EnumScript recArray
-
-    File.WriteAllLines(Config.getPath "_backup-output.txt", result)    
+    printfn "Database saved to file %s." filename
+    File.WriteAllLines(Config.getPath "_backup-output.txt", result)  
     
 let printUserRoles (guid: Guid) = 
     let uroles = 
@@ -99,7 +100,6 @@ let printUserRoles (guid: Guid) =
     
     let print list = Seq.iter (fun i -> printfn "   %A;" i) list
 
-    //TODO: Print to file.
     printfn "================================"
     printfn "User: %A" guid
     printfn "Roles:" 
