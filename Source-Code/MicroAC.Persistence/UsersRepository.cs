@@ -14,16 +14,22 @@ namespace MicroAC.Persistence
 {
     public class UsersRepository : IUsersRepository
     {
-        private readonly MicroACContext Context;
+        readonly MicroACContext _context;
 
-        public UsersRepository(MicroACContext context)
+        readonly IPasswordHandler _passwordHandler;
+
+        public UsersRepository(MicroACContext context, IPasswordHandler passwordHandler)
         {
-            Context = context;
+            _context = context;
+            _passwordHandler = passwordHandler;
         }
 
         public async Task<Domain.User> GetUser(string email, string password)
         {
-            var user = await Context.Users.Where(u => u.Email == email).FirstOrDefaultAsync();
+            var user = await _context.Users.Where(u => u.Email == email)
+                                          .FirstOrDefaultAsync();
+            if (!_passwordHandler.ConfirmPassword(user, password))
+                return null;
 
             var roles = await GetUserRoles(user.Id);
 
@@ -32,7 +38,7 @@ namespace MicroAC.Persistence
 
         public async Task<Domain.User> GetUser(Guid guid)
         {
-            var user = Context.Users.Where(u => u.Id == guid).FirstOrDefault();
+            var user = _context.Users.Where(u => u.Id == guid).FirstOrDefault();
 
             var roles = await GetUserRoles(user.Id);
 
@@ -40,8 +46,9 @@ namespace MicroAC.Persistence
         }
 
         private async Task<IEnumerable<string>> GetUserRoles(Guid userId) => 
-            await Context.UsersRoles.Where(ur => ur.User == userId)
+            await _context.UsersRoles.Where(ur => ur.User == userId)
                                     .Select(ur => ur.Role)
+                                    //.AsNoTracking()
                                     .ToListAsync();
 
         //TODO: Implement Automapping

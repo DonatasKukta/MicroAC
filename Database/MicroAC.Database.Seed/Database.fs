@@ -89,6 +89,7 @@ let saveStateToScript(filename) =
     File.WriteAllLines(Config.getPath "_backup-output.txt", result)  
     
 let printUserRoles (guid: Guid) = 
+    let user = context.Users.Find guid
     let uroles = 
         context.UsersRoles.ToList() 
         |> Seq.where (fun ur -> ur.User.Equals(guid)) 
@@ -99,9 +100,10 @@ let printUserRoles (guid: Guid) =
         |> Seq.map (fun rp -> rp.Permission)
     
     let print list = Seq.iter (fun i -> printfn "   %A;" i) list
-
+    let hex (bytes:byte[]) = bytes |> Array.fold (fun state x-> state + sprintf "%02X" x) ""
     printfn "================================"
-    printfn "User: %A" guid
+    printfn "User-  guid:%A " guid 
+    printfn "Email: %s Salt: %s Password: %s"user.Email (hex user.Salt) (hex user.PasswordHash)
     printfn "Roles:" 
     print uroles
     printfn "Permissions:" 

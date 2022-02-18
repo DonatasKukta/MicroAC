@@ -26,8 +26,6 @@ namespace MicroAC.Authentication
             services.AddRouting();
             services.AddControllers()
                     .AddNewtonsoftJson();
-            //services.AddEndpointsApiExplorer();
-            services.AddSwaggerGen();
 
             services.AddScoped<AccessExternal>();
             services.AddScoped<RefreshExternal>();
@@ -38,6 +36,7 @@ namespace MicroAC.Authentication
             services.AddScoped(typeof(IClaimBuilder<AccessExternal>), typeof(ClaimBuilder<AccessExternal>));
             services.AddScoped(typeof(IClaimBuilder<RefreshExternal>), typeof(ClaimBuilder<RefreshExternal>));
 
+            services.AddTransient<IPasswordHandler, PasswordHandler>();
             services.AddScoped<IUsersRepository, UsersRepository>();
 
             services.AddSingleton<IConfiguration>(_config);
@@ -52,12 +51,6 @@ namespace MicroAC.Authentication
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(options =>
-                {
-                    options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-                    options.RoutePrefix = string.Empty;
-                });
             }
 
             if (_config.GetValue<bool>("Timestamp:Enabled"))

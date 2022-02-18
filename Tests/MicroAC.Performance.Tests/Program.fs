@@ -13,23 +13,23 @@ open System.Threading
 
 open Types
 
-//TODO: Setup data feed.
-let credentials  = { Email= "Jonas.Jonaitis@gmail.com"; Password= "" }
+let email i = $"testemail{i}@SeedTestData.com"
+
 let users = 
-    { 1 .. 1 .. 1000} 
-    |> Seq.map(fun i -> { Email= $"testemail{i}@SeedTestData.com"; Password= "" })
+    { 1 .. 1 .. 15000} 
+    |> Seq.map(fun i -> { Email= email i; Password= email i })
     |> Feed.createCircular "users"
 
 let runTests() =
     let httpFactory = HttpClientFactory.create()
     let csvMutex = new Mutex();
 
-    let login =     Steps.createLogin          httpFactory users
-    let resource =  Steps.createResource       httpFactory 
-    let refresh =   Steps.createRefresh        httpFactory 
-    let final =     Steps.postScenarioHandling csvMutex
+    let login =    Steps.createLogin          httpFactory users
+    let refresh =  Steps.createRefresh        httpFactory 
+    let resource = Steps.createResource       httpFactory 
+    let final =    Steps.postScenarioHandling csvMutex
 
-    Scenario.create "debug" [login; resource; refresh; final]
+    Scenario.create "debug" [login; refresh; resource; final]
     //|> Scenario.withLoadSimulations [KeepConstant(copies = 1, during = seconds 10)]
     |> Scenario.withLoadSimulations [InjectPerSec(rate = 60, during = minutes 5)]
     |> NBomberRunner.registerScenario
@@ -44,7 +44,7 @@ let debug() =
         printf "Debug send operation"
         let http = new HttpClient()
         let req = new HttpRequestMessage(HttpMethod.Post, Config.loginUrl)
-        let json = JsonContent.Create(credentials)
+        let json = JsonContent.Create({ Email= email 1; Password= email 1 })
         req.Content <- json :> HttpContent
         let result = http.Send(req)
         let! response = StepDataHandling.readApiResponse<LoginResult> result "debugResponse" 

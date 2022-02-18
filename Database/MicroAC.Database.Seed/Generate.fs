@@ -1,24 +1,36 @@
 ﻿module Generate
 
+open System
+open System.Text
+
+open MicroAC.Persistence
 open MicroAC.Persistence.Entities
 
-open System
-
 let dataSeed = "SeedTestData"
-let data str (i:int) =  $"{str}{i}_{dataSeed}"
-let generate count map = Seq.map map { 1 .. 1 .. count }
-let infinite seq = Seq.initInfinite (fun _ -> seq) |> Seq.concat
+let private data str (i:int) =  $"{str}{i}_{dataSeed}"
+let private generate count map = Seq.map map { 1 .. 1 .. count }
+let private infinite seq = Seq.initInfinite (fun _ -> seq) |> Seq.concat
+     
+let private bytes (s:string) = Encoding.UTF8.GetBytes(s)
+let private passwordHandler = new PasswordHandler(Config.pepperStr)
+let private hash passw salt = passwordHandler.HashPassword(bytes passw, salt)
 
 let users (organisations:seq<Organisation>) = 
+    let random = new Random(1)
     let createUser (i, o :Organisation) = 
+        let email = $"testemail{i}@{dataSeed}.com"
+        let salt : byte array =  Array.zeroCreate 16
+        random.NextBytes(salt)
         User(
             Id = Guid.NewGuid(),
             Name = data "Name" i,
             Surname = data "Surname" i,
-            Email = $"testemail{i}@{dataSeed}.com",
+            Email = email,
             Phone = $"+370 6500{i}{i}",
             Organisation = o.Name,
-            Blocked = false
+            Blocked = false,
+            Salt = salt,
+            PasswordHash = hash email salt
             )        
     infinite organisations
     |> Seq.zip {1..1..Config.usersCount}
