@@ -1,8 +1,12 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 using MicroAC.Core.Auth;
 using MicroAC.Core.Common;
+using MicroAC.Core.Exceptions;
+using MicroAC.Core.Models;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -15,50 +19,36 @@ namespace Example.ResourceApi
     {
         readonly IJwtTokenHandler<AccessInternal> _accessInternalTokenHandler;
 
-        readonly string _timestampHeader;
-
-        readonly string _serviceName;
-
         public ResourceApiController(IJwtTokenHandler<AccessInternal> accessInternalTokenHandler, IConfiguration config)
         {
             _accessInternalTokenHandler = accessInternalTokenHandler;
-            _timestampHeader = config.GetSection("Timestamp:Header").Value;
-            _serviceName = config.GetSection("Timestamp:ServiceName").Value;
         }
 
         [HttpGet("/Action")]
         public async Task<ActionResult> Index()
         {
-            // TODO: Move Extraction and validation of token to common code
-            var hasToken = this.Request.Headers.TryGetValue("MicroAC-JWT", out var headerValues);
-            if (!hasToken)
-            {
-                return UnauthorizedWithTimestamp("Missing internal access token.");
-            }
-
-            var token = headerValues.FirstOrDefault();
-
-            if (token is null)
-            {
-                return UnauthorizedWithTimestamp("Missing internal access token.");
-            }
-
-            var permissions = _accessInternalTokenHandler.GetValidatedPermissions(token);
-           
-            await Task.Delay(1000);
             var response = new
             {
                 message = "Hello World! 1s long response.",
-                permissions
+                permissions = Authorize()
             };
+
+            await Task.Delay(1000);
 
             return Ok(response);
         }
 
-        private ActionResult UnauthorizedWithTimestamp(string reason)
+        // TODO: Move Extraction and validation of token to common code library
+        private IEnumerable<Permission> Authorize()
         {
-            this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Unauthorized");
-            return Unauthorized(reason);
+            var hasToken = this.Request.Headers.TryGetValue("MicroAC-JWT", out var headerValues);
+            var token = headerValues.FirstOrDefault();
+
+            if (!hasToken || token is null)
+            {
+                throw new AuthenticationFailedException("Missing internal access token.");
+            }
+            return _accessInternalTokenHandler.GetValidatedPermissions(token);
         }
     }
 }

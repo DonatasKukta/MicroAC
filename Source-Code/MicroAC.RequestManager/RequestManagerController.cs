@@ -1,4 +1,5 @@
 ﻿using MicroAC.Core.Common;
+using MicroAC.Core.Exceptions;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -45,29 +46,20 @@ namespace MicroAC.RequestManager
             var requestedRoute = GetMatchingEndpointRoute();
 
             if (requestedRoute is null)
-                return NotFound("Requested resource could not be found.");
-
-            if (requestedRoute.RequiresAuhtentication)
             {
-                var containsExternalAccessToken = this.Request.Headers.ContainsKey("Authorization");
-                if (!containsExternalAccessToken)
-                {
-                    this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Unauthorized");
-                    return Unauthorized("Access token is missing.");
-                }
+                return NotFound("Requested resource could not be found.");
+            }
+
+            if (requestedRoute.RequiresAuhtentication
+                && !this.Request.Headers.ContainsKey("Authorization"))
+            {
+                throw new AuthenticationFailedException(
+                    $"Request path {this.HttpContext.Request.Path} requires external access token.");
             }
 
             if (requestedRoute.RequiresAuthorization)
             {
-                this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "StartAuth");
-
-                var authorised = await AuthorizeRequest();
-
-                if (!authorised)
-                {
-                    this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Unauthorized");
-                    return Unauthorized("Unable to authorize the request.");
-                }
+                await AuthorizeRequest();
             }
 
             var response = await ForwardRequest(requestedRoute);
@@ -86,24 +78,25 @@ namespace MicroAC.RequestManager
             return await HandleForwardedResponse(response);
         }
 
-        private async Task<bool> AuthorizeRequest()
+        private async Task AuthorizeRequest()
         {
+            this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "StartAuth");
+
             var request = await CreateForwardRequest(_authorizationUrl);
             request.Method = HttpMethod.Post;
             var response = await _http.SendAsync(request);
+            var responseContent = await response.Content.ReadAsStringAsync();
 
             if (!response.IsSuccessStatusCode)
             {
-                return false;
+                throw new AuthorizationFailedException("Unable to authorize the request.",
+                    new Exception("Response received from Authorization: " + responseContent));
             }
 
             this.HttpContext.AppendeTimestampHeaders(_timestampHeader, response.Headers);
             this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Authorized");
 
-            var token = await response.Content.ReadAsStringAsync();
-            this.HttpContext.Request.Headers.Add("MicroAC-JWT", token);
-
-            return true;
+            this.HttpContext.Request.Headers.Add("MicroAC-JWT", responseContent);
         }
 
         private EndpointRoute GetMatchingEndpointRoute()

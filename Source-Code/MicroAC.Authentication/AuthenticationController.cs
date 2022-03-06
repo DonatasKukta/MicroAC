@@ -9,6 +9,7 @@ using System.IO;
 using System.Threading.Tasks;
 using MicroAC.Core.Common;
 using Microsoft.Extensions.Configuration;
+using MicroAC.Core.Exceptions;
 
 namespace MicroAC.Authentication
 {
@@ -64,61 +65,64 @@ namespace MicroAC.Authentication
             {
                 return BadRequest("Login credentials not provided.");
             }
-
-            this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "StartAuth");
-            var user = await _usersRepository.GetUser(credentials.Email, credentials.Password);
-            
-            if (user == null)
+            try
             {
-                return Unauthorized("Incorrect username or password.");
+                this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "StartAuth");
+                var user = await _usersRepository.GetUser(credentials.Email, credentials.Password);
+
+                if (user == null)
+                {
+                    throw new AuthenticationFailedException("User not found.");
+                }
+
+                var accessClaims = _accessClaimBuilder
+                 .AddCommonClaims()
+                 .AddUserId(user.Id)
+                 .AddRoles(user.Roles)
+                 .Build();
+                var accessJwt = _accessTokenHandler.Create(accessClaims);
+
+                var refreshClaims = _refreshClaimBuilder
+                 .AddCommonClaims()
+                 .AddUserId(user.Id)
+                 .Build();
+                var refreshJwt = _accessTokenHandler.Create(refreshClaims);
+
+                this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Success");
+
+                return Ok(new { accessJwt, refreshJwt });
             }
-
-            var accessClaims = _accessClaimBuilder
-             .AddCommonClaims()
-             .AddUserId(user.Id)
-             .AddRoles(user.Roles)
-             .Build();
-            var accessJwt = _accessTokenHandler.Create(accessClaims);
-
-            var refreshClaims = _refreshClaimBuilder
-             .AddCommonClaims()
-             .AddUserId(user.Id)
-             .Build();
-            var refreshJwt = _accessTokenHandler.Create(refreshClaims);
-
-            this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Success");
-
-            return Ok(new { accessJwt, refreshJwt });
+            catch (Exception e)
+            {
+                throw new AuthenticationFailedException("Incorrect username or password.", e);
+            }
         }
 
         [HttpPost("Refresh")]
         public async Task<ActionResult> Refresh()
         {
-            var bodyStream = new StreamReader(Request.Body);
-
-            var refreshClaims  = _refreshTokenHandler.Validate(await bodyStream.ReadToEndAsync());
-
-            var userId = refreshClaims.Claims.FirstOrDefault(c => c.Type == MicroACClaimTypes.UserId)?.Value;
-            var user = await _usersRepository.GetUser(new Guid(userId));
-            if (user == null)
+            try
             {
-                return UnauthorizedWithTimestamp("User Id could not be found.");
+                var bodyStream = new StreamReader(Request.Body);
+
+                var refreshClaims = _refreshTokenHandler.Validate(await bodyStream.ReadToEndAsync());
+
+                var userId = refreshClaims.Claims.FirstOrDefault(c => c.Type == MicroACClaimTypes.UserId)?.Value;
+                var user = await _usersRepository.GetUser(new Guid(userId));
+
+                var accessClaims = _accessClaimBuilder
+                 .AddCommonClaims()
+                 .AddUserId(user.Id)
+                 .AddRoles(user.Roles)
+                 .Build();
+                var accessJwt = _accessTokenHandler.Create(accessClaims);
+
+                return Ok(accessJwt);
             }
-
-            var accessClaims = _accessClaimBuilder
-             .AddCommonClaims()
-             .AddUserId(user.Id)
-             .AddRoles(user.Roles)
-             .Build();
-            var accessJwt = _accessTokenHandler.Create(accessClaims);
-
-            return Ok(accessJwt);
-        }
-
-        private ActionResult UnauthorizedWithTimestamp(string reason)
-        {
-            this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Unauthorized");
-            return Unauthorized(reason);
+            catch (Exception e)
+            {
+                throw new AuthenticationFailedException("Cannot to issue refresh token", e);
+            }
         }
     }
 }

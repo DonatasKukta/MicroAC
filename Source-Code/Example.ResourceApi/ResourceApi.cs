@@ -29,8 +29,10 @@ namespace Example.ResourceApi
         /// <returns>The collection of listeners.</returns>
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
-            return new ServiceInstanceListener[]
+            try
             {
+                return new ServiceInstanceListener[]
+                {
                 new ServiceInstanceListener(serviceContext =>
                     new KestrelCommunicationListener(serviceContext, "ServiceEndpoint", (url, listener) =>
                     {
@@ -47,7 +49,13 @@ namespace Example.ResourceApi
                                     .UseUrls(url)
                                     .Build();
                     }))
-            };
+                };
+            }
+            catch (Exception ex)
+            {
+                ServiceEventSource.Current.Message("Donatas - Exception during startup", ex);
+                throw;
+            }
         }
     }
 }

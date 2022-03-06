@@ -4,10 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Fabric;
 using System.Linq;
-using Microsoft.Extensions.Primitives;
 using MicroAC.Core.Common;
 using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
+using MicroAC.Core.Exceptions;
 
 namespace MicroAC.Authorization
 {
@@ -55,17 +55,12 @@ namespace MicroAC.Authorization
         [HttpPost("Authorize")]
         public async Task<ActionResult> Authorize()
         {
-            var hasToken = this.Request.Headers.TryGetValue("Authorization", out StringValues headerValues);
-            if (!hasToken)
-            {
-                return UnauthorizedWithTimestamp("Missing external access token.");
-            }
-
+            var hasToken = this.Request.Headers.TryGetValue("Authorization", out var headerValues);
             var token = headerValues.FirstOrDefault();
 
-            if (token is null)
-            {
-                return UnauthorizedWithTimestamp("Missing external access token.");
+            if (!hasToken || token is null) 
+            { 
+                throw new AuthorizationFailedException("Missing external access token.");
             }
 
             var accessClaims = _accessExternalTokenHandler.Validate(token);
@@ -75,28 +70,29 @@ namespace MicroAC.Authorization
 
             if (roles.Count() < 1)
             {
-                return UnauthorizedWithTimestamp("User has no roles assigned therefore cannot be authorized.");
+                throw new AuthorizationFailedException("User has no roles assigned therefore cannot be authorized.");
             }
 
-            this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "AuthStart");
-            var permissions = await _permissionsRepository.GetRolePermissions(roles);
+            try
+            {
+                this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "AuthStart");
+                var permissions = await _permissionsRepository.GetRolePermissions(roles);
 
-            var claims = _accessInternalClaimBuilder
-                .AddCommonClaims()
-                .AddRoles(roles)
-                .AddSubjectClaims(permissions)
-                .Build();
-            var jwt = _accessInternalTokenHandler.Create(claims);
-            
-            this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Success");
+                var claims = _accessInternalClaimBuilder
+                    .AddCommonClaims()
+                    .AddRoles(roles)
+                    .AddSubjectClaims(permissions)
+                    .Build();
+                var jwt = _accessInternalTokenHandler.Create(claims);
 
-            return Ok(jwt);
-        }
+                this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Success");
 
-        private ActionResult UnauthorizedWithTimestamp(string reason)
-        {
-            this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Unauthorized");
-            return Unauthorized(reason);
+                return Ok(jwt);
+            }
+            catch (Exception e)
+            {
+                throw new AuthorizationFailedException("Unable to issue external access token", e);
+            }
         }
     }
 }

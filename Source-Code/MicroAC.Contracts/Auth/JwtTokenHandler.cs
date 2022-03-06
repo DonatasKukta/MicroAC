@@ -8,6 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
+using MicroAC.Core.Exceptions;
 
 namespace MicroAC.Core.Auth
 {
@@ -64,12 +65,19 @@ namespace MicroAC.Core.Auth
 
         public IEnumerable<Permission> GetValidatedPermissions(string token)
         {
-            var claimsPrincipal = _jwtHandler.ValidateToken(token, _validationParameters, out var stoken);
+            try
+            {
+                var claimsPrincipal = _jwtHandler.ValidateToken(token, _validationParameters, out var stoken);
 
-            var sClaims = claimsPrincipal.Claims.Where(c => c.Type == MicroACClaimTypes.SubjectClaims);
-            var result = sClaims.Select(c => JsonSerializer.Deserialize<Permission>(c.Value));
+                var sClaims = claimsPrincipal.Claims.Where(c => c.Type == MicroACClaimTypes.SubjectClaims);
+                var result = sClaims.Select(c => JsonSerializer.Deserialize<Permission>(c.Value));
 
-            return result;
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw new AuthorizationFailedException("Failed to authorize the request", e);
+            }
         }
 
         private TokenValidationParameters GetValidationParameters()

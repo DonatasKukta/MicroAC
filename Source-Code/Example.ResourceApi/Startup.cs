@@ -1,15 +1,11 @@
-using System.Text.Json.Serialization;
-using System.Threading;
-
 using MicroAC.Core.Auth;
 using MicroAC.Core.Common;
+using MicroAC.Core.Exceptions;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 namespace Example.ResourceApi
 {
@@ -24,7 +20,10 @@ namespace Example.ResourceApi
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMicroACProblemDetails();
+
             services.AddRouting();
+
             services.AddControllers(); ;
 
             services.AddScoped<AccessInternal>();
@@ -39,10 +38,7 @@ namespace Example.ResourceApi
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            app.UseMicroACProblemDetails();
 
             if (_config.GetValue<bool>("Timestamp:Enabled"))
             {

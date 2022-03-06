@@ -1,12 +1,12 @@
 using System.Net.Http;
 
 using MicroAC.Core.Common;
+using MicroAC.Core.Exceptions;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 namespace MicroAC.RequestManager
 {
@@ -21,6 +21,8 @@ namespace MicroAC.RequestManager
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMicroACProblemDetails();
+
             services.AddCors();
 
             services.AddRouting();
@@ -35,6 +37,8 @@ namespace MicroAC.RequestManager
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseMicroACProblemDetails();
+
             //TODO: Apply CORS policies
             app.UseCors(x => x
                 .AllowAnyMethod()
@@ -43,11 +47,6 @@ namespace MicroAC.RequestManager
                 .WithExposedHeaders(
                     _config.GetValue<string>("Timestamp:Header"), 
                     "X-ServiceFabricRequestId"));
-
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
 
             if (_config.GetValue<bool>("Timestamp:Enabled"))
             {

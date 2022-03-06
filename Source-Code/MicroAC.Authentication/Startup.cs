@@ -3,11 +3,11 @@ using MicroAC.Core.Persistence;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using MicroAC.Persistence;
 using Microsoft.Extensions.Configuration;
 using MicroAC.Core.Common;
 using Microsoft.EntityFrameworkCore;
+using MicroAC.Core.Exceptions;
 
 namespace MicroAC.Authentication
 {
@@ -23,7 +23,10 @@ namespace MicroAC.Authentication
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMicroACProblemDetails();
+
             services.AddRouting();
+
             services.AddControllers()
                     .AddNewtonsoftJson();
 
@@ -48,10 +51,7 @@ namespace MicroAC.Authentication
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            app.UseMicroACProblemDetails();
 
             if (_config.GetValue<bool>("Timestamp:Enabled"))
             {

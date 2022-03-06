@@ -1,5 +1,6 @@
 using MicroAC.Core.Auth;
 using MicroAC.Core.Common;
+using MicroAC.Core.Exceptions;
 using MicroAC.Core.Persistence;
 using MicroAC.Persistence;
 
@@ -8,7 +9,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 namespace MicroAC.Authorization
 {
@@ -24,7 +24,10 @@ namespace MicroAC.Authorization
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMicroACProblemDetails();
+
             services.AddRouting();
+
             services.AddControllers();
 
             services.AddScoped<AccessExternal>();
@@ -46,10 +49,7 @@ namespace MicroAC.Authorization
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            app.UseMicroACProblemDetails();
 
             if (_config.GetValue<bool>("Timestamp:Enabled"))
             {
