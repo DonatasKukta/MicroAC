@@ -2,6 +2,7 @@
 Notes
 GenerateDbDTOs.bat
 /results
+*feature.cs
 
 #Ignore appsettings with secrets
 appsettings.persistance.json
