@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebShop.Cart
@@ -16,7 +13,7 @@ namespace WebShop.Cart
 
         }
 
-        [HttpPost()]
+        [HttpPost("/carts")]
         public WebShopCart CreateCart()
         {
             return new WebShopCart()
@@ -27,7 +24,7 @@ namespace WebShop.Cart
             };
         }
 
-        [HttpGet("/{cartId}")]
+        [HttpGet("/carts/{cartId}")]
         public WebShopCart GetCart(Guid cartId)
         {
             return new WebShopCart()
@@ -38,24 +35,24 @@ namespace WebShop.Cart
             };
         }
 
-        [HttpPost("/{cartId}/products")]
+        [HttpPost("/carts/{cartId}/products")]
         public ActionResult AddCartItem([FromBody] CartItem newCartItem) {
             return Ok();
         }
 
-        [HttpDelete("cart/{cartId}")]
+        [HttpDelete("/carts/{cartId}")]
         public ActionResult DeleteCart()
         {
             return Ok();
         }
 
-        [HttpDelete("cart/{cartId}/products/{productId}")]
+        [HttpDelete("/carts/{cartId}/products/{productId}")]
         public ActionResult DeleteCartItem()
         {
             return Ok();
         }
 
-        List<CartItem> Items = new List<CartItem>
+        List<CartItem> Items = new()
             {
                 new CartItem { ProductId = 1, Quantity = 4, AddedAt = DateTime.Now},
                 new CartItem { ProductId = 3, Quantity = 2, AddedAt = DateTime.Now.AddMinutes(-5)},

@@ -9,11 +9,5 @@ namespace WebShop.IntegrationTests
         public HttpResponseMessage Response { get; set; }
 
         public HttpRequestMessage Request { get; set; }
-
-        public async Task<T> GetResponseJsonData<T>()
-        {
-            var str = await Response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<T>(str);
-        }
     }
 }
