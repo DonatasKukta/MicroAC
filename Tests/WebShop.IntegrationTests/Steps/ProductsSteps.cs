@@ -15,17 +15,14 @@ namespace WebShop.IntegrationTests.Steps
     [Binding]
     public sealed class ProductsSteps
     {
-        Uri Url = new Uri("http://localhost:19083/MicroAC.ServiceFabric/WebShop.Products/");
-
-        readonly ScenarioContext ScenarioContext;
+        readonly Uri Url = new Uri("http://localhost:19083/MicroAC.ServiceFabric/WebShop.Products/");
 
         readonly TestState State;
 
         readonly HttpClient HtppClient = new HttpClient();
 
-        public ProductsSteps(ScenarioContext scenarioContext)
+        public ProductsSteps()
         {
-            ScenarioContext = scenarioContext;
             State = new TestState
             {
                 Request = new HttpRequestMessage()

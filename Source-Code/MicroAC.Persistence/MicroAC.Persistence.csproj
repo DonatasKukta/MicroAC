@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MicroAC.Contracts\MicroAC.Core.csproj" />
+    <ProjectReference Include="..\MicroAC.Core\MicroAC.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

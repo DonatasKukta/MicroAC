@@ -49,7 +49,7 @@ namespace WebShop.Products
         }
 
         [HttpDelete("/{id}")]
-        public ActionResult DeleteProduct([FromRoute] int id)
+        public ActionResult DeleteProduct()
         {
             return Ok();
         }

@@ -13,8 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MicroAC.Core\MicroAC.Core.csproj" />
-    <ProjectReference Include="..\MicroAC.Persistence\MicroAC.Persistence.csproj" />
+    <ProjectReference Include="..\..\MicroAC.Core\MicroAC.Core.csproj" />
   </ItemGroup>
 
 </Project>

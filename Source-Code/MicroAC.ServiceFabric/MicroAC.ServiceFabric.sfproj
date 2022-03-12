@@ -36,7 +36,10 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Example.ResourceApi\Example.ResourceApi.csproj">
+    <ProjectReference Include="..\WebShopExample\WebShop.Cart\WebShop.Cart.csproj">
+      <ServiceLaunchUrl>http://localhost:{ServicePort}/</ServiceLaunchUrl>
+    </ProjectReference>
+    <ProjectReference Include="..\WebShopExample\Example.ResourceApi\Example.ResourceApi.csproj">
       <ServiceLaunchUrl>http://localhost:{ServicePort}/</ServiceLaunchUrl>
     </ProjectReference>
     <ProjectReference Include="..\MicroAC.Authentication\MicroAC.Authentication.csproj">
@@ -48,7 +51,7 @@
     <ProjectReference Include="..\MicroAC.RequestManager\MicroAC.RequestManager.csproj">
       <ServiceLaunchUrl>http://localhost:{ServicePort}/</ServiceLaunchUrl>
     </ProjectReference>
-    <ProjectReference Include="..\Source-Code\Example\WebShop.Products\WebShop.Products.csproj">
+    <ProjectReference Include="..\WebShopExample\WebShop.Products\WebShop.Products.csproj">
       <ServiceLaunchUrl>http://localhost:{ServicePort}/</ServiceLaunchUrl>
     </ProjectReference>
   </ItemGroup>

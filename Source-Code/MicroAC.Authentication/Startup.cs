@@ -13,7 +13,7 @@ namespace MicroAC.Authentication
 {
     public class Startup
     {
-        IConfiguration _config = new ConfigurationBuilder()
+        readonly IConfiguration _config = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .AddJsonFile("appsettings.persistance.json")
                 .AddEnvironmentVariables()
