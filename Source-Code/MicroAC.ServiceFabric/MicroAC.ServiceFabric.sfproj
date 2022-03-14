@@ -51,6 +51,9 @@
     <ProjectReference Include="..\MicroAC.RequestManager\MicroAC.RequestManager.csproj">
       <ServiceLaunchUrl>http://localhost:{ServicePort}/</ServiceLaunchUrl>
     </ProjectReference>
+    <ProjectReference Include="..\WebShopExample\WebShop.Orders\WebShop.Orders.csproj">
+      <ServiceLaunchUrl>http://localhost:{ServicePort}/</ServiceLaunchUrl>
+    </ProjectReference>
     <ProjectReference Include="..\WebShopExample\WebShop.Products\WebShop.Products.csproj">
       <ServiceLaunchUrl>http://localhost:{ServicePort}/</ServiceLaunchUrl>
     </ProjectReference>

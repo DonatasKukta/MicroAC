@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\Cart - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Products - Copy.feature.cs" />
   </ItemGroup>
 
@@ -24,12 +25,19 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Features\Orders.feature.cs">
+      <DependentUpon>Orders.feature</DependentUpon>
+    </Compile>
     <Compile Update="Features\Cart.feature.cs">
       <DependentUpon>Cart.feature</DependentUpon>
     </Compile>
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\Orders.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\Cart.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
