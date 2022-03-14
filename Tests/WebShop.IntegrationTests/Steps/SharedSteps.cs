@@ -70,7 +70,7 @@ namespace WebShop.IntegrationTests.Steps
         {
             JsonSerializerOptions options = new JsonSerializerOptions
             {
-                PropertyNameCaseInsensitive = false
+                PropertyNameCaseInsensitive = true
             };
             var str = await State.Response.Content.ReadAsStringAsync();
             var obj = JsonSerializer.Deserialize<T>(str, options);

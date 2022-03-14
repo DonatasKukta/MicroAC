@@ -42,6 +42,7 @@ namespace WebShop.IntegrationTests.Steps
         public async Task ThenTheResponseContainsAProduct()
         {
             var product = await GetResponseJsonData<Product>();
+            
             product.Should().NotBeNull();
             product.Name.Should().NotBeEmpty();
         }

@@ -43,9 +43,10 @@ namespace WebShop.IntegrationTests.Steps
         [Then(@"the response contains a cart")]
         public async Task ThenTheResponseContainsACart()
         {
-            //TODO: Fix data with Cart Deserialization from response string.
             Cart = await GetResponseJsonData<Cart>();
+
             Cart.Should().NotBeNull();
+            Cart.Id.Should().NotBeEmpty();
         }
 
         [Then(@"a list of cart items")]
