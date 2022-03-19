@@ -18,6 +18,8 @@ namespace WebShop.Orders
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRouting();
+
+            services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -32,10 +34,7 @@ namespace WebShop.Orders
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/", async context =>
-                {
-                    await context.Response.WriteAsync("Hello World!");
-                });
+                endpoints.MapControllers();
             });
         }
     }

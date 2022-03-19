@@ -23,6 +23,7 @@ namespace WebShop.Orders
 
     public class PaymentDetails
     {
+        //TODO: Limit exposure
         public string CardNumber { get; set; }
         public string SecurityCode { get; set; }
         public string ExpiryDate { get; set; }
@@ -32,12 +33,11 @@ namespace WebShop.Orders
     public class ShipmentDetails
     {
         public string Country { get; set; }
-        public string Municipality { get; set; }
         public string AddressLine1 { get; set; }
         public string AddressLine2 { get; set; }
         public string City { get; set; }
         public string PostCode { get; set; }
-        public string Cost { get; set; }
+        public decimal Cost { get; set; }
         public string Provider { get; set; }
         public string Type { get; set; }
     }
