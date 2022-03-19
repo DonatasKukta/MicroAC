@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,6 +15,12 @@ namespace WebShop.Orders
         public OrdersController()
         {
             Data = new DataGenerator();
+        }
+
+        [HttpGet]
+        public IEnumerable<Order> GetOrders()
+        {
+            return Data.GenerateOrders();
         }
 
         [HttpGet("/{id}")]
@@ -45,7 +52,7 @@ namespace WebShop.Orders
             return Ok();
         }
 
-        [HttpPut("/{orderId}")]
+        [HttpPut("/{orderId}/shipment")]
         public ActionResult SubmitShipmentDetails(
             [FromRoute] Guid orderId, 
             [FromBody] Order.ShipmentDetails shipmentDetails)
@@ -54,7 +61,7 @@ namespace WebShop.Orders
             return Created(Guid.NewGuid().ToString(), shipmentDetails);
         }
 
-        [HttpPut("/{orderId}")]
+        [HttpPut("/{orderId}/payment")]
         public ActionResult SubmitPaymentDetails(
             [FromRoute] Guid orderId,
             [FromBody] Order.PaymentDetails paymentDetails)

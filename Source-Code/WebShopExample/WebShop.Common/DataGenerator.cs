@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using Bogus;
 
@@ -49,6 +50,10 @@ namespace WebShop.Common
         public Order GenerateOrder()
         {
             return FakeOrder.Generate();
+        }
+        public IEnumerable<Order> GenerateOrders()
+        {
+            return FakeOrder.Generate(100);
         }
 
         public Order.PaymentDetails GenerateOrderPaymentDetails()
