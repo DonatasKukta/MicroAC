@@ -16,6 +16,7 @@ Scenario: Get Shipment
 Scenario: Create Shipment
 	Given POST request
 		And Guid in path
+		And Shipment Details in body
 	When request is sent
 	Then response status code is 201
 		

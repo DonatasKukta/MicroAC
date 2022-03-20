@@ -1,21 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
 
 using Microsoft.AspNetCore.Mvc;
+
+using WebShop.Common;
 
 namespace WebShop.Cart
 {
     [Route("/")]
     public class CartController : Controller
     {
-        public CartController()
-        {
+        readonly IWebShopApiClient WebShopApi;
 
+        public CartController(IWebShopApiClient webShopApi)
+        {
+            WebShopApi = webShopApi;
         }
 
         [HttpPost("/carts")]
         public WebShopCart CreateCart()
         {
+
+            WebShopApi.SendServiceRequest(
+                WebShopServices.Products,
+                HttpMethod.Get,
+                $"/");
+
             return new WebShopCart()
             {
                 Id = Guid.NewGuid(),

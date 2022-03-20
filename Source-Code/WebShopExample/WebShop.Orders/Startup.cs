@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+using WebShop.Common;
+
 namespace WebShop.Orders
 {
     public class Startup
@@ -20,6 +22,8 @@ namespace WebShop.Orders
             services.AddRouting();
 
             services.AddControllers();
+
+            services.AddWebShopApiClient();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -9,6 +9,8 @@ using FluentAssertions;
 
 using TechTalk.SpecFlow;
 
+using WebShop.Common;
+
 namespace WebShop.IntegrationTests.Steps
 {
     public class SharedSteps
@@ -17,11 +19,15 @@ namespace WebShop.IntegrationTests.Steps
 
         protected readonly TestState State;
 
-        readonly HttpClient HtppClient = new HttpClient();
+        protected readonly DataGenerator RequestDataGenerator;
+
+        readonly HttpClient HtppClient;
 
         public SharedSteps(Uri baseUri)
         {
             Url = baseUri;
+            HtppClient = new HttpClient();
+            RequestDataGenerator = new DataGenerator();
             State = new TestState
             {
                 Request = new HttpRequestMessage()
@@ -75,6 +81,14 @@ namespace WebShop.IntegrationTests.Steps
             var str = await State.Response.Content.ReadAsStringAsync();
             var obj = JsonSerializer.Deserialize<T>(str, options);
             return obj;
+        }
+
+        [Given(@"Shipment Details in body")]
+        public void GivenShipmentDetailsInBody()
+        {
+            var shipment = RequestDataGenerator.GenerateShipment();
+
+            SetJsonBody(shipment);
         }
     }
 }

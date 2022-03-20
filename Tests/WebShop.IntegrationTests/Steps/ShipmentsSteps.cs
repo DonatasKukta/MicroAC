@@ -14,12 +14,10 @@ namespace WebShop.IntegrationTests.Steps
     [Scope(Feature = "Shipments")]
     public sealed class ShipmentsSteps : SharedSteps
     {
-        readonly DataGenerator RequestDataGenerator;
 
         public ShipmentsSteps()
             : base(new Uri("http://localhost:19083/MicroAC.ServiceFabric/WebShop.Shipments"))
         {
-            RequestDataGenerator = new DataGenerator();
         }
 
         [Given(@"(.*) in path")]

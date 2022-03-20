@@ -29,8 +29,10 @@ namespace WebShop.Shipments
             return Data.GenerateShipment();
         }
 
-        [HttpPost("/{shipmentId}")]
-        public ActionResult CreateShipment([FromRoute] Guid shipmentId)
+        [HttpPost("/{orderId}")]
+        public ActionResult CreateShipment(
+            [FromRoute] Guid orderId, 
+            [FromBody] Shipment shipment)
         {
             return Created(Guid.NewGuid().ToString(), Data.GenerateShipment());
         }

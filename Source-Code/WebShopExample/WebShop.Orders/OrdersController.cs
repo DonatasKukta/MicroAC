@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,9 +13,12 @@ namespace WebShop.Orders
     {
         DataGenerator Data;
 
-        public OrdersController()
+        IWebShopApiClient WebShopApi;
+
+        public OrdersController(IWebShopApiClient webShopApi)
         {
             Data = new DataGenerator();
+            WebShopApi = webShopApi;
         }
 
         [HttpGet]
@@ -34,9 +38,20 @@ namespace WebShop.Orders
         [HttpPost("/{cartId}")]
         public ActionResult CreateOrder([FromRoute] Guid cartId)
         {
-            // Call Carts Api (Get)
-            // Call Carts Api (Delete)
-            // Call Products Api
+            WebShopApi.SendServiceRequest(
+                WebShopServices.Cart,
+                HttpMethod.Get,
+                $"/{cartId}");
+
+            WebShopApi.SendServiceRequest(
+                WebShopServices.Cart,
+                HttpMethod.Delete,
+                $"/{cartId}");
+
+            WebShopApi.SendServiceRequest(
+                WebShopServices.Products,
+                HttpMethod.Get,
+                "/");
 
             var order = Data.GenerateOrder();
             
@@ -57,8 +72,12 @@ namespace WebShop.Orders
             [FromRoute] Guid orderId, 
             [FromBody] Shipment shipmentDetails)
         {
-            // Call Shipment Api
-            return Created(Guid.NewGuid().ToString(), shipmentDetails);
+            WebShopApi.SendServiceRequest(
+                WebShopServices.Shipments,
+                HttpMethod.Post,
+                "/");
+            
+            return Created(orderId.ToString(), shipmentDetails);
         }
 
         [HttpPut("/{orderId}/payment")]
@@ -66,15 +85,24 @@ namespace WebShop.Orders
             [FromRoute] Guid orderId,
             [FromBody] Order.PaymentDetails paymentDetails)
         {
-            return Created(Guid.NewGuid().ToString(), paymentDetails);
+            return Created(orderId.ToString(), paymentDetails);
         }
 
         [HttpPut("/{orderId}")]
         public Order SubmitOrder([FromRoute] Guid orderId)
         {
-            // Call Shipment Api
-            // Call Payment Api
-            // Call Products Api
+            WebShopApi.SendServiceRequest(
+                WebShopServices.Shipments,
+                HttpMethod.Get,
+                $"/");
+
+            WebShopApi.SendServiceRequest(
+                WebShopServices.Shipments,
+                HttpMethod.Put,
+                $"/{Guid.NewGuid()}",
+                "",
+                Data.GenerateShipment());
+
             return GetOrder(orderId);
         }
     }

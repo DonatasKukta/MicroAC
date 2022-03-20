@@ -13,12 +13,9 @@ namespace WebShop.IntegrationTests.Steps
     [Scope(Feature = "Orders")]
     public sealed class OrdersSteps : SharedSteps
     {
-        readonly DataGenerator RequestDataGenerator;
-
         public OrdersSteps()
             : base(new Uri("http://localhost:19083/MicroAC.ServiceFabric/WebShop.Orders"))
         {
-            RequestDataGenerator = new DataGenerator();
         }
 
         [Given(@"(.*) in path")]
@@ -28,14 +25,6 @@ namespace WebShop.IntegrationTests.Steps
                 this.AppendToRequestUrl(Guid.NewGuid().ToString());
             else
                 this.AppendToRequestUrl(pathParameter);
-        }
-
-        [Given(@"Shipment Details in body")]
-        public void GivenShipmentDetailsInBody()
-        {
-            var shipment = RequestDataGenerator.GenerateShipment();
-
-            SetJsonBody(shipment);
         }
 
         [Given(@"Payment Details in body")]
