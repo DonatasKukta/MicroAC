@@ -13,7 +13,7 @@ namespace WebShop.Common
 
         Faker<Order.PaymentDetails> FakeOrderPaymentDetails;
 
-        Faker<Order.ShipmentDetails> FakeOrderShipmentDetails;
+        Faker<Shipment> FakeShipment;
 
         public DataGenerator()
         {
@@ -31,7 +31,8 @@ namespace WebShop.Common
                 .RuleFor(i => i.CardNumber, f =>
                  new string('*', 12) + f.Finance.CreditCardNumber().Substring(11));
 
-            FakeOrderShipmentDetails = new Faker<Order.ShipmentDetails>()
+            FakeShipment = new Faker<Shipment>()
+                .RuleForType(typeof(Guid), f => f.Random.Guid())
                 .RuleFor(i => i.Country, f => f.Address.Country())
                 .RuleFor(i => i.AddressLine1, f => f.Address.StreetAddress())
                 .RuleFor(i => i.AddressLine2, f => f.Address.SecondaryAddress())
@@ -44,13 +45,14 @@ namespace WebShop.Common
                 .RuleForType(typeof(Guid), f => f.Random.Guid())
                 .RuleFor(i => i.Products, f => FakeOrderItem.GenerateBetween(1, 10))
                 .RuleFor(i => i.Payment, f => FakeOrderPaymentDetails.Generate())
-                .RuleFor(i => i.Shipment, f => FakeOrderShipmentDetails.Generate());
+                .RuleFor(i => i.Shipment, f => FakeShipment.Generate());
         }
 
         public Order GenerateOrder()
         {
             return FakeOrder.Generate();
         }
+
         public IEnumerable<Order> GenerateOrders()
         {
             return FakeOrder.Generate(100);
@@ -61,9 +63,14 @@ namespace WebShop.Common
             return FakeOrderPaymentDetails.Generate();
         }
 
-        public Order.ShipmentDetails GenerateOrderShipmentDetails()
+        public Shipment GenerateShipment()
         {
-            return FakeOrderShipmentDetails.Generate();
+            return FakeShipment.Generate();
+        }
+
+        public List<Shipment> GenerateShipments()
+        {
+            return FakeShipment.Generate(100);
         }
     }
 }

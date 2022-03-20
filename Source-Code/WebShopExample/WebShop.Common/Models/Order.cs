@@ -9,7 +9,7 @@ namespace WebShop.Common
         public Guid UserId { get; set; }
         public List<Item> Products { get; set; }
         public PaymentDetails Payment { get; set; }
-        public ShipmentDetails Shipment { get; set; }
+        public Shipment Shipment { get; set; }
         
         public class Item
         {
@@ -26,18 +26,6 @@ namespace WebShop.Common
             public string SecurityCode { get; set; }
             public string ExpiryDate { get; set; }
             public decimal TotalSum { get; set; }
-        }
-
-        public class ShipmentDetails
-        {
-            public string Country { get; set; }
-            public string AddressLine1 { get; set; }
-            public string AddressLine2 { get; set; }
-            public string City { get; set; }
-            public string PostCode { get; set; }
-            public decimal Cost { get; set; }
-            public string Provider { get; set; }
-            public string Type { get; set; }
         }
     }
 }

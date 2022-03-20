@@ -57,6 +57,9 @@
     <ProjectReference Include="..\WebShopExample\WebShop.Products\WebShop.Products.csproj">
       <ServiceLaunchUrl>http://localhost:{ServicePort}/</ServiceLaunchUrl>
     </ProjectReference>
+    <ProjectReference Include="..\WebShopExample\WebShop.Shipments\WebShop.Shipments.csproj">
+      <ServiceLaunchUrl>http://localhost:{ServicePort}/</ServiceLaunchUrl>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
   <PropertyGroup>

@@ -55,7 +55,7 @@ namespace WebShop.Orders
         [HttpPut("/{orderId}/shipment")]
         public ActionResult SubmitShipmentDetails(
             [FromRoute] Guid orderId, 
-            [FromBody] Order.ShipmentDetails shipmentDetails)
+            [FromBody] Shipment shipmentDetails)
         {
             // Call Shipment Api
             return Created(Guid.NewGuid().ToString(), shipmentDetails);

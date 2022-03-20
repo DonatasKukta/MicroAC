@@ -33,7 +33,7 @@ namespace WebShop.IntegrationTests.Steps
         [Given(@"Shipment Details in body")]
         public void GivenShipmentDetailsInBody()
         {
-            var shipment = RequestDataGenerator.GenerateOrderShipmentDetails();
+            var shipment = RequestDataGenerator.GenerateShipment();
 
             SetJsonBody(shipment);
         }
@@ -58,7 +58,7 @@ namespace WebShop.IntegrationTests.Steps
         [Then(@"response contains Shipment Details")]
         public async Task ThenResponseContainsShipmentDetails()
         {
-            var shipment = await GetResponseJsonData<Order.ShipmentDetails>();
+            var shipment = await GetResponseJsonData<Shipment>();
 
             shipment.Should().NotBeNull();
         }
