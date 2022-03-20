@@ -15,24 +15,26 @@ namespace WebShop.IntegrationTests.Steps
 {
     public class SharedSteps
     {
+        static readonly string BaseUrl = "http://localhost:19083/MicroAC.ServiceFabric/";
+
         protected readonly Uri Url;
 
         protected readonly TestState State;
 
         protected readonly DataGenerator RequestDataGenerator;
 
-        readonly HttpClient HtppClient;
+        readonly HttpClient HttpClient;
 
-        public SharedSteps(Uri baseUri)
+        public SharedSteps(string serviceUri)
         {
-            Url = baseUri;
-            HtppClient = new HttpClient();
+            Url = new Uri(BaseUrl + serviceUri);
+            HttpClient = new HttpClient();
             RequestDataGenerator = new DataGenerator();
             State = new TestState
             {
                 Request = new HttpRequestMessage()
                 {
-                    RequestUri = baseUri
+                    RequestUri = Url
                 },
                 Response = new HttpResponseMessage()
             };
@@ -47,7 +49,7 @@ namespace WebShop.IntegrationTests.Steps
         [When(@"request is sent")]
         public async Task WhenRequestIsSent()
         {
-            State.Response = await HtppClient.SendAsync(State.Request);
+            State.Response = await HttpClient.SendAsync(State.Request);
         }
 
         [Then(@"response status code is (.*)")]

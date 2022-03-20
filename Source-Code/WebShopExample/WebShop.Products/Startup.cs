@@ -1,3 +1,5 @@
+using MicroAC.Core.Common;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,6 +27,8 @@ namespace WebShop.Products
             }
 
             app.UseRouting();
+
+            app.UseMiddleware<TimestampMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {

@@ -14,7 +14,7 @@ namespace WebShop.IntegrationTests.Steps
     public sealed class OrdersSteps : SharedSteps
     {
         public OrdersSteps()
-            : base(new Uri("http://localhost:19083/MicroAC.ServiceFabric/WebShop.Orders"))
+            : base("WebShop.Orders")
         {
         }
 

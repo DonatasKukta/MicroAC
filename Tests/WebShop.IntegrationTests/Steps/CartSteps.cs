@@ -16,7 +16,7 @@ namespace WebShop.IntegrationTests.Steps
         Cart? Cart;
 
         public CartSteps()
-            : base(new Uri("http://localhost:19083/MicroAC.ServiceFabric/WebShop.Cart/carts"))
+            : base("WebShop.Cart/carts")
         {
 
         }

@@ -11,6 +11,7 @@ using Microsoft.ServiceFabric.Services.Communication.AspNetCore;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using Microsoft.ServiceFabric.Data;
+using Microsoft.Extensions.Configuration;
 
 namespace WebShop.Cart
 {
@@ -38,6 +39,10 @@ namespace WebShop.Cart
 
                         return new WebHostBuilder()
                                     .UseKestrel()
+                                    .ConfigureAppConfiguration((builderContext, config) =>
+                                    {
+                                        config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+                                    })
                                     .ConfigureServices(
                                         services => services
                                             .AddSingleton<StatelessServiceContext>(serviceContext))

@@ -16,7 +16,7 @@ namespace WebShop.IntegrationTests.Steps
     {
 
         public ShipmentsSteps()
-            : base(new Uri("http://localhost:19083/MicroAC.ServiceFabric/WebShop.Shipments"))
+            : base("WebShop.Shipments")
         {
         }
 

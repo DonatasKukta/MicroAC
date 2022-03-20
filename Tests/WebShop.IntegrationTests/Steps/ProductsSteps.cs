@@ -13,7 +13,7 @@ namespace WebShop.IntegrationTests.Steps
     public sealed class ProductsSteps : SharedSteps
     {
         public ProductsSteps()
-            : base(new Uri("http://localhost:19083/MicroAC.ServiceFabric/WebShop.Products/"))
+            : base("WebShop.Products/")
         {
 
         }
