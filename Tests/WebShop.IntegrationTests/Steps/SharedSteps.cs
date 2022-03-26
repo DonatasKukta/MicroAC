@@ -15,7 +15,10 @@ namespace WebShop.IntegrationTests.Steps
 {
     public class SharedSteps
     {
-        static readonly string BaseUrl = "http://localhost:19083/MicroAC.ServiceFabric/";
+        //TODO: Move to config
+        static readonly string TestAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI0YzlkZjM3MS1lZjVlLTRhOTgtYTllNC00ODUyNDA3ZDI0MGEiLCJpc3MiOiJNaWNyb0FDOkF1dGhlbnRpY2F0aW9uU2VydmljZSIsImF1ZCI6Ik1pY3JvQUM6QXV0aG9yaXphdGlvblNlcnZpY2UiLCJzdWIiOiJNaWNyb0FDOlVzZXIiLCJ1aWQiOiJmZTk4MzEwYi1lYmMyLTQyOTktOTg1NC1mYmVhNDZmNjI1OTEiLCJ1cm9sZXMiOlsiUm9sZTEwX1NlZWRUZXN0RGF0YSJdLCJuYmYiOjE2NDc3OTk4MDQsImV4cCI6MTY2NTA3OTgwNCwiaWF0IjoxNjQ3Nzk5ODA0fQ.zeEV6S0dbzNZMwTBxadf34WJzXPjTmFBzx7s_EAOCVA";
+
+        static readonly string BaseUrl = "http://localhost:19081/MicroAC.ServiceFabric/MicroAC.RequestManager/";
 
         protected readonly Uri Url;
 
@@ -38,6 +41,7 @@ namespace WebShop.IntegrationTests.Steps
                 },
                 Response = new HttpResponseMessage()
             };
+            State.Request.Headers.Add("Authorization", TestAuthToken);
         }
 
         [Given(@"(.*) request")]
@@ -80,8 +84,11 @@ namespace WebShop.IntegrationTests.Steps
             {
                 PropertyNameCaseInsensitive = true
             };
-            var str = await State.Response.Content.ReadAsStringAsync();
-            var obj = JsonSerializer.Deserialize<T>(str, options);
+            var responseContent = await State.Response.Content.ReadAsStringAsync();
+
+            responseContent.Should().NotBeNullOrEmpty();
+
+            var obj = JsonSerializer.Deserialize<T>(responseContent, options);
             return obj;
         }
 

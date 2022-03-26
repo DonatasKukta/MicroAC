@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace MicroAC.RequestManager
@@ -29,6 +30,8 @@ namespace MicroAC.RequestManager
         readonly string _serviceName;
 
         readonly string _timestampHeader;
+
+        StringContent ForwardRequestContent;
 
         public RequestManagerController(HttpClient httpClient, IConfiguration config)
         {
@@ -57,6 +60,8 @@ namespace MicroAC.RequestManager
                     $"Request path {this.HttpContext.Request.Path} requires external access token.");
             }
 
+            ForwardRequestContent = await GetForwardRequestContent();
+
             if (requestedRoute.RequiresAuthorization)
             {
                 await AuthorizeRequest();
@@ -69,7 +74,7 @@ namespace MicroAC.RequestManager
         private async Task<IActionResult> ForwardRequest(EndpointRoute requestedRoute)
         {
             var forwardUri = GetForwardUri(requestedRoute);
-            var forwardRequest = await CreateForwardRequest(forwardUri);
+            var forwardRequest = CreateForwardRequest(forwardUri);
 
             this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Forward");
 
@@ -82,7 +87,7 @@ namespace MicroAC.RequestManager
         {
             this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "StartAuth");
 
-            var request = await CreateForwardRequest(_authorizationUrl);
+            var request = CreateForwardRequest(_authorizationUrl);
             request.Method = HttpMethod.Post;
             var response = await _http.SendAsync(request);
             var responseContent = await response.Content.ReadAsStringAsync();
@@ -108,38 +113,33 @@ namespace MicroAC.RequestManager
         private async Task<IActionResult> HandleForwardedResponse(HttpResponseMessage response)
         {
             this.HttpContext.AppendeTimestampHeaders(_timestampHeader, response.Headers);
-            /* TODO: Fix header transfer
-            foreach (var header in response.Headers)
-            {
-                if (!_headersToIgnore.Contains(header.Key) && header.Key != _timestampHeader)
-                {
-                    this.HttpContext.Response.Headers.Add(header.Key, header.Value.ToString());
-                }
-            }
-            */
+            
+            // TODO: Fix header transfer
+            
             this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Receive");
 
             this.HttpContext.Response.StatusCode = (int)response.StatusCode;
 
-            return new ObjectResult(await response.Content.ReadAsStringAsync());
+            var body = await response.Content.ReadAsStringAsync();
+            
+            return new ObjectResult(body);
         }
 
-        /// <summary>
-        /// Creates HttpRequestMessage from HttpContext. Body string, headers and HTTP method are transfered,
-        /// </summary>
-        private async Task<HttpRequestMessage> CreateForwardRequest(Uri uri)
+        
+        private HttpRequestMessage CreateForwardRequest(Uri uri)
         {
+            var method = new HttpMethod(this.HttpContext.Request.Method);
             var request = new HttpRequestMessage()
             {
-                Method = new HttpMethod(this.HttpContext.Request.Method),
-                Content = await GetForwardRequestContent(),
+                Method = method,
+                Content = ForwardRequestContent,
                 RequestUri = uri
             };
-
+            
             foreach (var header in this.HttpContext.Request.Headers)
             {
                 if (!_headersToIgnore.Contains(header.Key) && !header.Key.StartsWith("Content-"))
-                    request.Headers.Add(header.Key, header.Value.ToString());
+                    request.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
             }
 
             return request;
@@ -147,17 +147,16 @@ namespace MicroAC.RequestManager
 
         private async Task<StringContent> GetForwardRequestContent()
         {
-            var bodyStream = new StreamReader(this.Request.Body);
-            var requestBody = await bodyStream.ReadToEndAsync();
-            var content = new StringContent(requestBody);
+            var requestBody = await new StreamReader(Request.Body, Encoding.Default).ReadToEndAsync();
 
+            if (requestBody == null)
+                return null;
+
+            var content = new StringContent(requestBody, Encoding.UTF8, "application/json");
+            
             foreach (var header in this.HttpContext.Request.Headers)
             {
-                if (!_headersToIgnore.Contains(header.Key) && header.Key.StartsWith("Content-"))
-                {
-                    content.Headers.Remove(header.Key);
-                    content.Headers.Add(header.Key, header.Value.ToString());
-                }
+                content.Headers.TryAddWithoutValidation(header.Key, header.Value.ToString());
             }
 
             return content;

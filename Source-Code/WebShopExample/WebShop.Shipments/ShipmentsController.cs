@@ -34,7 +34,7 @@ namespace WebShop.Shipments
             [FromRoute] Guid orderId, 
             [FromBody] Shipment shipment)
         {
-            return Created(Guid.NewGuid().ToString(), Data.GenerateShipment());
+            return Created(Guid.NewGuid().ToString(), shipment);
         }
 
         [HttpPut("/{shipmentId}")]

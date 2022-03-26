@@ -13,8 +13,7 @@ namespace WebShop.IntegrationTests.Steps
     [Scope(Feature = "Orders")]
     public sealed class OrdersSteps : SharedSteps
     {
-        public OrdersSteps()
-            : base("WebShop.Orders")
+        public OrdersSteps() : base("Orders")
         {
         }
 
@@ -53,8 +52,8 @@ namespace WebShop.IntegrationTests.Steps
         }
 
 
-        [Then(@"reponse contains Payment Details")]
-        public async Task ThenReponseContainsPaymentDetails()
+        [Then(@"response contains Payment Details")]
+        public async Task ThenResponseContainsPaymentDetails()
         {
             var payment = await GetResponseJsonData<Order.PaymentDetails>();
 

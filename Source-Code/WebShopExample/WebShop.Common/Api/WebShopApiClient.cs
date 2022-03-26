@@ -16,7 +16,7 @@ namespace WebShop.Common
 
     public class WebShopApiClient : IWebShopApiClient
     {
-        static readonly string BaseUrl = "http://localhost:19083/MicroAC.ServiceFabric/WebShop.";
+        static readonly string BaseUrl = "http://localhost:19081/MicroAC.ServiceFabric/WebShop.";
         
         readonly HttpClient HttpClient;
 

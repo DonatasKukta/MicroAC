@@ -40,7 +40,7 @@ Scenario: Submit Payment Details
 		And Payment Details in body
 	When request is sent
 	Then response status code is 201
-		And reponse contains Payment Details
+		And response contains Payment Details
 
 Scenario: Submit Order
 	Given PUT request

@@ -7,7 +7,7 @@ import RequestHandler from '../Components/CommonResponseFields';
 
 //TODO: Move to env config
 const authUrl =
-  'http://localhost:19083/MicroAC.ServiceFabric/MicroAC.RequestManager/Authentication/Login';
+  'http://localhost:19081/MicroAC.ServiceFabric/MicroAC.RequestManager/Authentication/Login';
 
 const defaultCredentialsState: Credentials = {
   email: 'Jonas.Jonaitis@gmail.com',

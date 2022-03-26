@@ -19,7 +19,7 @@ Scenario: Create Shipment
 		And Shipment Details in body
 	When request is sent
 	Then response status code is 201
-		
+
 Scenario: Update Shipment
 	Given PUT request
 		And Guid in path

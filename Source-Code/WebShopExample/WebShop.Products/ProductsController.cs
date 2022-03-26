@@ -39,7 +39,9 @@ namespace WebShop.Products
         [HttpPost]
         public ActionResult CreateProduct([FromBody] Product product)
         {
-            return Created($"/products/{product.Id}", product);
+            return product == null
+                ? BadRequest("Product is missing from body.")
+                : Created($"/products/{product.Id}", product);
         }
 
         [HttpPut]

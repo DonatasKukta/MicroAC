@@ -15,8 +15,7 @@ namespace WebShop.IntegrationTests.Steps
     {
         Cart? Cart;
 
-        public CartSteps()
-            : base("WebShop.Cart/carts")
+        public CartSteps() : base("Carts")
         {
 
         }

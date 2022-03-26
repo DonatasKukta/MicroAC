@@ -6,7 +6,7 @@ import SendRequest from '../Domain/SendRequest';
 import RequestHandler from '../Components/CommonResponseFields';
 //TODO: Move to env config
 const resourceActionUrl =
-  'http://localhost:19083/MicroAC.ServiceFabric/MicroAC.RequestManager/ResourceApi/Action';
+  'http://localhost:19081/MicroAC.ServiceFabric/MicroAC.RequestManager/ResourceApi/Action';
 
 interface IProps {
   accessJwt: Token;

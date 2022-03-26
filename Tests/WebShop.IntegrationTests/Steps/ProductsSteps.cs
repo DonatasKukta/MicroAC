@@ -12,8 +12,7 @@ namespace WebShop.IntegrationTests.Steps
     [Scope(Feature = "Products")]
     public sealed class ProductsSteps : SharedSteps
     {
-        public ProductsSteps()
-            : base("WebShop.Products/")
+        public ProductsSteps() : base("Products")
         {
 
         }

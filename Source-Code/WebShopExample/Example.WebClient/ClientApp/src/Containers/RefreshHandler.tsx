@@ -6,7 +6,7 @@ import SendRequest from '../Domain/SendRequest';
 import RequestHandler from '../Components/CommonResponseFields';
 //TODO: Move to env config
 const authUrl =
-  'http://localhost:19083/MicroAC.ServiceFabric/MicroAC.RequestManager/Authentication/Refresh';
+  'http://localhost:19081/MicroAC.ServiceFabric/MicroAC.RequestManager/Authentication/Refresh';
 
 interface IProps {
   refreshJwt: Token;

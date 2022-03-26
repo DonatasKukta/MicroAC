@@ -41,12 +41,12 @@ namespace WebShop.Orders
             WebShopApi.SendServiceRequest(
                 WebShopServices.Cart,
                 HttpMethod.Get,
-                $"/{cartId}");
+                $"/carts/{cartId}");
 
             WebShopApi.SendServiceRequest(
                 WebShopServices.Cart,
                 HttpMethod.Delete,
-                $"/{cartId}");
+                $"/carts/{cartId}");
 
             WebShopApi.SendServiceRequest(
                 WebShopServices.Products,
@@ -92,7 +92,7 @@ namespace WebShop.Orders
         public Order SubmitOrder([FromRoute] Guid orderId)
         {
             WebShopApi.SendServiceRequest(
-                WebShopServices.Shipments,
+                WebShopServices.Products,
                 HttpMethod.Get,
                 $"/");
 

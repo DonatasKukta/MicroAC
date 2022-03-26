@@ -15,8 +15,7 @@ namespace WebShop.IntegrationTests.Steps
     public sealed class ShipmentsSteps : SharedSteps
     {
 
-        public ShipmentsSteps()
-            : base("WebShop.Shipments")
+        public ShipmentsSteps() : base("Shipments")
         {
         }
 
