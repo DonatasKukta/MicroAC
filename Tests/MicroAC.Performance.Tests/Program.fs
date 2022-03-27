@@ -1,12 +1,8 @@
 ﻿open NBomber
-open NBomber.Contracts
 open NBomber.FSharp
-open NBomber.Plugins.Http.FSharp
 open FSharp.Control.Tasks
 open Serilog
 
-open System
-open System.IO
 open System.Net.Http
 open System.Net.Http.Json
 open System.Threading

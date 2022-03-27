@@ -9,7 +9,6 @@ open FSharp.Control.Tasks
 open System.Net.Http
 open Types
 open StepDataHandling
-open WebShop.Common
 
 let private globalTimeout = seconds 10
 let private loginStep = "Login"
@@ -99,18 +98,32 @@ let webshop (name:string) (service:Service) (action:Action) (httpFactory: IClien
         }
 )
 
-let getProducts (httpFactory: IClientFactory<_>) = 
-    webshop "GetProducts" Service.Products Action.GetList httpFactory None
+let getProduct    factory       = webshop "GetProduct"     Service.Products Action.GetOne  factory None
+let getProducts   factory       = webshop "GetProducts"    Service.Products Action.GetList factory None
+let createProduct factory feed  = webshop "CreateProducts" Service.Products Action.Create  factory feed
+let updateProduct factory       = webshop "UpdateProducts" Service.Products Action.Update  factory None
+let deleteProduct factory       = webshop "DeleteProducts" Service.Products Action.Delete  factory None
 
-let getShipments (httpFactory: IClientFactory<HttpClient>) = 
-    webshop "GetShipments" Service.Shipments Action.GetList httpFactory None
+let getCart        factory      = webshop "GetCart"        Service.Cart Action.GetOne  factory None
+let createCart     factory      = webshop "CreateCart"     Service.Cart Action.GetList factory None
+let addCartItem    factory feed = webshop "AddCartItem"    Service.Cart Action.Create  factory feed
+let deleteCart     factory      = webshop "DeleteCart"     Service.Cart Action.Update  factory None
+let deleteCartItem factory      = webshop "DeleteCartItem" Service.Cart Action.Delete  factory None
 
-let getOrders (httpFactory: IClientFactory<HttpClient>) = 
-    webshop "GetOrders" Service.Orders Action.GetList httpFactory None
+let getShipment    factory      = webshop "GetShipment"     Service.Shipments Action.GetOne  factory None
+let getShipments   factory      = webshop "GetShipments"    Service.Shipments Action.GetList factory None
+let createShipment factory feed = webshop "CreateShipments" Service.Shipments Action.Create  factory feed
+let updateShipment factory feed = webshop "UpdateShipments" Service.Shipments Action.Update  factory feed
+let deleteShipment factory      = webshop "DeleteShipments" Service.Shipments Action.Delete  factory None
 
-let createProduct (httpFactory: IClientFactory<HttpClient>) (feed: IFeed<Product> option) = 
-    webshop "CreateProduct" Service.Products Action.Create httpFactory feed
- 
+let getOrder       factory      = webshop "GetOrder"            Service.Products Action.GetOne  factory None
+let getOrders      factory      = webshop "GetOrders"           Service.Products Action.GetList factory None
+let createOrder    factory feed = webshop "CreateOrders"        Service.Products Action.Create  factory feed
+let deleteOrder    factory      = webshop "DeleteOrders"        Service.Products Action.Delete  factory None
+let submitShipment factory feed = webshop "SubmitOrderShipment" Service.Products Action.GetList factory feed
+let submitPayment  factory feed = webshop "SubmitOrderPayment"  Service.Products Action.Create  factory feed
+let submitOrder    factory      = webshop "SubmitOrder"         Service.Products Action.Delete  factory None
+
 // Common Steps
 
 let postScenarioHandling mutex = 
@@ -119,9 +132,9 @@ let postScenarioHandling mutex =
         timeout = globalTimeout,
         execute = fun context ->  task {
         //TODO: Iterate context.Data and extract all api responses
-        let login =     getApiResponseNew loginStep       context 
-        let refresh =   getApiResponseNew refreshStep     context
-        let resource =  getApiResponseNew resourceApiStep context
+        let login =    getApiResponseNew loginStep       context 
+        let refresh =  getApiResponseNew refreshStep     context
+        let resource = getApiResponseNew resourceApiStep context
 
         if(Option.isSome login)     
             then Csv.appendTimestampsToCsv mutex (toApiResponse<LoginResult> login) |> ignore
