@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace WebShop.Cart
+namespace WebShop.Common
 {
     public class WebShopCart
     {

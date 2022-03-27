@@ -4,7 +4,8 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using TechTalk.SpecFlow;
 using System.Collections.Generic;
-using WebShop.IntegrationTests.Models;
+
+using WebShop.Common;
 
 namespace WebShop.IntegrationTests.Steps
 {

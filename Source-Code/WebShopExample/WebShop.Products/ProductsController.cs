@@ -3,6 +3,8 @@ using System.Linq;
 
 using Microsoft.AspNetCore.Mvc;
 
+using WebShop.Common;
+
 namespace WebShop.Products
 {
     [Route("/")]

@@ -5,7 +5,7 @@ using FluentAssertions;
 
 using TechTalk.SpecFlow;
 
-using WebShop.IntegrationTests.Models;
+using WebShop.Common;
 
 namespace WebShop.IntegrationTests.Steps
 {
@@ -13,7 +13,7 @@ namespace WebShop.IntegrationTests.Steps
     [Scope(Feature = "Carts")]
     public sealed class CartSteps : SharedSteps
     {
-        Cart? Cart;
+        WebShopCart? Cart;
 
         public CartSteps() : base("Carts")
         {
@@ -30,7 +30,7 @@ namespace WebShop.IntegrationTests.Steps
         public void GivenNewCartItem()
         {
             AppendToRequestUrl($"products");
-            SetJsonBody(new Item { ProductId = 1, AddedAt = DateTime.Now, Quantity = 4 });
+            SetJsonBody(new CartItem { ProductId = 1, AddedAt = DateTime.Now, Quantity = 4 });
         }
 
         [Given(@"with product id")]
@@ -42,7 +42,7 @@ namespace WebShop.IntegrationTests.Steps
         [Then(@"the response contains a cart")]
         public async Task ThenTheResponseContainsACart()
         {
-            Cart = await GetResponseJsonData<Cart>();
+            Cart = await GetResponseJsonData<WebShopCart>();
 
             Cart.Should().NotBeNull();
             Cart.Id.Should().NotBeEmpty();

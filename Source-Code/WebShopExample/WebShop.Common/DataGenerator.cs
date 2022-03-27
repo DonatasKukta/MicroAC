@@ -15,6 +15,8 @@ namespace WebShop.Common
 
         Faker<Shipment> FakeShipment;
 
+        Faker<WebShopCart> FakeCart;
+
         public DataGenerator()
         {
             FakeOrderItem = new Faker<Order.Item>()

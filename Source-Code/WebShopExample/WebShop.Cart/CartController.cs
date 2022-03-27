@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,10 +20,9 @@ namespace WebShop.Cart
         }
 
         [HttpPost("/carts")]
-        public WebShopCart CreateCart()
+        public async Task<WebShopCart> CreateCart()
         {
-
-            WebShopApi.SendServiceRequest(
+            await WebShopApi.SendServiceRequest(
                 WebShopServices.Products,
                 HttpMethod.Get,
                 $"/");

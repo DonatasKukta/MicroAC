@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -36,19 +37,19 @@ namespace WebShop.Orders
         }
 
         [HttpPost("/{cartId}")]
-        public ActionResult CreateOrder([FromRoute] Guid cartId)
+        public async Task<ActionResult> CreateOrder([FromRoute] Guid cartId)
         {
-            WebShopApi.SendServiceRequest(
+            await WebShopApi.SendServiceRequest(
                 WebShopServices.Cart,
                 HttpMethod.Get,
                 $"/carts/{cartId}");
 
-            WebShopApi.SendServiceRequest(
+            await WebShopApi.SendServiceRequest(
                 WebShopServices.Cart,
                 HttpMethod.Delete,
                 $"/carts/{cartId}");
 
-            WebShopApi.SendServiceRequest(
+            await WebShopApi.SendServiceRequest(
                 WebShopServices.Products,
                 HttpMethod.Get,
                 "/");
@@ -68,14 +69,16 @@ namespace WebShop.Orders
         }
 
         [HttpPut("/{orderId}/shipment")]
-        public ActionResult SubmitShipmentDetails(
+        public async Task<ActionResult> SubmitShipmentDetails(
             [FromRoute] Guid orderId, 
             [FromBody] Shipment shipmentDetails)
         {
-            WebShopApi.SendServiceRequest(
+            await WebShopApi.SendServiceRequest(
                 WebShopServices.Shipments,
                 HttpMethod.Post,
-                "/");
+                $"/{orderId}",
+                "",
+                Data.GenerateShipment());
             
             return Created(orderId.ToString(), shipmentDetails);
         }
@@ -89,14 +92,14 @@ namespace WebShop.Orders
         }
 
         [HttpPut("/{orderId}")]
-        public Order SubmitOrder([FromRoute] Guid orderId)
+        public async Task<Order> SubmitOrder([FromRoute] Guid orderId)
         {
-            WebShopApi.SendServiceRequest(
+            await WebShopApi.SendServiceRequest(
                 WebShopServices.Products,
                 HttpMethod.Get,
                 $"/");
 
-            WebShopApi.SendServiceRequest(
+            await WebShopApi.SendServiceRequest(
                 WebShopServices.Shipments,
                 HttpMethod.Put,
                 $"/{Guid.NewGuid()}",
