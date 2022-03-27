@@ -21,21 +21,11 @@ let users =
     |> Feed.createCircular "users"
 
 let runTests() =
-    let httpFactory = HttpClientFactory.create()
-    let csvMutex = new Mutex();
-
-    let login =    Steps.createLogin          httpFactory users
-    let refresh =  Steps.createRefresh        httpFactory 
-    let resource = Steps.createResource       httpFactory 
-    let final =    Steps.postScenarioHandling csvMutex
-
-    Scenario.create "debug" [login; refresh; resource; final]
-    |> Scenario.withLoadSimulations [KeepConstant(copies = 1, during = seconds 10)]
-    //|> Scenario.withLoadSimulations [InjectPerSec(rate = 60, during = minutes 5)]
-    |> NBomberRunner.registerScenario
+    Scenarios.GenerateScenarios()
+    |> NBomberRunner.registerScenarios
     |> NBomberRunner.withTestSuite "http"
     |> NBomberRunner.withReportFolder Config.reportsFolder
-    //|> NBomberRunner.withLoggerConfig(fun () -> LoggerConfiguration().MinimumLevel.Verbose())
+    |> NBomberRunner.withLoggerConfig(fun () -> LoggerConfiguration().MinimumLevel.Verbose())
     |> NBomberRunner.run
     |> ignore
 

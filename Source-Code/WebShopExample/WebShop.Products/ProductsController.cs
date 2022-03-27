@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using Microsoft.AspNetCore.Mvc;
@@ -33,9 +34,9 @@ namespace WebShop.Products
         }
 
         [HttpGet("/{id}")]
-        public Product GetProduct([FromRoute] int id)
+        public Product GetProduct([FromRoute] Guid id)
         {
-            return Products.FirstOrDefault(p => p.Id == id % Products.Count);
+            return Products.FirstOrDefault(p => p.Id == 5);
         }
 
         [HttpPost]
@@ -46,8 +47,8 @@ namespace WebShop.Products
                 : Created($"/products/{product.Id}", product);
         }
 
-        [HttpPut]
-        public ActionResult UpdateProduct()
+        [HttpPut("/{id}")]
+        public ActionResult UpdateProduct([FromRoute] Guid id, [FromBody] Product product)
         {
             return Ok();
         }

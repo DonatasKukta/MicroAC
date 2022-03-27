@@ -22,6 +22,7 @@ Scenario: Create Product
 
 Scenario: Update Product
 	Given PUT request
+		And product Id
 		And product
 	When request is sent
 	Then response status code is 200

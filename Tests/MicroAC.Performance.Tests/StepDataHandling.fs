@@ -43,8 +43,48 @@ let saveResponseInContext<'content,'a> stepKey (stepContext : IStepContext<HttpC
             | false -> return Response.fail($"Error.PostHandling: Unable to add {stepKey} to context data.", -2)
     }
 
-let getApiResponse<'content, 'a> stepKey (stepContext : IStepContext<HttpClient, 'a>) = 
+let getApiResponseNew stepKey (stepContext : IStepContext<_,_>) = 
     let found, value = stepContext.Data.TryGetValue stepKey
     match found with
-        | true -> Some (value :?> ApiResponse<'content>)
+        | true -> Some value
         | false -> None
+
+let getWebShopHttpMethod action = 
+    match action with
+    | Action.SubmitPayment 
+    | Action.SubmitShipment
+    | Action.Update -> "PUT"
+    | Action.DeleteCartItem
+    | Action.Delete -> "DELETE"
+    | Action.GetOne 
+    | Action.GetList -> "GET"
+    | Action.AddCartItem   
+    | Action.Create -> "POST"
+
+let getWebShopUrl service action = 
+    let servicePath = 
+        match service with
+        | Service.Cart      -> "Carts/"
+        | Service.Products  -> "Products/"
+        | Service.Orders    -> "Orders/"
+        | Service.Shipments -> "Shipments/"
+
+    let id() = Guid.NewGuid().ToString()
+
+    let path = 
+        match (service, action) with 
+        // Special Cases:
+        | (Service.Cart,    Action.AddCartItem)    -> $"{id()}/products"
+        | (Service.Cart,    Action.DeleteCartItem) -> $"{id()}/products/{id()}"
+        | (Service.Orders,  Action.SubmitPayment)  -> $"{id()}/payment"
+        | (Service.Orders,  Action.SubmitShipment) -> $"{id()}/shipment"
+        | (Service.Shipments, _)
+        // Common cases
+        | (_, Action.Update) 
+        | (_, Action.Delete) 
+        | (_, Action.GetOne) -> id()
+        | (_, Action.GetList) 
+        | (_, Action.Create) -> ""
+        | (service , action) -> $"Unrecognised {service} and {action} path combination."
+
+    Config.webShopBaseUrl + servicePath + path

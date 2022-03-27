@@ -13,6 +13,7 @@ let private config = configProvider.Load(settings)
 let loginUrl = config.LoginUrl 
 let refreshUrl = config.RefreshUrl
 let resourceActionUrl = config.ResourceActionUrl
+let webShopBaseUrl = config.WebShopBaseUrl
 
 let private date = DateTime.Now.ToString().Replace(':', '.')
 let getPath filename = Path.Combine(config.ReportsFolder, date, filename) 

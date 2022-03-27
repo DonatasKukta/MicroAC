@@ -3,6 +3,23 @@
 open System.Collections
 open System
 
+type Service = 
+    | Cart 
+    | Products 
+    | Shipments 
+    | Orders 
+
+type Action = 
+    | GetOne 
+    | GetList
+    | Create
+    | Update
+    | Delete
+    | SubmitPayment
+    | SubmitShipment
+    | AddCartItem
+    | DeleteCartItem
+
 type LoginResult = { 
     accessJwt: string
     refreshJwt: string

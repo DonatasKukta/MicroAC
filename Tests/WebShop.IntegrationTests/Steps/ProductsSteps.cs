@@ -21,7 +21,7 @@ namespace WebShop.IntegrationTests.Steps
         [Given(@"product Id")]
         public void GivenRequestWithProductId()
         {
-            AppendToRequestUrl("1");
+            AppendToRequestUrl(Guid.NewGuid().ToString());
         }
 
         [Given(@"product")]
