@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
 
 namespace WebShop.Common
 {
@@ -16,6 +20,8 @@ namespace WebShop.Common
 
     public class WebShopApiClient : IWebShopApiClient
     {
+        static readonly string TimestampHeader = "MicroAC-Timestamp";
+
         static readonly string BaseUrl = "http://localhost:19081/MicroAC.ServiceFabric/WebShop.";
         
         readonly HttpClient HttpClient;
@@ -26,6 +32,7 @@ namespace WebShop.Common
         }
 
         public async Task<HttpResponseMessage> SendServiceRequest(
+            HttpContext context,
             WebShopServices service,
             HttpMethod method,
             string route,
@@ -51,6 +58,11 @@ namespace WebShop.Common
             var response = await HttpClient.SendAsync(request);
 
             response.EnsureSuccessStatusCode();
+
+            if (response.Headers.TryGetValues(TimestampHeader, out var timestamps))
+            {
+                context.Response.Headers.Append(TimestampHeader, new StringValues(timestamps.ToArray()));
+            }
 
             return response;
         }

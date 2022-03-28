@@ -23,6 +23,7 @@ namespace WebShop.Cart
         public async Task<WebShopCart> CreateCart()
         {
             await WebShopApi.SendServiceRequest(
+                this.HttpContext,
                 WebShopServices.Products,
                 HttpMethod.Get,
                 $"/");

@@ -40,16 +40,19 @@ namespace WebShop.Orders
         public async Task<ActionResult> CreateOrder([FromRoute] Guid cartId)
         {
             await WebShopApi.SendServiceRequest(
+                this.HttpContext,
                 WebShopServices.Cart,
                 HttpMethod.Get,
                 $"/carts/{cartId}");
 
             await WebShopApi.SendServiceRequest(
+                this.HttpContext,
                 WebShopServices.Cart,
                 HttpMethod.Delete,
                 $"/carts/{cartId}");
 
             await WebShopApi.SendServiceRequest(
+                this.HttpContext,
                 WebShopServices.Products,
                 HttpMethod.Get,
                 "/");
@@ -74,6 +77,7 @@ namespace WebShop.Orders
             [FromBody] Shipment shipmentDetails)
         {
             await WebShopApi.SendServiceRequest(
+                this.HttpContext,
                 WebShopServices.Shipments,
                 HttpMethod.Post,
                 $"/{orderId}",
@@ -95,11 +99,13 @@ namespace WebShop.Orders
         public async Task<Order> SubmitOrder([FromRoute] Guid orderId)
         {
             await WebShopApi.SendServiceRequest(
+                this.HttpContext,
                 WebShopServices.Products,
                 HttpMethod.Get,
                 $"/");
 
             await WebShopApi.SendServiceRequest(
+                this.HttpContext,
                 WebShopServices.Shipments,
                 HttpMethod.Put,
                 $"/{Guid.NewGuid()}",
