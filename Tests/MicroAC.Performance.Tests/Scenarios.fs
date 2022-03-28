@@ -51,7 +51,7 @@ let GenerateScenarios() =
 
     let getOrder       = Steps.getOrder       httpFactory     
     let getOrders      = Steps.getOrders      httpFactory     
-    let createOrder    = Steps.createOrder    httpFactory orderFeed
+    let createOrder    = Steps.createOrder    httpFactory
     let deleteOrder    = Steps.deleteOrder    httpFactory     
     let submitShipment = Steps.submitShipment httpFactory shipmentFeed
     let submitPayment  = Steps.submitPayment  httpFactory paymentFeed
@@ -65,7 +65,7 @@ let GenerateScenarios() =
         //|> Scenario.withLoadSimulations [InjectPerSec(rate = 60, during = minutes 5)]
     
     let dataAnalyst =  
-        Scenario.create "data analyst" [login; getProducts; getShipments; getOrders; createProduct;] 
+        Scenario.create "data analyst" [login; getProducts; getShipments; getOrders; createProduct;final] 
         |> Scenario.withLoadSimulations [KeepConstant(copies = 1, during = seconds 10)]
         |> Scenario.withoutWarmUp
         //|> Scenario.withLoadSimulations [InjectPerSec(rate = 60, during = minutes 5)]

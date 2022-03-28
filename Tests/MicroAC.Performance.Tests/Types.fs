@@ -30,6 +30,13 @@ type LoginInput = {
     Password: string;
 }
 
+type ApiResult = {
+    id: Guid;
+    step: string;
+    success: bool;
+    timestamps: IEnumerable;
+}
+
 type ApiResponse<'bodyType> = {
     id: Guid;
     step: string;

@@ -78,6 +78,7 @@ let getWebShopUrl service action =
         | (Service.Cart,    Action.DeleteCartItem) -> $"{id()}/products/{id()}"
         | (Service.Orders,  Action.SubmitPayment)  -> $"{id()}/payment"
         | (Service.Orders,  Action.SubmitShipment) -> $"{id()}/shipment"
+        | (Service.Orders,  Action.Create)
         | (Service.Shipments, _)
         // Common cases
         | (_, Action.Update) 

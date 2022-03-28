@@ -37,7 +37,7 @@ let debug() =
         response.timestamps 
         |> Seq.cast<string> 
         |> Seq.iter (fun x -> printfn "%A " x)
-        Csv.appendTimestampsToCsv (new Mutex()) response |> ignore
+        //Csv.appendTimestampsToCsv (new Mutex()) response |> ignore
     }
 
 let postTestCalculations reportsFolder = 

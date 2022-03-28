@@ -29,7 +29,7 @@ let toTimestampCsvStr t = $"{t.id};{t.step};{t.service};{t.action};{formatDate t
 /// Appends timestamps to csv file.
 /// Ignores timestamps where response.success is false.
 /// </summary>
-let appendTimestampsToCsv (mutex : Mutex) (response:ApiResponse<'bodyType> ) = 
+let appendTimestampsToCsv (mutex : Mutex) (response:ApiResult ) = 
     if (not response.success) then ()
     let timestampsStr = response.timestamps 
                         |> (parseRawTimestamps response.id response.step)
