@@ -59,51 +59,41 @@ let GenerateScenarios() =
 
     let final = Steps.postScenarioHandling csvMutex
     
-    let basicAuth = 
-        Scenario.create "basic auth" [login; refresh; resource; final]
+    let withdefaultSettings scenario  =
+        scenario 
         |> Scenario.withLoadSimulations [KeepConstant(copies = 1, during = seconds 10)]
         //|> Scenario.withLoadSimulations [InjectPerSec(rate = 60, during = minutes 5)]
-    
-    let dataAnalyst =  
-        Scenario.create "data analyst" [login; getProducts; getShipments; getOrders; createProduct;final] 
-        |> Scenario.withLoadSimulations [KeepConstant(copies = 1, during = seconds 10)]
         |> Scenario.withoutWarmUp
-        //|> Scenario.withLoadSimulations [InjectPerSec(rate = 60, during = minutes 5)]
+
+    let basicAuth = 
+        [login; refresh; resource; final]
+        |> Scenario.create "basic auth"              
+        |> withdefaultSettings
+    
+    let dataAnalyst = 
+        [login; getProducts; getShipments; getOrders; createProduct;final] 
+        |> Scenario.create "data analyst" 
+        |> withdefaultSettings
     
     let allSteps =  
         [
-            login;
-            refresh;
-            resource;
-            getProduct;
-            getProducts;
-            createProduct;
-            updateProduct;
-            deleteProduct;
-            getCart;
-            createCart;
-            addCartItem;
-            deleteCart;
-            deleteCartItem;
-            getShipment;
-            getShipments;
-            createShipment;
-            updateShipment;
-            deleteShipment;
-            getOrder;
-            getOrders;
-            createOrder;
-            deleteOrder;
-            submitShipment;
-            submitPayment;
-            submitOrder;
+            login; refresh; resource;
+            getProduct; getProducts; createProduct; updateProduct; deleteProduct;
+            getCart; createCart; addCartItem; deleteCart; deleteCartItem;
+            getShipment; getShipments; createShipment; updateShipment; deleteShipment;
+            getOrder; getOrders; createOrder; deleteOrder; submitShipment; submitPayment; submitOrder;
             final;
         ] 
         |> Scenario.create "all steps" 
-        |> Scenario.withLoadSimulations [KeepConstant(copies = 1, during = seconds 10)]
-        |> Scenario.withoutWarmUp
+        |> withdefaultSettings
+
+    let debugStep = 
+        [login; createOrder; final;]
+        |> Scenario.create "debug" 
+        |> withdefaultSettings
 
     [
+        debugStep;
         allSteps;
         basicAuth; 
         dataAnalyst

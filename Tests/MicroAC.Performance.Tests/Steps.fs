@@ -76,7 +76,7 @@ let withOptionalJsonBody body request =
     | null -> request 
     | body -> Http.withBody (JsonContent.Create body) request
     
-let webshop (name:string) (service:Service) (action:Action) (httpFactory: IClientFactory<_>) (feed: IFeed<'a> option) = 
+let webshop name service action httpFactory feed = 
     Step.create(name,
         ?feed = feed,
         clientFactory = httpFactory,
@@ -129,7 +129,7 @@ let submitOrder    factory      = webshop "SubmitOrder"         Service.Orders A
 
 // Common Steps
 
-let toResult (response : ApiResponse<'t>) = 
+let toApiResult (response : ApiResponse<'t>) = 
     { 
         id = response.id; 
         success = response.success;  
@@ -149,8 +149,8 @@ let postScenarioHandling mutex =
         |> Seq.filter (fun d ->  not (d.Key.Equals "nbomber_step_response"))
         |> Seq.map (fun d -> d.Value)
         |> Seq.map (fun r -> match r with 
-                              | :? ApiResponse<LoginResult> as x -> toResult x
-                              | :? ApiResponse<string> as y -> toResult y
+                              | :? ApiResponse<LoginResult> as x -> toApiResult x
+                              | :? ApiResponse<string> as y -> toApiResult y
                               | _ -> raise (System.Exception("Unrecognised body type"))
                               )
         |> Seq.iter (fun r -> (write r) |> ignore)
