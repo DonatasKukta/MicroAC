@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
@@ -26,26 +26,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Source-Code\WebShopExample\WebShop.Common\WebShop.Common.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Features\Orders.feature.cs">
-      <DependentUpon>Orders.feature</DependentUpon>
-    </Compile>
-    <Compile Update="Features\Cart.feature.cs">
-      <DependentUpon>Cart.feature</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <SpecFlowFeatureFiles Update="Features\Orders.feature">
-      <Visible>$(UsingMicrosoftNETSdk)</Visible>
-      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
-    </SpecFlowFeatureFiles>
-    <SpecFlowFeatureFiles Update="Features\Cart.feature">
-      <Visible>$(UsingMicrosoftNETSdk)</Visible>
-      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
-    </SpecFlowFeatureFiles>
   </ItemGroup>
 
 </Project>

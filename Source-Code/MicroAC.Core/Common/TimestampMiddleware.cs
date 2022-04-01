@@ -68,7 +68,7 @@ namespace MicroAC.Core.Common
             context.Response.Headers.Append(header, $"{name}-{message}-{_timeNow}");
         }
 
-        public static void AppendeTimestampHeaders(this HttpContext context, string key, HttpResponseHeaders headers)
+        public static void AppendTimestampHeaders(this HttpContext context, string key, HttpResponseHeaders headers)
         {
             var containsTimestampHeaders = headers.TryGetValues(key, out var timestamps);
 

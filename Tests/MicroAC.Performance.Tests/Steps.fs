@@ -129,7 +129,7 @@ let submitOrder    factory      = webshop "SubmitOrder"         Service.Orders A
 
 // Common Steps
 
-let toApiResult (response : ApiResponse<'t>) = 
+let toResult (response : ApiResponse<'t>) = 
     { 
         id = response.id; 
         success = response.success;  
@@ -149,8 +149,8 @@ let postScenarioHandling mutex =
         |> Seq.filter (fun d ->  not (d.Key.Equals "nbomber_step_response"))
         |> Seq.map (fun d -> d.Value)
         |> Seq.map (fun r -> match r with 
-                              | :? ApiResponse<LoginResult> as x -> toApiResult x
-                              | :? ApiResponse<string> as y -> toApiResult y
+                              | :? ApiResponse<LoginResult> as x -> toResult x
+                              | :? ApiResponse<string> as y -> toResult y
                               | _ -> raise (System.Exception("Unrecognised body type"))
                               )
         |> Seq.iter (fun r -> (write r) |> ignore)

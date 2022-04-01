@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Primitives;
+
+using MicroAC.Core.Common;
 
 namespace WebShop.Common
 {
@@ -59,10 +59,7 @@ namespace WebShop.Common
 
             response.EnsureSuccessStatusCode();
 
-            if (response.Headers.TryGetValues(TimestampHeader, out var timestamps))
-            {
-                context.Response.Headers.Append(TimestampHeader, new StringValues(timestamps.ToArray()));
-            }
+            context.AppendTimestampHeaders(TimestampHeader, response.Headers);
 
             return response;
         }

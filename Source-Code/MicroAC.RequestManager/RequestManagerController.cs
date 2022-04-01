@@ -98,7 +98,7 @@ namespace MicroAC.RequestManager
                     new Exception("Response received from Authorization: " + responseContent));
             }
 
-            this.HttpContext.AppendeTimestampHeaders(_timestampHeader, response.Headers);
+            this.HttpContext.AppendTimestampHeaders(_timestampHeader, response.Headers);
             this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Authorized");
 
             this.HttpContext.Request.Headers.Add("MicroAC-JWT", responseContent);
@@ -112,7 +112,7 @@ namespace MicroAC.RequestManager
 
         private async Task<IActionResult> HandleForwardedResponse(HttpResponseMessage response)
         {
-            this.HttpContext.AppendeTimestampHeaders(_timestampHeader, response.Headers);
+            this.HttpContext.AppendTimestampHeaders(_timestampHeader, response.Headers);
             
             // TODO: Fix header transfer
             

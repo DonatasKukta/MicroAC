@@ -61,8 +61,8 @@ let GenerateScenarios() =
     
     let withdefaultSettings scenario  =
         scenario 
-        |> Scenario.withLoadSimulations [KeepConstant(copies = 1, during = seconds 10)]
-        //|> Scenario.withLoadSimulations [InjectPerSec(rate = 60, during = minutes 5)]
+        |> Scenario.withLoadSimulations [KeepConstant(copies = 2, during = seconds 10)]
+        //|> Scenario.withLoadSimulations [InjectPerSec(rate = 2, during = minutes 5)]
         |> Scenario.withoutWarmUp
 
     let basicAuth = 
@@ -93,8 +93,8 @@ let GenerateScenarios() =
         |> withdefaultSettings
 
     [
-        debugStep;
+        //debugStep;
         allSteps;
-        basicAuth; 
-        dataAnalyst
+        //basicAuth; 
+        //dataAnalyst
     ]

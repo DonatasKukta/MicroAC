@@ -47,12 +47,6 @@ namespace WebShop.Orders
 
             await WebShopApi.SendServiceRequest(
                 this.HttpContext,
-                WebShopServices.Cart,
-                HttpMethod.Delete,
-                $"/carts/{cartId}");
-
-            await WebShopApi.SendServiceRequest(
-                this.HttpContext,
                 WebShopServices.Products,
                 HttpMethod.Get,
                 "/");
@@ -79,7 +73,7 @@ namespace WebShop.Orders
             await WebShopApi.SendServiceRequest(
                 this.HttpContext,
                 WebShopServices.Shipments,
-                HttpMethod.Post,
+                HttpMethod.Put,
                 $"/{orderId}",
                 "",
                 Data.GenerateShipment());
@@ -88,10 +82,18 @@ namespace WebShop.Orders
         }
 
         [HttpPut("/{orderId}/payment")]
-        public ActionResult SubmitPaymentDetails(
+        public async Task<ActionResult> SubmitPaymentDetails(
             [FromRoute] Guid orderId,
             [FromBody] Order.PaymentDetails paymentDetails)
         {
+            await WebShopApi.SendServiceRequest(
+                this.HttpContext,
+                WebShopServices.Shipments,
+                HttpMethod.Put,
+                $"/{orderId}",
+                "",
+                Data.GenerateShipment());
+
             return Created(orderId.ToString(), paymentDetails);
         }
 
