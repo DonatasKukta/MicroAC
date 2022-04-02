@@ -8,6 +8,7 @@ open FSharp.Json
 open System
 open System.Net.Http
 open Types
+open MicroAC.Core.Constants
 
 let readContent<'content> (response : HttpResponseMessage) = 
     task {
@@ -21,7 +22,7 @@ let readContent<'content> (response : HttpResponseMessage) =
 let readApiResponse<'content> (response: HttpResponseMessage) step = 
     task {
         let! body = readContent<'content> response
-        let foundt, timestamps = response.Headers.TryGetValues "MicroAC-Timestamp"
+        let foundt, timestamps = response.Headers.TryGetValues HttpHeaders.Timestamps
         let foundr, ids = response.Headers.TryGetValues "X-ServiceFabricRequestId" 
         let id = ids |> Seq.head |> Guid.Parse
         return { 

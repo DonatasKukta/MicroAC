@@ -3,6 +3,7 @@
 using Hellang.Middleware.ProblemDetails;
 
 using MicroAC.Core.Common;
+using MicroAC.Core.Constants;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
@@ -30,7 +31,7 @@ namespace MicroAC.Core.Exceptions
                 });
                 options.OnBeforeWriteDetails = (context, problemDetails) => 
                 {
-                    context.AddActionMessage("MicroAC-Timestamp", "ErrorMiddleware", $"Error {problemDetails.Status}");
+                    context.AddActionMessage("ErrorMiddleware", $"Error {problemDetails.Status}");
                 };
             });
             return services;

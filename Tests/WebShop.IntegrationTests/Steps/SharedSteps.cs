@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 using FluentAssertions;
 
+using MicroAC.Core.Constants;
+
 using TechTalk.SpecFlow;
 
 using WebShop.Common;
@@ -41,7 +43,7 @@ namespace WebShop.IntegrationTests.Steps
                 },
                 Response = new HttpResponseMessage()
             };
-            State.Request.Headers.Add("Authorization", TestAuthToken);
+            State.Request.Headers.Add(HttpHeaders.Authorization, TestAuthToken);
         }
 
         [Given(@"(.*) request")]

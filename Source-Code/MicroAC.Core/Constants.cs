@@ -21,4 +21,3 @@
         public const string Permissions = "Permissions";
     }
 }
-

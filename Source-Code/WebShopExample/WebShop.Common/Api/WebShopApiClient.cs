@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
 using MicroAC.Core.Common;
+using MicroAC.Core.Constants;
 
 namespace WebShop.Common
 {
@@ -20,8 +21,6 @@ namespace WebShop.Common
 
     public class WebShopApiClient : IWebShopApiClient
     {
-        static readonly string TimestampHeader = "MicroAC-Timestamp";
-
         static readonly string BaseUrl = "http://localhost:19081/MicroAC.ServiceFabric/WebShop.";
         
         readonly HttpClient HttpClient;
@@ -46,7 +45,7 @@ namespace WebShop.Common
             };
 
             if (authToken != "")
-                request.Headers.Add("Authorization", authToken);
+                request.Headers.Add(HttpHeaders.Authorization, authToken);
             
             if(body != null)
                 request.Content = new StringContent(
@@ -59,7 +58,7 @@ namespace WebShop.Common
 
             response.EnsureSuccessStatusCode();
 
-            context.AppendTimestampHeaders(TimestampHeader, response.Headers);
+            context.AppendTimestampHeaders(response.Headers);
 
             return response;
         }

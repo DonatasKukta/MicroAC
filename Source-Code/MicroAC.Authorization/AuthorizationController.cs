@@ -8,6 +8,7 @@ using MicroAC.Core.Common;
 using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
 using MicroAC.Core.Exceptions;
+using MicroAC.Core.Constants;
 
 namespace MicroAC.Authorization
 {
@@ -23,8 +24,6 @@ namespace MicroAC.Authorization
         readonly IClaimBuilder<AccessInternal> _accessInternalClaimBuilder;
 
         readonly IPermissionsRepository _permissionsRepository;
-
-        readonly string _timestampHeader;
 
         readonly string _serviceName;
 
@@ -42,7 +41,6 @@ namespace MicroAC.Authorization
             _accessInternalTokenHandler = accessInternalTokenHandler;
             _accessInternalClaimBuilder = accessInternalClaimBuiler;
             _permissionsRepository = permissionsRepository;
-            _timestampHeader = config.GetSection("Timestamp:Header").Value;
             _serviceName = config.GetSection("Timestamp:ServiceName").Value;
         }
 
@@ -55,7 +53,7 @@ namespace MicroAC.Authorization
         [HttpPost("Authorize")]
         public async Task<ActionResult> Authorize()
         {
-            var hasToken = this.Request.Headers.TryGetValue("Authorization", out var headerValues);
+            var hasToken = this.Request.Headers.TryGetValue(HttpHeaders.Authorization, out var headerValues);
             var token = headerValues.FirstOrDefault();
 
             if (!hasToken || token is null) 
@@ -75,7 +73,7 @@ namespace MicroAC.Authorization
 
             try
             {
-                this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "AuthStart");
+                this.HttpContext.AddActionMessage(_serviceName, "AuthStart");
                 var permissions = await _permissionsRepository.GetRolePermissions(roles);
 
                 var claims = _accessInternalClaimBuilder
@@ -85,7 +83,7 @@ namespace MicroAC.Authorization
                     .Build();
                 var jwt = _accessInternalTokenHandler.Create(claims);
 
-                this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Success");
+                this.HttpContext.AddActionMessage(_serviceName, "Success");
 
                 return Ok(jwt);
             }

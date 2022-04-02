@@ -1,4 +1,5 @@
 ﻿using MicroAC.Core.Common;
+using MicroAC.Core.Constants;
 using MicroAC.Core.Exceptions;
 
 using Microsoft.AspNetCore.Mvc;
@@ -29,8 +30,6 @@ namespace MicroAC.RequestManager
 
         readonly string _serviceName;
 
-        readonly string _timestampHeader;
-
         StringContent ForwardRequestContent;
 
         public RequestManagerController(HttpClient httpClient, IConfiguration config)
@@ -41,7 +40,6 @@ namespace MicroAC.RequestManager
             _authorizationUrl = new Uri(_basePath + config.GetValue<string>("InternalAuthorizationRoute"));
             _headersToIgnore = config.GetSection("HeadersToIgnore").Get<List<string>>();
             _serviceName = config.GetValue<string>("Timestamp:ServiceName");
-            _timestampHeader = config.GetValue<string>("Timestamp:Header");
         }
 
         public async Task<IActionResult> Index()
@@ -54,7 +52,7 @@ namespace MicroAC.RequestManager
             }
 
             if (requestedRoute.RequiresAuhtentication
-                && !this.Request.Headers.ContainsKey("Authorization"))
+                && !this.Request.Headers.ContainsKey(HttpHeaders.Authorization))
             {
                 throw new AuthenticationFailedException(
                     $"Request path {this.HttpContext.Request.Path} requires external access token.");
@@ -76,7 +74,7 @@ namespace MicroAC.RequestManager
             var forwardUri = GetForwardUri(requestedRoute);
             var forwardRequest = CreateForwardRequest(forwardUri);
 
-            this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Forward");
+            this.HttpContext.AddActionMessage(_serviceName, "Forward");
 
             var response = await _http.SendAsync(forwardRequest);
 
@@ -85,7 +83,7 @@ namespace MicroAC.RequestManager
 
         private async Task AuthorizeRequest()
         {
-            this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "StartAuth");
+            this.HttpContext.AddActionMessage(_serviceName, "StartAuth");
 
             var request = CreateForwardRequest(_authorizationUrl);
             request.Method = HttpMethod.Post;
@@ -98,10 +96,10 @@ namespace MicroAC.RequestManager
                     new Exception("Response received from Authorization: " + responseContent));
             }
 
-            this.HttpContext.AppendTimestampHeaders(_timestampHeader, response.Headers);
-            this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Authorized");
+            this.HttpContext.AppendTimestampHeaders(response.Headers);
+            this.HttpContext.AddActionMessage(_serviceName, "Authorized");
 
-            this.HttpContext.Request.Headers.Add("MicroAC-JWT", responseContent);
+            this.HttpContext.Request.Headers.Add(HttpHeaders.InternalJWT, responseContent);
         }
 
         private EndpointRoute GetMatchingEndpointRoute()
@@ -112,11 +110,11 @@ namespace MicroAC.RequestManager
 
         private async Task<IActionResult> HandleForwardedResponse(HttpResponseMessage response)
         {
-            this.HttpContext.AppendTimestampHeaders(_timestampHeader, response.Headers);
+            this.HttpContext.AppendTimestampHeaders(response.Headers);
             
             // TODO: Fix header transfer
             
-            this.HttpContext.AddActionMessage(_timestampHeader, _serviceName, "Receive");
+            this.HttpContext.AddActionMessage(_serviceName, "Receive");
 
             this.HttpContext.Response.StatusCode = (int)response.StatusCode;
 
@@ -124,7 +122,6 @@ namespace MicroAC.RequestManager
             
             return new ObjectResult(body);
         }
-
         
         private HttpRequestMessage CreateForwardRequest(Uri uri)
         {

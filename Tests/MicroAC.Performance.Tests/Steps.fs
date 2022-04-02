@@ -9,6 +9,7 @@ open FSharp.Control.Tasks
 open System.Net.Http
 open Types
 open StepDataHandling
+open MicroAC.Core.Constants
 
 let private globalTimeout = seconds 10
 let private loginStep = "Login"
@@ -45,7 +46,7 @@ let resourceApi httpFactory =
              else 
              let accessJwt = (loginResponseObj.Value:?> ApiResponse<LoginResult>).body.accessJwt
              return! Http.createRequest "GET" Config.resourceActionUrl
-                     |> Http.withHeader "Authorization" accessJwt
+                     |> Http.withHeader HttpHeaders.Authorization accessJwt
                      |> Http.withCheck saveResponse
                      |> Http.send context
         }
@@ -94,7 +95,7 @@ let webshop name service action httpFactory feed =
             let url = getWebShopUrl service action
 
             return!  Http.createRequest method url
-                        |> Http.withHeader "Authorization" accessJwt
+                        |> Http.withHeader HttpHeaders.Authorization accessJwt
                         |> withOptionalJsonBody context.FeedItem
                         |> Http.withCheck saveResponse
                         |> Http.send context

@@ -14,8 +14,6 @@ namespace MicroAC.Core.Common
     {
         readonly RequestDelegate _next;
 
-        readonly string _timestampHeader;
-
         readonly string _serviceName;
 
         readonly StatelessServiceContext _serviceContext;
@@ -26,18 +24,17 @@ namespace MicroAC.Core.Common
             StatelessServiceContext serviceContext)
         {
             _next = next;
-            _timestampHeader = config.GetSection("Timestamp:Header").Value;
             _serviceName = config.GetSection("Timestamp:ServiceName").Value;
             _serviceContext = serviceContext;
         }
 
         public async Task InvokeAsync(HttpContext context)
         {
-            context.AddActionMessage(_timestampHeader, _serviceName, _serviceContext.NodeContext.NodeName);
-            context.AddStartTimestamp(_timestampHeader, _serviceName);
+            context.AddActionMessage(_serviceName, _serviceContext.NodeContext.NodeName);
+            context.AddStartTimestamp(_serviceName);
             context.Response.OnStarting(state =>
             {
-                (state as HttpContext).AddEndTimestamp(_timestampHeader, _serviceName);
+                (state as HttpContext).AddEndTimestamp(_serviceName);
                 return Task.CompletedTask;
             }, context);
 
@@ -53,28 +50,30 @@ namespace MicroAC.Core.Common
             get { return DateTime.Now.ToString(Constants.TimestampFormat); }
         }
 
-        internal static void AddStartTimestamp(this HttpContext context, string header, string name)
+        static string _timestampHeader = Core.Constants.HttpHeaders.Timestamps;
+
+        internal static void AddStartTimestamp(this HttpContext context, string name)
         {
-            context.Response.Headers.Append(header, $"{name}-Start-{_timeNow}");
+            context.Response.Headers.Append(_timestampHeader, $"{name}-Start-{_timeNow}");
         }
 
-        internal static void AddEndTimestamp(this HttpContext context, string header, string name)
+        internal static void AddEndTimestamp(this HttpContext context, string name)
         {
-            context.Response.Headers.Append(header, $"{name}-End-{_timeNow}");
+            context.Response.Headers.Append(_timestampHeader, $"{name}-End-{_timeNow}");
         }
 
-        public static void AddActionMessage(this HttpContext context, string header, string name, string message)
+        public static void AddActionMessage(this HttpContext context, string name, string message)
         {
-            context.Response.Headers.Append(header, $"{name}-{message}-{_timeNow}");
+            context.Response.Headers.Append(_timestampHeader, $"{name}-{message}-{_timeNow}");
         }
 
-        public static void AppendTimestampHeaders(this HttpContext context, string key, HttpResponseHeaders headers)
+        public static void AppendTimestampHeaders(this HttpContext context, HttpResponseHeaders headers)
         {
-            var containsTimestampHeaders = headers.TryGetValues(key, out var timestamps);
+            var containsTimestampHeaders = headers.TryGetValues(_timestampHeader, out var timestamps);
 
             if (containsTimestampHeaders)
             {
-                context.Response.Headers.Append(key, new StringValues(timestamps.ToArray()));
+                context.Response.Headers.Append(_timestampHeader, new StringValues(timestamps.ToArray()));
             }
         }
     }
