@@ -7,16 +7,11 @@ using Microsoft.Extensions.Primitives;
 using Microsoft.Extensions.DependencyInjection;
 using MicroAC.Core.Models;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Http;
 
 namespace MicroAC.Core.Auth
 {
-    /// <summary>
-    /// Authorizes MicroAC Internal Access Token.
-    /// Requires instances required to be registered in ActionExecutingContext.HttpContext.RequestServices:
-    ///     IJwtTokenHandler<AccessInternal>;
-    ///     IConfiguration with "StrictAuthozirationEnabled".
-    /// </summary>
-    public class MicroAuthorizeAttribute : ActionFilterAttribute
+    public class MicroAuthAttribute : ActionFilterAttribute
     {
         public const string PermissionsKey = "Permissions";
 
@@ -27,16 +22,11 @@ namespace MicroAC.Core.Auth
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             var httpContext = filterContext.HttpContext;
-
-            var containsToken = httpContext.Request.Headers.TryGetValue("MicroAC-JWT", out var tokenString);
-            
-            if (!containsToken || tokenString == StringValues.Empty)
-                throw new UnauthorizedAccessException("Authorization token not provided");
-
             var config = httpContext.RequestServices.GetService<IConfiguration>();
 
-            var tokenHandler = httpContext.RequestServices.GetService<IJwtTokenHandler<AccessInternal>>();
-            var permissions = tokenHandler.GetValidatedPermissions(tokenString);
+            var permissions = config.GetValue<bool>("CentralAuthorizationEnabled")
+                ? GetPermissionsFromHeader(httpContext)
+                : RetrievePermissionsFromAuthorizationService(httpContext);
 
             httpContext.Items.Add(PermissionsKey, permissions);
 
@@ -58,7 +48,24 @@ namespace MicroAC.Core.Auth
                 permissions = Filter(permissions, valueFilter);
         }
 
-        private IEnumerable<Permission> Filter(IEnumerable<Permission> permissions, Func<Permission, bool> filter)
+        IEnumerable<Permission> GetPermissionsFromHeader(HttpContext httpContext)
+        {
+            var containsToken = httpContext.Request.Headers.TryGetValue("MicroAC-JWT", out var tokenString);
+
+            if (!containsToken || tokenString == StringValues.Empty)
+                throw new UnauthorizedAccessException("Authorization token not provided");
+
+            var tokenHandler = httpContext.RequestServices.GetService<IJwtTokenHandler<AccessInternal>>();
+            return tokenHandler.GetValidatedPermissions(tokenString);
+        }
+
+        IEnumerable<Permission> RetrievePermissionsFromAuthorizationService(HttpContext httpContext)
+        {
+            // Send external request
+            return null;
+        }
+
+        static IEnumerable<Permission> Filter(IEnumerable<Permission> permissions, Func<Permission, bool> filter)
         {
             var filtered = permissions.Where(filter);
 

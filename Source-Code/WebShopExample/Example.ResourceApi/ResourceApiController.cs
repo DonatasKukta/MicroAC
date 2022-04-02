@@ -22,7 +22,7 @@ namespace Example.ResourceApi
         }
 
         [HttpGet("/Action")]
-        [MicroAuthorize(
+        [MicroAuth(
             ServiceName = "Service5_SeedTestData",
             Action = "Action742_SeedTestData", 
             Value = "PermissionValue742_SeedTestData"
@@ -32,7 +32,7 @@ namespace Example.ResourceApi
             var response = new
             {
                 message = "Hello World! 1s long response.",
-                permissions = this.HttpContext.Items[MicroAuthorizeAttribute.PermissionsKey]
+                permissions = this.HttpContext.Items[MicroAuthAttribute.PermissionsKey]
             };
 
             await Task.Delay(1000);
