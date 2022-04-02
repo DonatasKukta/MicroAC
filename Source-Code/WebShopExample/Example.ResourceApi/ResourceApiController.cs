@@ -12,11 +12,9 @@ namespace Example.ResourceApi
     [ApiController]
     public class ResourceApiController : ControllerBase
     {
-        readonly IJwtTokenHandler<AccessInternal> _accessInternalTokenHandler;
+        public ResourceApiController() 
+        { 
 
-        public ResourceApiController(IJwtTokenHandler<AccessInternal> accessInternalTokenHandler, IConfiguration config)
-        {
-            _accessInternalTokenHandler = accessInternalTokenHandler;
         }
 
         [HttpGet("/Action")]
@@ -27,10 +25,15 @@ namespace Example.ResourceApi
             )]
         public async Task<ActionResult> Index()
         {
+            var resolver = new FabricServiceResolver();
+
+            var resolved = await resolver.GetServiceEndpoints();
+
             var response = new
             {
                 message = "Hello World! 1s long response.",
-                permissions = this.HttpContext.Items[HttpContextKeys.Permissions]
+                permissions = this.HttpContext.Items[HttpContextKeys.Permissions],
+                resolved = resolved
             };
 
             await Task.Delay(1000);

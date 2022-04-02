@@ -9,7 +9,9 @@
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
-    <PackageReference Include="Microsoft.ServiceFabric" Version="5.1.329" />
+    <PackageReference Include="Microsoft.ServiceFabric" Version="8.1.329" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="5.1.329" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.12.2" />
   </ItemGroup>
 
