@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 using MicroAC.Core.Auth;
-using MicroAC.Core.Common;
 using MicroAC.Core.Exceptions;
 using MicroAC.Core.Models;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Primitives;
 
 namespace Example.ResourceApi
 {
@@ -25,12 +22,17 @@ namespace Example.ResourceApi
         }
 
         [HttpGet("/Action")]
+        [MicroAuthorize(
+            ServiceName = "Service5_SeedTestData",
+            Action = "Action742_SeedTestData", 
+            Value = "PermissionValue742_SeedTestData"
+            )]
         public async Task<ActionResult> Index()
         {
             var response = new
             {
                 message = "Hello World! 1s long response.",
-                permissions = Authorize()
+                permissions = this.HttpContext.Items[MicroAuthorizeAttribute.PermissionsKey]
             };
 
             await Task.Delay(1000);
