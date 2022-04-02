@@ -8,31 +8,25 @@ using Microsoft.AspNetCore.Http;
 
 using MicroAC.Core.Common;
 using MicroAC.Core.Constants;
+using MicroAC.Core.Client;
 
 namespace WebShop.Common
 {
-    public enum WebShopServices
-    {
-        Orders,
-        Shipments, 
-        Cart,
-        Products,
-    }
-
     public class WebShopApiClient : IWebShopApiClient
-    {
-        static readonly string BaseUrl = "http://localhost:19081/MicroAC.ServiceFabric/WebShop.";
-        
+    {        
         readonly HttpClient HttpClient;
 
-        public WebShopApiClient(HttpClient httpClient)
+        readonly IEndpointResolver EndpointResolver;
+
+        public WebShopApiClient(HttpClient httpClient, IEndpointResolver endpointResolver)
         {
             HttpClient = httpClient;
+            EndpointResolver = endpointResolver;
         }
 
         public async Task<HttpResponseMessage> SendServiceRequest(
             HttpContext context,
-            WebShopServices service,
+            MicroACServices service,
             HttpMethod method,
             string route,
             string authToken = "",
@@ -40,7 +34,7 @@ namespace WebShop.Common
         {
             var request = new HttpRequestMessage
             {
-                RequestUri = GetServiceUrl(service, route),
+                RequestUri = await GetServiceUrl(service, route),
                 Method = method,
             };
 
@@ -63,11 +57,11 @@ namespace WebShop.Common
             return response;
         }
 
-        public Uri GetServiceUrl(WebShopServices service, string route)
+        public async Task<Uri> GetServiceUrl(MicroACServices service, string route)
         {
-            var serviceStr = Enum.GetName(typeof(WebShopServices), service);
+            var endpoint = await EndpointResolver.GetServiceEndpoint(service);
             
-            return new Uri(BaseUrl + serviceStr + route);
+            return new Uri(endpoint + route);
         }
     }
 }

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
+using MicroAC.Core.Client;
+
 using Microsoft.AspNetCore.Mvc;
 
 using WebShop.Common;
@@ -24,7 +26,7 @@ namespace WebShop.Cart
         {
             await WebShopApi.SendServiceRequest(
                 this.HttpContext,
-                WebShopServices.Products,
+                MicroACServices.Products,
                 HttpMethod.Get,
                 $"/");
 

@@ -1,5 +1,7 @@
 ﻿using System.Net.Http;
 
+using MicroAC.Core.Client;
+
 using Microsoft.Extensions.DependencyInjection;
 
 namespace WebShop.Common
@@ -8,10 +10,11 @@ namespace WebShop.Common
     {
         public static void AddWebShopApiClient(this IServiceCollection services)
         {
-            var httpClient = new HttpClient();
-            var webShopApiClient = new WebShopApiClient(httpClient);
-
-            services.AddSingleton(typeof(IWebShopApiClient), webShopApiClient);
+            services.AddSingleton< HttpClient>();
+            
+            services.AddSingleton<IEndpointResolver,FabricEndpointResolver>();
+            
+            services.AddSingleton<IWebShopApiClient, WebShopApiClient>();
         }
     }
 }

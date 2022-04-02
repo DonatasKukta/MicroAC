@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
+using MicroAC.Core.Client;
+
 using Microsoft.AspNetCore.Mvc;
 
 using WebShop.Common;
@@ -12,9 +14,9 @@ namespace WebShop.Orders
     [Route("/")]
     public class OrdersController : Controller
     {
-        DataGenerator Data;
+        readonly DataGenerator Data;
 
-        IWebShopApiClient WebShopApi;
+        readonly IWebShopApiClient WebShopApi;
 
         public OrdersController(IWebShopApiClient webShopApi)
         {
@@ -41,13 +43,13 @@ namespace WebShop.Orders
         {
             await WebShopApi.SendServiceRequest(
                 this.HttpContext,
-                WebShopServices.Cart,
+                MicroACServices.Cart,
                 HttpMethod.Get,
                 $"/carts/{cartId}");
 
             await WebShopApi.SendServiceRequest(
                 this.HttpContext,
-                WebShopServices.Products,
+                MicroACServices.Products,
                 HttpMethod.Get,
                 "/");
 
@@ -72,7 +74,7 @@ namespace WebShop.Orders
         {
             await WebShopApi.SendServiceRequest(
                 this.HttpContext,
-                WebShopServices.Shipments,
+                MicroACServices.Shipments,
                 HttpMethod.Put,
                 $"/{orderId}",
                 "",
@@ -88,7 +90,7 @@ namespace WebShop.Orders
         {
             await WebShopApi.SendServiceRequest(
                 this.HttpContext,
-                WebShopServices.Shipments,
+                MicroACServices.Shipments,
                 HttpMethod.Put,
                 $"/{orderId}",
                 "",
@@ -102,13 +104,13 @@ namespace WebShop.Orders
         {
             await WebShopApi.SendServiceRequest(
                 this.HttpContext,
-                WebShopServices.Products,
+                MicroACServices.Products,
                 HttpMethod.Get,
                 $"/");
 
             await WebShopApi.SendServiceRequest(
                 this.HttpContext,
-                WebShopServices.Shipments,
+                MicroACServices.Shipments,
                 HttpMethod.Put,
                 $"/{Guid.NewGuid()}",
                 "",
