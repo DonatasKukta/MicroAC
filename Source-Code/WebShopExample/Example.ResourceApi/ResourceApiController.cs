@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 using MicroAC.Core.Auth;
-using MicroAC.Core.Exceptions;
-using MicroAC.Core.Models;
+using MicroAC.Core.Client;
+using MicroAC.Core.Constants;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -32,25 +30,12 @@ namespace Example.ResourceApi
             var response = new
             {
                 message = "Hello World! 1s long response.",
-                permissions = this.HttpContext.Items[MicroAuthAttribute.PermissionsKey]
+                permissions = this.HttpContext.Items[HttpContextKeys.Permissions]
             };
 
             await Task.Delay(1000);
 
             return Ok(response);
-        }
-
-        // TODO: Move Extraction and validation of token to common code library
-        private IEnumerable<Permission> Authorize()
-        {
-            var hasToken = this.Request.Headers.TryGetValue("MicroAC-JWT", out var headerValues);
-            var token = headerValues.FirstOrDefault();
-
-            if (!hasToken || token is null)
-            {
-                throw new AuthenticationFailedException("Missing internal access token.");
-            }
-            return _accessInternalTokenHandler.GetValidatedPermissions(token);
         }
     }
 }

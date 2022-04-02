@@ -8,30 +8,37 @@ using Microsoft.Extensions.DependencyInjection;
 using MicroAC.Core.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Http;
+using MicroAC.Core.Auth;
+using System.Threading.Tasks;
+using System.Threading;
+using MicroAC.Core.Constants;
 
-namespace MicroAC.Core.Auth
+namespace MicroAC.Core.Client
 {
     public class MicroAuthAttribute : ActionFilterAttribute
     {
-        public const string PermissionsKey = "Permissions";
-
         public string ServiceName { get; set; }
         public string Action { get; set; }
         public string Value { get; set; }
 
-        public override void OnActionExecuting(ActionExecutingContext filterContext)
+        public override async Task OnActionExecutionAsync(
+            ActionExecutingContext filterContext, 
+            ActionExecutionDelegate next)
         {
             var httpContext = filterContext.HttpContext;
             var config = httpContext.RequestServices.GetService<IConfiguration>();
 
-            var permissions = config.GetValue<bool>("CentralAuthorizationEnabled")
-                ? GetPermissionsFromHeader(httpContext)
-                : RetrievePermissionsFromAuthorizationService(httpContext);
+            var permissions = config.GetValue<bool>(ConfigKeys.CentralAuthorizationEnabled)
+                ? await RetrievePermissionsFromAuthorizationService(httpContext)
+                : GetPermissionsFromHeader(httpContext);
 
-            httpContext.Items.Add(PermissionsKey, permissions);
+            httpContext.Items.Add(HttpContextKeys.Permissions, permissions);
 
-            if (!config.GetValue<bool>("StrictAuthozirationEnabled"))
+            if (!config.GetValue<bool>(ConfigKeys.StrictAuthozirationEnabled))
+            {
+                await next();
                 return;
+            }
 
             bool serviceFilter(Permission permission) => permission.ServiceName.Equals(ServiceName);
             bool actionFilter(Permission permission)  => permission.Action.Equals(Action);
@@ -46,23 +53,39 @@ namespace MicroAC.Core.Auth
 
             if (!string.IsNullOrEmpty(Value))
                 permissions = Filter(permissions, valueFilter);
+
+            await next();
         }
 
         IEnumerable<Permission> GetPermissionsFromHeader(HttpContext httpContext)
         {
-            var containsToken = httpContext.Request.Headers.TryGetValue("MicroAC-JWT", out var tokenString);
-
-            if (!containsToken || tokenString == StringValues.Empty)
-                throw new UnauthorizedAccessException("Authorization token not provided");
+            var internalAccessToken = GetToken(HttpHeaders.InternalJWT, httpContext);
 
             var tokenHandler = httpContext.RequestServices.GetService<IJwtTokenHandler<AccessInternal>>();
-            return tokenHandler.GetValidatedPermissions(tokenString);
+            return tokenHandler.GetValidatedPermissions(internalAccessToken);
         }
 
-        IEnumerable<Permission> RetrievePermissionsFromAuthorizationService(HttpContext httpContext)
+        async Task<IEnumerable<Permission>> RetrievePermissionsFromAuthorizationService(HttpContext httpContext)
         {
-            // Send external request
-            return null;
+            var authorization = httpContext.RequestServices.GetService<IAuthorizationServiceClient>();
+
+            var externalAccessToken = GetToken(HttpHeaders.Authorization, httpContext);
+
+            (var permissions, var timestamps) = await authorization.Authorize(externalAccessToken);
+
+            httpContext.Response.Headers.Append(HttpHeaders.Timestamps, timestamps.ToArray());
+
+            return permissions;
+        }
+
+        static string GetToken(string header, HttpContext httpContext)
+        {
+            var containsToken = httpContext.Request.Headers.TryGetValue(header, out var tokenString);
+
+            if (!containsToken || tokenString == StringValues.Empty)
+                throw new UnauthorizedAccessException($"Authorization token {header} not provided");
+            
+            return tokenString;
         }
 
         static IEnumerable<Permission> Filter(IEnumerable<Permission> permissions, Func<Permission, bool> filter)

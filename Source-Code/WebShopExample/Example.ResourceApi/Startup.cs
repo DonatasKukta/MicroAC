@@ -1,4 +1,7 @@
+using System.Net.Http;
+
 using MicroAC.Core.Auth;
+using MicroAC.Core.Client;
 using MicroAC.Core.Common;
 using MicroAC.Core.Exceptions;
 
@@ -27,13 +30,15 @@ namespace Example.ResourceApi
 
             services.AddControllers(); ;
 
+            services.AddSingleton<IConfiguration>(_config);
+
             services.AddScoped<AccessInternal>();
 
-            services.AddScoped(typeof(IJwtTokenHandler<AccessInternal>), typeof(JwtTokenHandler<AccessInternal>));
+            services.AddScoped<IJwtTokenHandler<AccessInternal>,JwtTokenHandler<AccessInternal>>();
 
-            services.AddSingleton<IConfiguration>(_config); 
+            services.AddSingleton<HttpClient>();
 
-            services.AddSingleton(typeof(IJwtTokenHandler<AccessInternal>), new JwtTokenHandler<AccessInternal>(new AccessInternal()));
+            services.AddSingleton<IAuthorizationServiceClient, AuthorizationServiceClient>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
