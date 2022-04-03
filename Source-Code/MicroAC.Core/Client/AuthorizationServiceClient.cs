@@ -15,21 +15,25 @@ namespace MicroAC.Core.Client
 
         readonly IJwtTokenHandler<AccessInternal> TokenHandler;
 
-        //TODO: Make URL dynamic with Service Fabric discovery
-        const string AuthorizationURL 
-            = "http://localhost:19081/MicroAC.ServiceFabric/MicroAC.Authorization/Authorize";
+        readonly IEndpointResolver EndpointResolver;
 
-        public AuthorizationServiceClient(HttpClient httpClient, IJwtTokenHandler<AccessInternal> tokenHandler)
+        public AuthorizationServiceClient(
+            HttpClient httpClient, 
+            IJwtTokenHandler<AccessInternal> tokenHandler,
+            IEndpointResolver endpointResolver)
         {
             HttpClient = httpClient;
             TokenHandler = tokenHandler;
+            EndpointResolver = endpointResolver;
         }
 
         public async Task<(IEnumerable<Permission> permissions, IEnumerable<string> timestamps)> Authorize(string externalAccessToken)
         {
+            var authorizationUrl = await EndpointResolver.GetServiceEndpoint(MicroACServices.Authorization);
+            
             using var request = new HttpRequestMessage()
             {
-                RequestUri = new Uri(AuthorizationURL),
+                RequestUri = new Uri(authorizationUrl + "/Authorize"),
                 Method = HttpMethod.Post,
             };
             request.Headers.Add(HttpHeaders.Authorization, externalAccessToken);

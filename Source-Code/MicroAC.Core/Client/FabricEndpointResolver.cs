@@ -21,9 +21,9 @@ namespace MicroAC.Core.Client
         readonly Dictionary<MicroACServices, string> Services = new Dictionary<MicroACServices, string>()
         {
             { MicroACServices.ResourceApi,    "Example.ResourceApi" },
-            { MicroACServices.RequestManager, "MicroAC.Authentication" },
-            { MicroACServices.Authentication, "MicroAC.Authorization" },
-            { MicroACServices.Authorization,  "MicroAC.RequestManager" },
+            { MicroACServices.RequestManager, "MicroAC.RequestManager" },
+            { MicroACServices.Authentication, "MicroAC.Authentication" },
+            { MicroACServices.Authorization,  "MicroAC.Authorization" },
             { MicroACServices.Orders,         "WebShop.Orders" },
             { MicroACServices.Shipments,      "WebShop.Shipments" },
             { MicroACServices.Cart,           "WebShop.Cart" },

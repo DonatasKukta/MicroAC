@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using MicroAC.Core.Client;
+
 using Microsoft.AspNetCore.Mvc;
 
 using WebShop.Common;
@@ -34,12 +36,14 @@ namespace WebShop.Products
         }
 
         [HttpGet("/{id}")]
+        [MicroAuth]
         public Product GetProduct([FromRoute] Guid id)
         {
             return Products.FirstOrDefault(p => p.Id == 5);
         }
 
         [HttpPost]
+        [MicroAuth]
         public ActionResult CreateProduct([FromBody] Product product)
         {
             return product == null
@@ -48,12 +52,14 @@ namespace WebShop.Products
         }
 
         [HttpPut("/{id}")]
+        [MicroAuth]
         public ActionResult UpdateProduct([FromRoute] Guid id, [FromBody] Product product)
         {
             return Ok();
         }
 
         [HttpDelete("/{id}")]
+        [MicroAuth]
         public ActionResult DeleteProduct()
         {
             return Ok();

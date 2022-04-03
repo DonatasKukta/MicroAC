@@ -10,7 +10,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Http;
 using MicroAC.Core.Auth;
 using System.Threading.Tasks;
-using System.Threading;
 using MicroAC.Core.Constants;
 
 namespace MicroAC.Core.Client
@@ -22,12 +21,11 @@ namespace MicroAC.Core.Client
         public string Value { get; set; }
 
         public override async Task OnActionExecutionAsync(
-            ActionExecutingContext filterContext, 
+            ActionExecutingContext filterContext,
             ActionExecutionDelegate next)
         {
             var httpContext = filterContext.HttpContext;
             var config = httpContext.RequestServices.GetService<IConfiguration>();
-
             var permissions = config.GetValue<bool>(ConfigKeys.CentralAuthorizationEnabled)
                 ? await RetrievePermissionsFromAuthorizationService(httpContext)
                 : GetPermissionsFromHeader(httpContext);
@@ -41,8 +39,8 @@ namespace MicroAC.Core.Client
             }
 
             bool serviceFilter(Permission permission) => permission.ServiceName.Equals(ServiceName);
-            bool actionFilter(Permission permission)  => permission.Action.Equals(Action);
-            bool valueFilter(Permission permission)   => permission.Value.Equals(Value);
+            bool actionFilter(Permission permission) => permission.Action.Equals(Action);
+            bool valueFilter(Permission permission) => permission.Value.Equals(Value);
 
 
             if (!string.IsNullOrEmpty(ServiceName))
@@ -84,7 +82,7 @@ namespace MicroAC.Core.Client
 
             if (!containsToken || tokenString == StringValues.Empty)
                 throw new UnauthorizedAccessException($"Authorization token {header} not provided");
-            
+
             return tokenString;
         }
 

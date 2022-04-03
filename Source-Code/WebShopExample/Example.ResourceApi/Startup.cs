@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+using WebShop.Common;
+
 namespace Example.ResourceApi
 {
     public class Startup
@@ -32,13 +34,7 @@ namespace Example.ResourceApi
 
             services.AddSingleton<IConfiguration>(_config);
 
-            services.AddScoped<AccessInternal>();
-
-            services.AddScoped<IJwtTokenHandler<AccessInternal>,JwtTokenHandler<AccessInternal>>();
-
-            services.AddSingleton<HttpClient>();
-
-            services.AddSingleton<IAuthorizationServiceClient, AuthorizationServiceClient>();
+            services.AddWebShopServiceDependencies();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

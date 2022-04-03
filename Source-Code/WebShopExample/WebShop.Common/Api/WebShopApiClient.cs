@@ -9,19 +9,26 @@ using Microsoft.AspNetCore.Http;
 using MicroAC.Core.Common;
 using MicroAC.Core.Constants;
 using MicroAC.Core.Client;
+using Microsoft.Extensions.Configuration;
 
 namespace WebShop.Common
 {
     public class WebShopApiClient : IWebShopApiClient
-    {        
+    {
         readonly HttpClient HttpClient;
 
         readonly IEndpointResolver EndpointResolver;
 
-        public WebShopApiClient(HttpClient httpClient, IEndpointResolver endpointResolver)
+        readonly bool IsCentralAuthorizationEnabled;
+
+        public WebShopApiClient(
+            HttpClient httpClient,
+            IEndpointResolver endpointResolver,
+            IConfiguration configuration)
         {
             HttpClient = httpClient;
             EndpointResolver = endpointResolver;
+            IsCentralAuthorizationEnabled = configuration.GetValue<bool>(ConfigKeys.CentralAuthorizationEnabled);
         }
 
         public async Task<HttpResponseMessage> SendServiceRequest(
@@ -29,7 +36,6 @@ namespace WebShop.Common
             MicroACServices service,
             HttpMethod method,
             string route,
-            string authToken = "",
             object body = null)
         {
             var request = new HttpRequestMessage
@@ -38,10 +44,14 @@ namespace WebShop.Common
                 Method = method,
             };
 
-            if (authToken != "")
-                request.Headers.Add(HttpHeaders.Authorization, authToken);
-            
-            if(body != null)
+            var authHeader = IsCentralAuthorizationEnabled
+                ? HttpHeaders.Authorization
+                : HttpHeaders.InternalJWT;
+
+            var headerValue = context.Request.Headers.GetCommaSeparatedValues(authHeader);
+            request.Headers.Add(authHeader, headerValue);
+
+            if (body != null)
                 request.Content = new StringContent(
                     JsonSerializer.Serialize(body),
                     Encoding.UTF8,
@@ -57,10 +67,10 @@ namespace WebShop.Common
             return response;
         }
 
-        public async Task<Uri> GetServiceUrl(MicroACServices service, string route)
+        async Task<Uri> GetServiceUrl(MicroACServices service, string route)
         {
             var endpoint = await EndpointResolver.GetServiceEndpoint(service);
-            
+
             return new Uri(endpoint + route);
         }
     }

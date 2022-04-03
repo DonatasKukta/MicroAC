@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using MicroAC.Core.Client;
+
 using Microsoft.AspNetCore.Mvc;
 
 using WebShop.Common;
@@ -18,18 +20,21 @@ namespace WebShop.Shipments
         }
 
         [HttpGet]
+        [MicroAuth]
         public IEnumerable<Shipment> GetShipments()
         {
             return Data.GenerateShipments();
         }
 
         [HttpGet("/{shipmentId}")]
+        [MicroAuth]
         public Shipment GetShipment([FromRoute] Guid shipmentId)
         {
             return Data.GenerateShipment();
         }
 
         [HttpPost("/{orderId}")]
+        [MicroAuth]
         public ActionResult CreateShipment(
             [FromRoute] Guid orderId, 
             [FromBody] Shipment shipment)
@@ -38,6 +43,7 @@ namespace WebShop.Shipments
         }
 
         [HttpPut("/{shipmentId}")]
+        [MicroAuth]
         public ActionResult UpdateShipment(
             [FromRoute] Guid shipmentId,
             [FromBody] Shipment shipmentDetails)
@@ -46,6 +52,7 @@ namespace WebShop.Shipments
         }
 
         [HttpDelete("/{shipmentId}")]
+        [MicroAuth]
         public ActionResult DeleteShipment([FromRoute] Guid shipmentId)
         {
             return Ok();

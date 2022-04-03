@@ -14,7 +14,6 @@ namespace WebShop.Common
             MicroACServices service,
             HttpMethod method,
             string route,
-            string authToken = "",
             object body = null);
     }
 }

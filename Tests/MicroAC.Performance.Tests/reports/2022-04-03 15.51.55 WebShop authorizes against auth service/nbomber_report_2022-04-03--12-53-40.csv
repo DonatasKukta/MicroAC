@@ -1,0 +1,26 @@
+test_suite,test_name,scenario,duration,step_name,request_count,ok,failed,rps,min,mean,max,50_percent,75_percent,95_percent,99_percent,std_dev,data_transfer_min_kb,data_transfer_mean_kb,data_transfer_max_kb,data_transfer_all_mb
+http,nbomber_default_test_name,all steps,00:01:40,Login,542,542,0,5,4,17,74,265,54,2809,04,134,01,321,02,1019,39,1664,354,42,1,545,1,547,1,548,0,8188
+http,nbomber_default_test_name,all steps,00:01:40,Refresh,542,542,0,5,4,14,14,128,51,746,24,104,77,169,22,358,14,560,13,106,1,1,016,1,018,1,019,0,5386
+http,nbomber_default_test_name,all steps,00:01:40,ResourceApi,542,542,0,5,4,133,18,288,94,1070,26,263,42,343,55,539,14,738,3,134,93,2,407,2,41,2,413,1,2760
+http,nbomber_default_test_name,all steps,00:01:40,GetProduct,542,542,0,5,4,20,76,142,49,689,68,117,44,174,59,404,99,611,33,112,61,1,894,1,894,1,894,1,0023
+http,nbomber_default_test_name,all steps,00:01:40,GetProducts,542,542,0,5,4,20,17,147,35,671,13,137,34,195,07,299,77,513,02,95,59,10,516,10,52,10,516,5,5659
+http,nbomber_default_test_name,all steps,00:01:40,CreateProducts,542,542,0,5,4,20,63,135,16,549,32,121,92,190,72,261,76,437,25,85,76,1,866,1,866,1,866,0,9878
+http,nbomber_default_test_name,all steps,00:01:40,UpdateProducts,542,542,0,5,4,14,78,119,55,446,72,112,26,168,06,239,23,331,01,72,2,0,905,0,905,0,905,0,4792
+http,nbomber_default_test_name,all steps,00:01:40,DeleteProducts,542,542,0,5,4,15,42,121,93,553,22,113,6,172,54,242,69,357,12,75,7,0,905,0,905,0,905,0,4792
+http,nbomber_default_test_name,all steps,00:01:40,GetCart,542,542,0,5,4,12,71,74,72,242,45,72,38,103,23,151,55,178,43,41,17,1,021,1,024,1,025,0,5424
+http,nbomber_default_test_name,all steps,00:01:40,CreateCart,542,542,0,5,4,16,31,87,49,278,63,85,5,117,95,168,45,206,59,45,97,0,795,0,795,0,795,0,4207
+http,nbomber_default_test_name,all steps,00:01:40,AddCartItem,542,542,0,5,4,6,08,64,79,204,79,61,28,91,2,124,48,156,29,36,52,0,531,0,531,0,531,0,2812
+http,nbomber_default_test_name,all steps,00:01:40,DeleteCart,542,542,0,5,4,7,07,61,45,202,31,59,84,87,36,121,09,150,66,35,55,0,531,0,531,0,531,0,2812
+http,nbomber_default_test_name,all steps,00:01:40,DeleteCartItem,542,542,0,5,4,6,24,64,12,235,57,61,92,88,7,132,74,172,93,39,64,0,531,0,531,0,531,0,2812
+http,nbomber_default_test_name,all steps,00:01:40,GetShipment,542,542,0,5,4,30,09,162,78,1139,38,152,19,214,53,294,14,401,66,111,27,1,246,1,269,1,313,0,6719
+http,nbomber_default_test_name,all steps,00:01:40,GetShipments,542,542,0,5,4,32,74,167,16,495,53,161,54,228,22,323,84,386,3,87,98,1,247,1,27,1,313,0,6720
+http,nbomber_default_test_name,all steps,00:01:40,CreateShipments,542,542,0,5,4,30,68,174,95,409,31,164,61,242,56,334,08,384,26,91,89,1,253,1,268,1,307,0,6710
+http,nbomber_default_test_name,all steps,00:01:40,UpdateShipments,542,542,0,5,4,32,56,179,74,718,78,173,7,249,47,334,59,417,02,98,03,1,253,1,267,1,307,0,6708
+http,nbomber_default_test_name,all steps,00:01:40,DeleteShipments,542,542,0,5,4,27,71,172,47,1154,25,166,14,240,38,315,65,431,36,110,46,0,908,0,908,0,908,0,4807
+http,nbomber_default_test_name,all steps,00:01:40,GetOrder,542,542,0,5,4,33,75,196,66,1204,26,175,23,265,47,403,2,576,131,31,1,586,2,177,2,788,1,1521
+http,nbomber_default_test_name,all steps,00:01:40,GetOrders,542,542,0,5,4,56,04,401,64,1303,87,357,89,568,32,810,5,1045,5,228,12,115,521,125,008,135,328,66,1663
+http,nbomber_default_test_name,all steps,00:01:40,CreateOrder,542,542,0,5,4,39,05,243,5,1172,73,206,72,312,83,601,6,1005,06,182,52,1,437,2,013,2,626,1,0654
+http,nbomber_default_test_name,all steps,00:01:40,DeleteOrders,542,542,0,5,4,25,88,203,58,1402,17,155,39,248,96,572,93,867,33,180,02,0,899,0,899,0,899,0,4761
+http,nbomber_default_test_name,all steps,00:01:40,SubmitOrderShipment,537,537,0,5,4,45,43,244,21,1558,02,185,34,313,34,583,68,1123,33,205,38,1,382,1,395,1,436,0,7316
+http,nbomber_default_test_name,all steps,00:01:40,SubmitOrderPayment,527,527,0,5,3,45,2,270,97,1333,93,192,26,366,59,672,26,1052,67,221,71,1,133,1,133,1,133,0,5830
+http,nbomber_default_test_name,all steps,00:01:40,SubmitOrder,526,526,0,5,3,23,2,237,83,1358,84,154,88,374,53,598,02,944,64,208,69,0,899,0,899,0,899,0,4620
