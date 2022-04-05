@@ -1,6 +1,4 @@
 ﻿using System.Net.Http;
-using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace WebShop.IntegrationTests
 {
@@ -9,5 +7,7 @@ namespace WebShop.IntegrationTests
         public HttpResponseMessage Response { get; set; }
 
         public HttpRequestMessage Request { get; set; }
+
+        public string Url { get; set; }
     }
 }

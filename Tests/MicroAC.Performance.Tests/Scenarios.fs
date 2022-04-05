@@ -15,9 +15,9 @@ let email i = $"testemail{i}@SeedTestData.com"
 
 let shipmentFeed = data.GenerateShipments()    |> Feed.createCircular "shipments" |> Some
 let orderFeed    = data.GenerateOrders()       |> Feed.createCircular "orders"    |> Some
-let cartItemFeed = [new CartItem()]            |> Feed.createCircular  "cartsItems"|> Some
-let productFeed  = [new Product()]             |> Feed.createCircular  "products"  |> Some
-let paymentFeed  = [new Order.PaymentDetails()]|> Feed.createCircular  "payments"  |> Some
+let cartItemFeed = [new CartItem()]            |> Feed.createCircular "cartsItems"|> Some
+let productFeed  = [new Product()]             |> Feed.createCircular "products"  |> Some
+let paymentFeed  = [new Order.PaymentDetails()]|> Feed.createCircular "payments"  |> Some
 let usersFeed = 
     { 1 .. 1 .. 15000} 
     |> Seq.map(fun i -> { Email= email i; Password= email i })

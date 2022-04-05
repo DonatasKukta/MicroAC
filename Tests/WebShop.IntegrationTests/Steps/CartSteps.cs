@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 
 using FluentAssertions;
 
+using MicroAC.Core.Client;
+
 using TechTalk.SpecFlow;
 
 using WebShop.Common;
@@ -15,7 +17,7 @@ namespace WebShop.IntegrationTests.Steps
     {
         WebShopCart? Cart;
 
-        public CartSteps() : base("Carts")
+        public CartSteps() : base(MicroACServices.Cart, "/Carts")
         {
 
         }

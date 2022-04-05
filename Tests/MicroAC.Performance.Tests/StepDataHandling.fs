@@ -65,7 +65,7 @@ let getWebShopHttpMethod action =
 let getWebShopUrl service action = 
     let servicePath = 
         match service with
-        | Service.Cart      -> "Carts/"
+        | Service.Cart      -> "Cart/"
         | Service.Products  -> "Products/"
         | Service.Orders    -> "Orders/"
         | Service.Shipments -> "Shipments/"

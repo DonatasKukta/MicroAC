@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 
 using FluentAssertions;
 
+using MicroAC.Core.Client;
+
 using TechTalk.SpecFlow;
 
 using WebShop.Common;
@@ -15,8 +17,9 @@ namespace WebShop.IntegrationTests.Steps
     public sealed class ShipmentsSteps : SharedSteps
     {
 
-        public ShipmentsSteps() : base("Shipments")
+        public ShipmentsSteps() : base(MicroACServices.Shipments)
         {
+
         }
 
         [Given(@"(.*) in path")]

@@ -32,7 +32,7 @@ namespace MicroAC.Core.Client
 
             httpContext.Items.Add(HttpContextKeys.Permissions, permissions);
 
-            if (!config.GetValue<bool>(ConfigKeys.StrictAuthozirationEnabled))
+            if (!config.GetValue<bool>(ConfigKeys.StrictAuthorizationEnabled))
             {
                 await next();
                 return;
@@ -41,7 +41,6 @@ namespace MicroAC.Core.Client
             bool serviceFilter(Permission permission) => permission.ServiceName.Equals(ServiceName);
             bool actionFilter(Permission permission) => permission.Action.Equals(Action);
             bool valueFilter(Permission permission) => permission.Value.Equals(Value);
-
 
             if (!string.IsNullOrEmpty(ServiceName))
                 permissions = Filter(permissions, serviceFilter);

@@ -40,8 +40,9 @@ namespace WebShop.Shipments
                         return new WebHostBuilder()
                                     .UseKestrel()
                                     .ConfigureAppConfiguration((builderContext, config) =>
-                                    {
+                                    { 
                                         config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+                                        config.AddJsonFile("appsettings.core.json");
                                     })
                                     .ConfigureServices(
                                         services => services

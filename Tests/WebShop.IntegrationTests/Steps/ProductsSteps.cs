@@ -6,6 +6,7 @@ using TechTalk.SpecFlow;
 using System.Collections.Generic;
 
 using WebShop.Common;
+using MicroAC.Core.Client;
 
 namespace WebShop.IntegrationTests.Steps
 {
@@ -13,7 +14,7 @@ namespace WebShop.IntegrationTests.Steps
     [Scope(Feature = "Products")]
     public sealed class ProductsSteps : SharedSteps
     {
-        public ProductsSteps() : base("Products")
+        public ProductsSteps() : base(MicroACServices.Products)
         {
 
         }

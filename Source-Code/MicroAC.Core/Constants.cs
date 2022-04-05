@@ -13,7 +13,7 @@
     {
         public const string CentralAuthorizationEnabled = "CentralAuthorizationEnabled";
 
-        public const string StrictAuthozirationEnabled = "StrictAuthozirationEnabled";
+        public const string StrictAuthorizationEnabled = "StrictAuthorizationEnabled";
     }
 
     public static class HttpContextKeys

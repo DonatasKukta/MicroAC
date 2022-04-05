@@ -50,7 +50,7 @@ namespace WebShop.Cart
         }
 
         [HttpPost("/carts/{cartId}/products")]
-        public ActionResult AddCartItem([FromBody] CartItem newCartItem) {
+        public ActionResult AddCartItem([FromBody] CartItem newCartItem)  {
             return Ok();
         }
 

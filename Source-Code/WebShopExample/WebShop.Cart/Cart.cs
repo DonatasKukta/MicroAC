@@ -42,6 +42,7 @@ namespace WebShop.Cart
                                     .ConfigureAppConfiguration((builderContext, config) =>
                                     {
                                         config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+                                        config.AddJsonFile("appsettings.core.json");
                                     })
                                     .ConfigureServices(
                                         services => services
