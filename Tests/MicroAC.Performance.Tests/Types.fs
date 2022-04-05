@@ -2,12 +2,9 @@
 
 open System.Collections
 open System
+open MicroAC.Core.Client
 
-type Service = 
-    | Cart 
-    | Products 
-    | Shipments 
-    | Orders 
+type Service  = MicroACServices
 
 type Action = 
     | GetOne 
@@ -19,6 +16,8 @@ type Action =
     | SubmitShipment
     | AddCartItem
     | DeleteCartItem
+    | Login
+    | Refresh
 
 type LoginResult = { 
     accessJwt: string

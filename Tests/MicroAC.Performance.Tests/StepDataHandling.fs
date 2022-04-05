@@ -9,6 +9,7 @@ open System
 open System.Net.Http
 open Types
 open MicroAC.Core.Constants
+open MicroAC.Core.Client
 
 let readContent<'content> (response : HttpResponseMessage) = 
     task {
@@ -24,7 +25,7 @@ let readApiResponse<'content> (response: HttpResponseMessage) step =
         let! body = readContent<'content> response
         let foundt, timestamps = response.Headers.TryGetValues HttpHeaders.Timestamps
         let foundr, ids = response.Headers.TryGetValues "X-ServiceFabricRequestId" 
-        let id = ids |> Seq.head |> Guid.Parse
+        let id = if foundr then ids |> Seq.head |> Guid.Parse else Guid.NewGuid()
         return { 
             id = id; 
             success = response.IsSuccessStatusCode;  
@@ -59,16 +60,29 @@ let getWebShopHttpMethod action =
     | Action.Delete -> "DELETE"
     | Action.GetOne 
     | Action.GetList -> "GET"
+    | Action.Login
+    | Action.Refresh
     | Action.AddCartItem   
     | Action.Create -> "POST"
 
+let endpointResolver = new FabricEndpointResolver();
+
 let getWebShopUrl service action = 
-    let servicePath = 
-        match service with
+
+    let directEndpoint = 
+        let baseUrl = endpointResolver.GetServiceEndpoint(service).Result
+        let servicePath = match service with | Service.Cart ->  "/Carts/" | _ -> "/"
+        baseUrl + servicePath
+    
+    let reverseProxyEndpoint = 
+        Config.webShopReverseProxyUrl + match service with
         | Service.Cart      -> "Cart/"
         | Service.Products  -> "Products/"
         | Service.Orders    -> "Orders/"
         | Service.Shipments -> "Shipments/"
+        | _ -> ""
+
+    let baseUrl = if Config.centralAuthorizationEnabled then directEndpoint else reverseProxyEndpoint
 
     let id() = Guid.NewGuid().ToString()
 
@@ -87,6 +101,8 @@ let getWebShopUrl service action =
         | (_, Action.GetOne) -> id()
         | (_, Action.GetList) 
         | (_, Action.Create) -> ""
+        | (Service.Authentication, Action.Login) -> "Login"
+        | (Service.Authentication, Action.Refresh) -> "Refresh"
         | (service , action) -> $"Unrecognised {service} and {action} path combination."
 
-    Config.webShopBaseUrl + servicePath + path
+    baseUrl + path

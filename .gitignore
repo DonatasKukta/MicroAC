@@ -4,6 +4,11 @@ GenerateDbDTOs.bat
 /results
 *feature.cs
 
+_averages.csv
+_durations.csv
+_timestamps.csv
+nbomber-log-*.txt
+
 #Ignore appsettings with secrets
 appsettings.persistance.json
 */MicroAC.RequestManager/appsettings.json
