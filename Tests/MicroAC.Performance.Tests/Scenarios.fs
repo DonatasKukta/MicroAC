@@ -34,7 +34,7 @@ let GenerateScenarios() =
     let getProduct    =  Steps.getProduct    httpFactory      
     let getProducts   =  Steps.getProducts   httpFactory      
     let createProduct =  Steps.createProduct httpFactory productFeed
-    let updateProduct =  Steps.updateProduct httpFactory      
+    let updateProduct =  Steps.updateProduct httpFactory productFeed     
     let deleteProduct =  Steps.deleteProduct httpFactory      
 
     let getCart        = Steps.getCart        httpFactory     
@@ -61,7 +61,7 @@ let GenerateScenarios() =
     
     let withdefaultSettings scenario  =
         scenario 
-        |> Scenario.withLoadSimulations [KeepConstant(copies = 1, during = seconds 30)]
+        |> Scenario.withLoadSimulations [KeepConstant(copies = 1, during = seconds 20)]
         //|> Scenario.withLoadSimulations [KeepConstant(copies = 50, during = seconds 100)]
         //|> Scenario.withLoadSimulations [InjectPerSec(rate = 2, during = minutes 5)]
         |> Scenario.withoutWarmUp

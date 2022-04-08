@@ -102,11 +102,11 @@ let webshop name service action httpFactory feed =
         }
 )
 
-let getProduct     factory       = webshop "GetProduct"     Service.Products Action.GetOne  factory None
-let getProducts    factory       = webshop "GetProducts"    Service.Products Action.GetList factory None
-let createProduct  factory feed  = webshop "CreateProducts" Service.Products Action.Create  factory feed
-let updateProduct  factory       = webshop "UpdateProducts" Service.Products Action.Update  factory None
-let deleteProduct  factory       = webshop "DeleteProducts" Service.Products Action.Delete  factory None
+let getProduct     factory      = webshop "GetProduct"     Service.Products Action.GetOne  factory None
+let getProducts    factory      = webshop "GetProducts"    Service.Products Action.GetList factory None
+let createProduct  factory feed = webshop "CreateProducts" Service.Products Action.Create  factory feed
+let updateProduct  factory feed = webshop "UpdateProducts" Service.Products Action.Update  factory feed
+let deleteProduct  factory      = webshop "DeleteProducts" Service.Products Action.Delete  factory None
 
 let getCart        factory      = webshop "GetCart"        Service.Cart Action.GetOne         factory None
 let createCart     factory      = webshop "CreateCart"     Service.Cart Action.Create         factory None
