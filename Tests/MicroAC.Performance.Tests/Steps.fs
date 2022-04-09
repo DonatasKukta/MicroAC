@@ -93,7 +93,7 @@ let webshop name service action httpFactory feed =
             
             let method = getWebShopHttpMethod action
             let url = getWebShopUrl service action
-
+            
             return!  Http.createRequest method url
                         |> Http.withHeader HttpHeaders.Authorization accessJwt
                         |> withOptionalJsonBody context.FeedItem
@@ -126,7 +126,7 @@ let createOrder    factory      = webshop "CreateOrder"         Service.Orders A
 let deleteOrder    factory      = webshop "DeleteOrders"        Service.Orders Action.Delete         factory None
 let submitShipment factory feed = webshop "SubmitOrderShipment" Service.Orders Action.SubmitShipment factory feed
 let submitPayment  factory feed = webshop "SubmitOrderPayment"  Service.Orders Action.SubmitPayment  factory feed
-let submitOrder    factory      = webshop "SubmitOrder"         Service.Orders Action.Delete         factory None
+let submitOrder    factory      = webshop "SubmitOrder"         Service.Orders Action.Update         factory None
 
 // Common Steps
 

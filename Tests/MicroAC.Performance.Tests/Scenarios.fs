@@ -89,7 +89,7 @@ let GenerateScenarios() =
         |> withdefaultSettings
 
     let debugStep = 
-        [login; createOrder; final;]
+        [login; submitOrder; final;]
         |> Scenario.create "debug" 
         |> withdefaultSettings
 

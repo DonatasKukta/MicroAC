@@ -8,6 +8,7 @@ open System.Net.Http.Json
 open System.Threading
 
 open Types
+open NBomber.Configuration
 
 let email i = $"testemail{i}@SeedTestData.com"
 
@@ -21,6 +22,7 @@ let runTests() =
     |> NBomberRunner.registerScenarios
     |> NBomberRunner.withTestSuite "http"
     |> NBomberRunner.withReportFolder Config.reportsFolder
+    |> NBomberRunner.withReportFormats [ReportFormat.Html; ReportFormat.Csv]
     |> NBomberRunner.withLoggerConfig(fun () -> LoggerConfiguration().MinimumLevel.Verbose())
     |> NBomberRunner.run
     |> ignore
@@ -37,21 +39,25 @@ let debug() =
         response.timestamps 
         |> Seq.cast<string> 
         |> Seq.iter (fun x -> printfn "%A " x)
-        //Csv.appendTimestampsToCsv (new Mutex()) response |> ignore
+        Csv.appendTimestampsToCsv (new Mutex()) (Steps.toResult response) |> ignore
     }
 
 let postTestCalculations reportsFolder = 
-    let timestamps =  Csv.readTimestampsFromFile reportsFolder
-    let durations =   Csv.calcRequestDurations timestamps
-    let averages =    Csv.calcRequestAverages durations
-    Csv.writeDurationsToCsv       durations
-    Csv.writeRequestAveragesToCsv averages
-    Csv.calcAverageMatrixToCsv    averages
+    let timestampsExist = System.IO.File.Exists(Config.timestampsCsv)
+    if not timestampsExist then
+        eprintfn "_timetsamps.csv file not found in reports folder. Ensure postScenarioHandling step es run at the end of at least one Scenario."
+        ()
+    else 
+        let timestamps =  Csv.readTimestampsFromFile reportsFolder
+        let durations =   Csv.calcRequestDurations timestamps
+        let averages =    Csv.calcRequestAverages durations
+        Csv.writeDurationsToCsv       durations
+        Csv.writeRequestAveragesToCsv averages
+        Csv.calcAverageMatrixToCsv    averages
 
 [<EntryPoint>]
 let main argv =
     Csv.deleteCsvFiles()
-    //debug() |> ignore
     //debug() |> ignore
     runTests() |> ignore
     postTestCalculations()
