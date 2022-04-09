@@ -75,18 +75,36 @@ let calcAverageMatrixToCsv averages =
 let find (timestamps: seq<Timestamp>) action service = 
     timestamps |> Seq.find (fun t -> t.action = action && t.service = service) 
 
+let getDuration start ``end`` = 
+    {
+        requestId = start.id; 
+        step = start.step; 
+        service = start.service; 
+        duration = getDurationDiff ``end``.date start.date
+    }
+    
 let getServiceDurations (timestamps:seq<Timestamp>) = 
-    let findEndOf = find timestamps "End"
-    timestamps 
-    |> Seq.filter (fun t -> t.action = "Start")
-    |> Seq.map (fun(s)-> let e = findEndOf s.service
-                         let duration = getDurationDiff e.date s.date
-                         {requestId = s.id; step = s.step; service = s.service; duration = duration}   )
+    let mutable durations = Seq.empty<Duration>
+    let mutable start  : Timestamp option = None
+    let mutable ``end``: Timestamp option = None
+    
+    for timestamp in timestamps do
+        match (timestamp.action, start, ``end``) with 
+            | ("Start", None, _) -> start    <- Some timestamp
+            | ("End", Some _, None) -> ``end``  <- Some timestamp
+            | _ -> ()
+        match (start, ``end``) with
+            | (Some s, Some e) -> 
+                durations <- Seq.append durations [getDuration s e]
+                start <- None
+                ``end`` <- None
+            | _ -> ()
+    durations
 
 let calcRequestDurations timestamps =
     timestamps
-    |> Seq.groupBy (fun (timestamp) -> timestamp.id)
-    |> Seq.map (fun (guid, t) -> ( (getServiceDurations t(*(Seq.map (fun(g,t)-> t) gt)*))))
+    |> Seq.groupBy (fun (timestamp) -> (timestamp.id, timestamp.service))
+    |> Seq.map (fun (guid, t) -> getServiceDurations t)
     |> Seq.concat
     
 let calcMsAverage (durations: seq<Duration>) = 

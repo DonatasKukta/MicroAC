@@ -22,7 +22,7 @@ let runTests() =
     |> NBomberRunner.registerScenarios
     |> NBomberRunner.withTestSuite "http"
     |> NBomberRunner.withReportFolder Config.reportsFolder
-    |> NBomberRunner.withReportFormats [ReportFormat.Html; ReportFormat.Csv]
+    |> NBomberRunner.withReportFormats [ReportFormat.Html; ReportFormat.Csv; ReportFormat.Txt]
     |> NBomberRunner.withLoggerConfig(fun () -> LoggerConfiguration().MinimumLevel.Verbose())
     |> NBomberRunner.run
     |> ignore
@@ -43,14 +43,12 @@ let debug() =
     }
 
 let postTestCalculations reportsFolder = 
-    let timestampsExist = System.IO.File.Exists(Config.timestampsCsv)
-    if not timestampsExist then
-        eprintfn "_timetsamps.csv file not found in reports folder. Ensure postScenarioHandling step es run at the end of at least one Scenario."
-        ()
-    else 
-        let timestamps =  Csv.readTimestampsFromFile reportsFolder
-        let durations =   Csv.calcRequestDurations timestamps
-        let averages =    Csv.calcRequestAverages durations
+    match System.IO.File.Exists(Config.timestampsCsv) with
+    | false -> eprintfn "_timetsamps.csv file not found in reports folder. Ensure postScenarioHandling step es run at the end of at least one Scenario."
+    | true -> 
+        let timestamps = Csv.readTimestampsFromFile()
+        let durations  = Csv.calcRequestDurations timestamps
+        let averages   = Csv.calcRequestAverages durations
         Csv.writeDurationsToCsv       durations
         Csv.writeRequestAveragesToCsv averages
         Csv.calcAverageMatrixToCsv    averages
