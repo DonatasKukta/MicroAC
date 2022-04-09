@@ -34,7 +34,7 @@ namespace WebShop.IntegrationTests.Steps
             .AddEnvironmentVariables()
             .Build();
 
-        public SharedSteps(MicroACServices service, string path = "")
+        public SharedSteps(MicroACServices service)
         {
             HttpClient = new HttpClient();
             RequestDataGenerator = new DataGenerator();
@@ -44,7 +44,7 @@ namespace WebShop.IntegrationTests.Steps
                 Response = new HttpResponseMessage()
             };
             State.Request.Headers.Add(HttpHeaders.Authorization, TestAuthToken);
-            State.Url = RetrieveUrl(service) + path;
+            State.Url = RetrieveUrl(service);
         }
 
         [Given(@"(.*) request")]
@@ -108,9 +108,9 @@ namespace WebShop.IntegrationTests.Steps
         {
             var IsCentralAuthorizationEnabled = Configuration.GetValue<bool>(ConfigKeys.CentralAuthorizationEnabled);
             var url = IsCentralAuthorizationEnabled
-                ? new FabricEndpointResolver().GetServiceEndpoint(service).Result
-                : $"http://localhost:19081/MicroAC.ServiceFabric/MicroAC.RequestManager/"
-                    + Enum.GetName(typeof(MicroACServices), service);
+                ? "http://localhost:19081/MicroAC.ServiceFabric/MicroAC.RequestManager/"
+                    + Enum.GetName(typeof(MicroACServices), service)
+                : new FabricEndpointResolver().GetServiceEndpoint(service).Result + "/";
             return url ?? string.Empty;
         }
     }

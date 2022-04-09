@@ -21,7 +21,7 @@ namespace WebShop.Cart
             WebShopApi = webShopApi;
         }
 
-        [HttpPost("/carts")]
+        [HttpPost()]
         public async Task<WebShopCart> CreateCart()
         {
             await WebShopApi.SendServiceRequest(
@@ -38,7 +38,7 @@ namespace WebShop.Cart
             };
         }
 
-        [HttpGet("/carts/{cartId}")]
+        [HttpGet("/{cartId}")]
         public WebShopCart GetCart(Guid cartId)
         {
             return new WebShopCart()
@@ -49,18 +49,18 @@ namespace WebShop.Cart
             };
         }
 
-        [HttpPost("/carts/{cartId}/products")]
+        [HttpPost("/{cartId}/products")]
         public ActionResult AddCartItem([FromBody] CartItem newCartItem)  {
             return Ok();
         }
 
-        [HttpDelete("/carts/{cartId}")]
+        [HttpDelete("/{cartId}")]
         public ActionResult DeleteCart()
         {
             return Ok();
         }
 
-        [HttpDelete("/carts/{cartId}/products/{productId}")]
+        [HttpDelete("/{cartId}/products/{productId}")]
         public ActionResult DeleteCartItem()
         {
             return Ok();

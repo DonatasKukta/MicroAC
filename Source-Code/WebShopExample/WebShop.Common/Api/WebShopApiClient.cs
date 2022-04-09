@@ -45,8 +45,8 @@ namespace WebShop.Common
             };
 
             var authHeader = IsCentralAuthorizationEnabled
-                ? HttpHeaders.Authorization
-                : HttpHeaders.InternalJWT;
+                ? HttpHeaders.InternalJWT     
+                : HttpHeaders.Authorization;    
 
             var headerValue = context.Request.Headers.GetCommaSeparatedValues(authHeader);
             request.Headers.Add(authHeader, headerValue);

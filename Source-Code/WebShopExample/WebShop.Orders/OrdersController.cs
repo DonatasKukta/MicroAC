@@ -48,7 +48,7 @@ namespace WebShop.Orders
                 this.HttpContext,
                 MicroACServices.Cart,
                 HttpMethod.Get,
-                $"/carts/{cartId}");
+                $"/{cartId}");
 
             await WebShopApi.SendServiceRequest(
                 this.HttpContext,

@@ -17,7 +17,7 @@ namespace WebShop.IntegrationTests.Steps
     {
         WebShopCart? Cart;
 
-        public CartSteps() : base(MicroACServices.Cart, "/Carts")
+        public CartSteps() : base(MicroACServices.Cart)
         {
 
         }

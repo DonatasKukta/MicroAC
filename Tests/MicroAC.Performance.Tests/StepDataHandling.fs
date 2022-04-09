@@ -68,41 +68,30 @@ let getWebShopHttpMethod action =
 let endpointResolver = new FabricEndpointResolver();
 
 let getWebShopUrl service action = 
-
-    let directEndpoint = 
-        let baseUrl = endpointResolver.GetServiceEndpoint(service).Result
-        let servicePath = match service with | Service.Cart ->  "/Carts/" | _ -> "/"
-        baseUrl + servicePath
+    let baseUrl = 
+        match Config.centralAuthorizationEnabled with 
+        | true -> $"{endpointResolver.GetServiceEndpoint(Service.RequestManager).Result}/{Enum.GetName service}"
+        | false -> endpointResolver.GetServiceEndpoint(service).Result
     
-    let reverseProxyEndpoint = 
-        Config.webShopReverseProxyUrl + match service with
-        | Service.Cart      -> "Cart/"
-        | Service.Products  -> "Products/"
-        | Service.Orders    -> "Orders/"
-        | Service.Shipments -> "Shipments/"
-        | _ -> ""
-
-    let baseUrl = if Config.centralAuthorizationEnabled then directEndpoint else reverseProxyEndpoint
-
-    let id() = Guid.NewGuid().ToString()
+    let id = Guid.NewGuid().ToString()
 
     let path = 
         match (service, action) with 
         // Special Cases:
-        | (Service.Cart,    Action.AddCartItem)    -> $"{id()}/products"
-        | (Service.Cart,    Action.DeleteCartItem) -> $"{id()}/products/{id()}"
-        | (Service.Orders,  Action.SubmitPayment)  -> $"{id()}/payment"
-        | (Service.Orders,  Action.SubmitShipment) -> $"{id()}/shipment"
+        | (Service.Cart,    Action.AddCartItem)    -> $"/{id}/products"
+        | (Service.Cart,    Action.DeleteCartItem) -> $"/{id}/products/{id}"
+        | (Service.Orders,  Action.SubmitPayment)  -> $"/{id}/payment"
+        | (Service.Orders,  Action.SubmitShipment) -> $"/{id}/shipment"
         | (Service.Orders,  Action.Create)
         | (Service.Shipments, _)
         // Common cases
         | (_, Action.Update) 
         | (_, Action.Delete) 
-        | (_, Action.GetOne) -> id()
+        | (_, Action.GetOne) -> $"/{id}"
         | (_, Action.GetList) 
         | (_, Action.Create) -> ""
-        | (Service.Authentication, Action.Login) -> "Login"
-        | (Service.Authentication, Action.Refresh) -> "Refresh"
+        | (Service.Authentication, Action.Login)   -> "/Login"
+        | (Service.Authentication, Action.Refresh) -> "/Refresh"
         | (service , action) -> $"Unrecognised {service} and {action} path combination."
 
     baseUrl + path

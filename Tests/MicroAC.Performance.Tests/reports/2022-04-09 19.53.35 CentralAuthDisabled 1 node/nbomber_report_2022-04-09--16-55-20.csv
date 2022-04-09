@@ -1,0 +1,26 @@
+test_suite,test_name,scenario,duration,step_name,request_count,ok,failed,rps,min,mean,max,50_percent,75_percent,95_percent,99_percent,std_dev,data_transfer_min_kb,data_transfer_mean_kb,data_transfer_max_kb,data_transfer_all_mb
+http,nbomber_default_test_name,all steps,00:01:40,Login,772,772,0,7,7,14,18,167,23,3438,18,78,85,177,66,551,42,1461,25,301,73,1,545,1,547,1,548,1,1662
+http,nbomber_default_test_name,all steps,00:01:40,Refresh,772,772,0,7,7,12,76,106,63,779,15,81,92,150,78,266,75,396,8,96,28,1,016,1,018,1,019,0,7672
+http,nbomber_default_test_name,all steps,00:01:40,ResourceApi,772,772,0,7,7,131,02,630,11,7386,15,262,14,357,63,3457,02,7331,84,1476,41,2,407,2,41,2,413,1,8175
+http,nbomber_default_test_name,all steps,00:01:40,GetProduct,772,772,0,7,7,6,02,153,18,7355,24,26,94,49,63,212,35,5140,48,772,01,1,449,1,449,1,449,1,0926
+http,nbomber_default_test_name,all steps,00:01:40,GetProducts,772,772,0,7,7,1,81,8,08,180,7,4,08,7,19,18,45,96,19,17,53,9,816,9,816,9,816,7,4007
+http,nbomber_default_test_name,all steps,00:01:40,CreateProducts,772,772,0,7,7,6,46,40,29,437,75,27,38,47,14,102,4,372,22,48,4,1,444,1,444,1,444,1,0889
+http,nbomber_default_test_name,all steps,00:01:40,UpdateProducts,772,772,0,7,7,5,34,41,34,1042,04,26,66,45,15,109,57,250,5,69,17,0,461,0,461,0,461,0,3475
+http,nbomber_default_test_name,all steps,00:01:40,DeleteProducts,772,772,0,7,7,4,84,39,46,489,25,26,83,47,36,109,57,244,86,47,17,0,461,0,461,0,461,0,3475
+http,nbomber_default_test_name,all steps,00:01:40,GetCart,772,772,0,7,7,1,37,9,07,371,76,4,82,9,6,27,28,52,13,18,82,0,688,0,69,0,691,0,5208
+http,nbomber_default_test_name,all steps,00:01:40,CreateCart,772,772,0,7,7,3,48,17,18,253,34,13,16,19,87,42,27,72,51,16,79,0,461,0,461,0,461,0,3475
+http,nbomber_default_test_name,all steps,00:01:40,AddCartItem,772,772,0,7,7,1,04,5,81,372,65,2,94,5,52,15,56,38,98,15,61,0,197,0,197,0,197,0,1487
+http,nbomber_default_test_name,all steps,00:01:40,DeleteCart,772,772,0,7,7,0,85,4,79,154,8,2,05,4,16,15,67,40,54,10,38,0,197,0,197,0,197,0,1487
+http,nbomber_default_test_name,all steps,00:01:40,DeleteCartItem,772,772,0,7,7,0,84,5,25,154,29,2,35,5,07,16,56,34,82,10,43,0,197,0,197,0,197,0,1487
+http,nbomber_default_test_name,all steps,00:01:40,GetShipment,772,772,0,7,7,12,98,104,49,2268,88,43,52,72,06,649,73,1078,27,212,93,0,803,0,824,0,874,0,6221
+http,nbomber_default_test_name,all steps,00:01:40,GetShipments,772,772,0,7,7,11,81,69,58,904,18,40,38,72,9,249,98,437,5,93,63,0,803,0,825,0,87,0,6225
+http,nbomber_default_test_name,all steps,00:01:40,CreateShipments,772,772,0,7,7,12,27,69,04,1022,49,43,1,69,57,239,74,470,78,88,66,0,852,0,871,0,911,0,6569
+http,nbomber_default_test_name,all steps,00:01:40,UpdateShipments,770,770,0,7,7,12,14,66,26,604,42,56,65,98,189,57,486,4,81,56,0,805,0,823,0,864,0,6196
+http,nbomber_default_test_name,all steps,00:01:40,DeleteShipments,770,770,0,7,7,11,68,54,02,503,56,39,65,63,01,140,8,240,9,48,08,0,464,0,464,0,464,0,3488
+http,nbomber_default_test_name,all steps,00:01:40,GetOrder,766,766,0,7,7,13,09,116,7,3021,78,44,61,72,38,829,44,1133,57,250,66,1,138,1,733,2,359,1,2972
+http,nbomber_default_test_name,all steps,00:01:40,GetOrders,764,764,0,7,6,22,83,106,4,1018,61,59,49,90,24,396,29,792,06,151,68,115,125,124,631,134,868,92,9856
+http,nbomber_default_test_name,all steps,00:01:40,CreateOrder,764,764,0,7,6,19,78,103,86,997,52,60,83,94,34,390,66,819,71,143,87,1,038,1,593,2,214,1,1889
+http,nbomber_default_test_name,all steps,00:01:40,DeleteOrders,764,764,0,7,6,11,99,67,1,1013,85,44,03,72,19,219,26,335,36,74,38,0,455,0,455,0,455,0,3395
+http,nbomber_default_test_name,all steps,00:01:40,SubmitOrderShipment,764,764,0,7,6,26,9,147,38,1807,63,88,7,145,41,418,82,1555,46,220,35,1,235,1,254,1,295,0,9360
+http,nbomber_default_test_name,all steps,00:01:40,SubmitOrderPayment,760,760,0,7,6,27,53,130,85,1382,67,85,57,138,11,371,46,753,15,154,85,0,99,0,99,0,99,0,7349
+http,nbomber_default_test_name,all steps,00:01:40,SubmitOrder,760,760,0,7,6,29,04,136,81,1072,6,90,3,152,96,399,1,760,32,147,41,1,659,2,258,2,876,1,6756

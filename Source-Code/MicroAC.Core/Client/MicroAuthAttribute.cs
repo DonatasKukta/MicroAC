@@ -27,8 +27,8 @@ namespace MicroAC.Core.Client
             var httpContext = filterContext.HttpContext;
             var config = httpContext.RequestServices.GetService<IConfiguration>();
             var permissions = config.GetValue<bool>(ConfigKeys.CentralAuthorizationEnabled)
-                ? await RetrievePermissionsFromAuthorizationService(httpContext)
-                : GetPermissionsFromHeader(httpContext);
+                ? GetPermissionsFromHeader(httpContext)
+                : await RetrievePermissionsFromAuthorizationService(httpContext);
 
             httpContext.Items.Add(HttpContextKeys.Permissions, permissions);
 

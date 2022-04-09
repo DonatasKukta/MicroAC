@@ -13,7 +13,7 @@ open NBomber.Configuration
 let email i = $"testemail{i}@SeedTestData.com"
 
 let users = 
-    { 1 .. 1 .. 15000} 
+    { 1 .. 1 .. 15000 } 
     |> Seq.map(fun i -> { Email= email i; Password= email i })
     |> Feed.createCircular "users"
 
@@ -42,7 +42,7 @@ let debug() =
         Csv.appendTimestampsToCsv (new Mutex()) (Steps.toResult response) |> ignore
     }
 
-let postTestCalculations reportsFolder = 
+let postTestCalculations() = 
     match System.IO.File.Exists(Config.timestampsCsv) with
     | false -> eprintfn "_timetsamps.csv file not found in reports folder. Ensure postScenarioHandling step es run at the end of at least one Scenario."
     | true -> 
