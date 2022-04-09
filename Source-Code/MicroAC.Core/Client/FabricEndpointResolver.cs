@@ -10,6 +10,7 @@ using Newtonsoft.Json.Linq;
 
 namespace MicroAC.Core.Client
 {
+    // TODO: Provide cached version of endpoint retrieved list
     public class FabricEndpointResolver : IEndpointResolver
     {
         readonly ServicePartitionResolver Resolver = ServicePartitionResolver.GetDefault();
@@ -35,10 +36,12 @@ namespace MicroAC.Core.Client
 
         }
 
-        // TODO: Provide a list of addresses.
-        public async Task<string> GetServiceEndpoint(MicroACServices service)
-        {
-            var uri = new Uri($"fabric:/MicroAC.ServiceFabric/{Services[service]}");
+        public Task<string> GetServiceEndpoint(MicroACServices service) =>
+            GetServiceEndpoint($"MicroAC.ServiceFabric/{Services[service]}");
+
+        public async Task<string> GetServiceEndpoint(string fabricServiceType)
+        { 
+            var uri = new Uri("fabric:/" + fabricServiceType);
 
             var partition = await Resolver.ResolveAsync( uri, PartitionKey, CancellationTokenSource.Token);
 

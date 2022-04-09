@@ -108,7 +108,8 @@ namespace WebShop.IntegrationTests.Steps
         {
             var IsCentralAuthorizationEnabled = Configuration.GetValue<bool>(ConfigKeys.CentralAuthorizationEnabled);
             var url = IsCentralAuthorizationEnabled
-                ? "http://localhost:19081/MicroAC.ServiceFabric/MicroAC.RequestManager/"
+                ? new FabricEndpointResolver().GetServiceEndpoint(MicroACServices.RequestManager).Result 
+                    + "/"
                     + Enum.GetName(typeof(MicroACServices), service)
                 : new FabricEndpointResolver().GetServiceEndpoint(service).Result + "/";
             return url ?? string.Empty;

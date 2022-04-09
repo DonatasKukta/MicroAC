@@ -1,7 +1,9 @@
-﻿using MicroAC.Core.Common;
+﻿using MicroAC.Core.Client;
+using MicroAC.Core.Common;
 using MicroAC.Core.Constants;
 using MicroAC.Core.Exceptions;
 
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
@@ -20,8 +22,6 @@ namespace MicroAC.RequestManager
     {
         readonly Uri _authorizationUrl;
 
-        readonly string _basePath;
-
         readonly HttpClient _http;
 
         readonly List<EndpointRoute> _routes;
@@ -30,14 +30,19 @@ namespace MicroAC.RequestManager
 
         readonly string _serviceName;
 
+        readonly IEndpointResolver _endpointResolver;
+
         StringContent ForwardRequestContent;
 
-        public RequestManagerController(HttpClient httpClient, IConfiguration config)
+        public RequestManagerController(
+            HttpClient httpClient, 
+            IConfiguration config, 
+            IEndpointResolver endpointResolver)
         {
+            _endpointResolver = endpointResolver;
             _http = httpClient;
             _routes = config.GetSection("EndpointRoutes").Get<List<EndpointRoute>>();
-            _basePath = config.GetValue<string>("InternalGateway");
-            _authorizationUrl = new Uri(_basePath + config.GetValue<string>("InternalAuthorizationRoute"));
+            _authorizationUrl = new Uri(endpointResolver.GetServiceEndpoint(MicroACServices.Authorization).Result + "/Authorize");
             _headersToIgnore = config.GetSection("HeadersToIgnore").Get<List<string>>();
             _serviceName = config.GetValue<string>("Timestamp:ServiceName");
         }
@@ -70,7 +75,7 @@ namespace MicroAC.RequestManager
 
         private async Task<IActionResult> ForwardRequest(EndpointRoute requestedRoute)
         {
-            var forwardUri = GetForwardUri(requestedRoute);
+            var forwardUri = await GetForwardUri(requestedRoute);
             var forwardRequest = CreateForwardRequest(forwardUri);
 
             this.HttpContext.AddActionMessage(_serviceName, "Forward");
@@ -158,11 +163,12 @@ namespace MicroAC.RequestManager
             return content;
         }
 
-        private Uri GetForwardUri(EndpointRoute requestedRoute)
+        private async Task<Uri> GetForwardUri(EndpointRoute requestedRoute)
         {
             var originalPath = this.HttpContext.Request.Path.ToString();
-            var forwardUri = _basePath
-                + originalPath.Replace(requestedRoute.ExternalRoute, requestedRoute.InternalRoute)
+            var forwardUri =
+                await _endpointResolver.GetServiceEndpoint(requestedRoute.InternalRoute)
+                + originalPath.Replace(requestedRoute.ExternalRoute, null)
                 + this.Request.QueryString.ToUriComponent();
 
             return new Uri(forwardUri);

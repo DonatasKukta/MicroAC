@@ -1,5 +1,6 @@
 using System.Net.Http;
 
+using MicroAC.Core.Client;
 using MicroAC.Core.Common;
 using MicroAC.Core.Exceptions;
 
@@ -32,6 +33,8 @@ namespace MicroAC.RequestManager
             services.AddSingleton<HttpClient>(new HttpClient());
 
             services.AddSingleton<IConfiguration>(_config);
+
+            services.AddSingleton<IEndpointResolver, FabricEndpointResolver>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
