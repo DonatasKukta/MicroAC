@@ -65,8 +65,7 @@ namespace MicroAC.RequestManager
                 await AuthorizeRequest();
             }
 
-            var response = await ForwardRequest(requestedRoute);
-            return response;
+            return await ForwardRequest(requestedRoute);
         }
 
         private async Task<IActionResult> ForwardRequest(EndpointRoute requestedRoute)
@@ -76,7 +75,7 @@ namespace MicroAC.RequestManager
 
             this.HttpContext.AddActionMessage(_serviceName, "Forward");
 
-            var response = await _http.SendAsync(forwardRequest);
+            using var response = await _http.SendAsync(forwardRequest, HttpCompletionOption.ResponseHeadersRead);
 
             return await HandleForwardedResponse(response);
         }
@@ -87,7 +86,7 @@ namespace MicroAC.RequestManager
 
             var request = CreateForwardRequest(_authorizationUrl);
             request.Method = HttpMethod.Post;
-            var response = await _http.SendAsync(request);
+            using var response = await _http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
             var responseContent = await response.Content.ReadAsStringAsync();
 
             if (!response.IsSuccessStatusCode)
@@ -119,7 +118,7 @@ namespace MicroAC.RequestManager
             this.HttpContext.Response.StatusCode = (int)response.StatusCode;
 
             var body = await response.Content.ReadAsStringAsync();
-            
+
             return new ObjectResult(body);
         }
         
