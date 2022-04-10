@@ -26,16 +26,19 @@ namespace Example.ResourceApi
         public async Task<ActionResult> Index()
         {
             var resolver = new FabricEndpointResolver();
+            resolver.InitialiseEndpoints();
 
-            var services = Enum.GetValues(typeof(MicroACServices))
-                .Cast<MicroACServices>()
-                .Select(s =>  resolver.GetServiceEndpoint(s).Result);
+            var services = Enum.GetValues(typeof(MicroACServices)).Cast<MicroACServices>();
+            // make list 3x original size
+            services = services.Concat(services.Concat(services));
+
+            var endpoints = services.Select(s =>  resolver.GetServiceEndpoint(s));
 
             var response = new
             {
                 message = "Hello World! 1s long response.",
                 permissions = this.HttpContext.Items[HttpContextKeys.Permissions],
-                resolved = services
+                resolved = endpoints
             };
 
             await Task.Delay(100);

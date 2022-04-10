@@ -29,7 +29,7 @@ namespace MicroAC.Core.Client
 
         public async Task<(IEnumerable<Permission> permissions, IEnumerable<string> timestamps)> Authorize(string externalAccessToken)
         {
-            var authorizationUrl = await EndpointResolver.GetServiceEndpoint(MicroACServices.Authorization);
+            var authorizationUrl = EndpointResolver.GetServiceEndpoint(MicroACServices.Authorization);
             
             using var request = new HttpRequestMessage()
             {

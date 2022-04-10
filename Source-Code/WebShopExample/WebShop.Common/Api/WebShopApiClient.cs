@@ -29,6 +29,7 @@ namespace WebShop.Common
             HttpClient = httpClient;
             EndpointResolver = endpointResolver;
             IsCentralAuthorizationEnabled = configuration.GetValue<bool>(ConfigKeys.CentralAuthorizationEnabled);
+            endpointResolver.InitialiseEndpoints();
         }
 
         public async Task<HttpResponseMessage> SendServiceRequest(
@@ -40,7 +41,7 @@ namespace WebShop.Common
         {
             var request = new HttpRequestMessage
             {
-                RequestUri = await GetServiceUrl(service, route),
+                RequestUri = GetServiceUrl(service, route),
                 Method = method,
             };
 
@@ -67,9 +68,9 @@ namespace WebShop.Common
             return response;
         }
 
-        async Task<Uri> GetServiceUrl(MicroACServices service, string route)
+        Uri GetServiceUrl(MicroACServices service, string route)
         {
-            var endpoint = await EndpointResolver.GetServiceEndpoint(service);
+            var endpoint = EndpointResolver.GetServiceEndpoint(service);
 
             return new Uri(endpoint + route);
         }

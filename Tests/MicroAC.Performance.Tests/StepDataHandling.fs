@@ -66,12 +66,14 @@ let getWebShopHttpMethod action =
     | Action.Create -> "POST"
 
 let endpointResolver = new FabricEndpointResolver();
+endpointResolver.InitialiseEndpoints();
+
 
 let getWebShopUrl service action = 
     let baseUrl = 
         match Config.centralAuthorizationEnabled with 
-        | true -> $"{endpointResolver.GetServiceEndpoint(Service.RequestManager).Result}/{Enum.GetName service}"
-        | false -> endpointResolver.GetServiceEndpoint(service).Result
+        | true -> $"{endpointResolver.GetServiceEndpoint(Service.RequestManager)}/{Enum.GetName service}"
+        | false -> endpointResolver.GetServiceEndpoint(service)
     
     let id = Guid.NewGuid().ToString()
 

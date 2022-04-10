@@ -4,8 +4,10 @@ namespace MicroAC.Core.Client
 {
     public interface IEndpointResolver
     {
-        Task<string> GetServiceEndpoint(MicroACServices service);
-        
-        Task<string> GetServiceEndpoint(string fabricServiceType);
+        void InitialiseEndpoints();
+
+        string GetServiceEndpoint(MicroACServices service);
+
+        string GetServiceEndpoint(string fabricService);
     }
 }

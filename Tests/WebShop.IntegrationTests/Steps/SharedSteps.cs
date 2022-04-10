@@ -27,7 +27,9 @@ namespace WebShop.IntegrationTests.Steps
 
         protected readonly DataGenerator RequestDataGenerator;
 
-        readonly HttpClient HttpClient; 
+        readonly HttpClient HttpClient;
+
+        readonly IEndpointResolver EndpointResolver;
 
         IConfiguration Configuration = new ConfigurationBuilder()
             .AddJsonFile("appsettings.core.json")
@@ -44,6 +46,8 @@ namespace WebShop.IntegrationTests.Steps
                 Response = new HttpResponseMessage()
             };
             State.Request.Headers.Add(HttpHeaders.Authorization, TestAuthToken);
+            EndpointResolver = new FabricEndpointResolver();
+            EndpointResolver.InitialiseEndpoints();
             State.Url = RetrieveUrl(service);
         }
 
@@ -68,7 +72,6 @@ namespace WebShop.IntegrationTests.Steps
 
         protected void AppendToRequestUrl(string uri)
         {
-            //TODO: This part is troublesome. New URI removes relative path.
             this.State.Url = $"{this.State.Url}/{uri}";
         }
 
@@ -108,10 +111,10 @@ namespace WebShop.IntegrationTests.Steps
         {
             var IsCentralAuthorizationEnabled = Configuration.GetValue<bool>(ConfigKeys.CentralAuthorizationEnabled);
             var url = IsCentralAuthorizationEnabled
-                ? new FabricEndpointResolver().GetServiceEndpoint(MicroACServices.RequestManager).Result 
+                ? EndpointResolver.GetServiceEndpoint(MicroACServices.RequestManager) 
                     + "/"
                     + Enum.GetName(typeof(MicroACServices), service)
-                : new FabricEndpointResolver().GetServiceEndpoint(service).Result + "/";
+                : EndpointResolver.GetServiceEndpoint(service) + "/";
             return url ?? string.Empty;
         }
     }
