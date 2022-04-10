@@ -13,11 +13,14 @@ let deleteCsvFiles() =
     printfn "%s" Config.timestampsCsv
     printfn "%s" Config.durationsCsv 
     printfn "%s" Config.averagesCsv  
-    printfn "%s" Config.matrixAvgCsv 
+    printfn "%s" Config.resultsCsv 
     deleteFile Config.timestampsCsv
     deleteFile Config.durationsCsv
     deleteFile Config.averagesCsv
-    deleteFile Config.matrixAvgCsv
+    deleteFile Config.resultsCsv
+
+let printProcessingMessage message =
+    printfn "%A - %s" DateTime.Now message
 
 let fromTimestampCsvStr (str : string) = 
     let split = str.Split(";")
@@ -45,16 +48,41 @@ let readTimestampsFromFile() =
     |> Seq.map fromTimestampCsvStr
 
 let writeDurationsToCsv (durations: seq<Duration>) = 
+    printProcessingMessage "Write durations to csv"
     let lines = durations |> Seq.map (fun d -> $"{d.requestId};{d.step};{d.service};{d.duration};")
     File.WriteAllLines(Config.durationsCsv, lines)
     
 let writeRequestAveragesToCsv (averages: seq<Average>) = 
+    printProcessingMessage "Write averages to csv"
     let str = averages |> Seq.map (fun a -> $"{a.step};{a.service};{a.average};")
     File.WriteAllLines(Config.averagesCsv, str)
 
-let calcAverageMatrixToCsv averages =
-    let rows    = Seq.map (fun a -> a.step)    averages |> Seq.distinct
-    let columns = Seq.map (fun a -> a.service) averages |> Seq.distinct
+let writeTestTimesToCsv (started:DateTime) completed = 
+    printProcessingMessage "Write Run times to csv"
+    File.WriteAllLines(Config.resultsCsv, [
+        $"Start;{started}";
+        $"End;{completed }";
+        $"Duration;{(completed - started)}";
+        ])
+
+let appendMetricsToCsv (externalRequestCount, internalRequestCount, nodeCounts, timestampCount) =
+    printProcessingMessage "Write metrics to csv"
+    let allLines = 
+        nodeCounts
+        |> Seq.map (fun (node, count) -> $"{node};{count}")
+        |> Seq.append [ 
+            $"Timestamps;{timestampCount}"
+            $"ExternalRequests;{externalRequestCount}";  
+            $"InternalRequests;{internalRequestCount}";
+            ""
+            ]
+
+    File.AppendAllLines(Config.resultsCsv, allLines)
+
+let appendCalcAverageMatrixToCsv averages =
+    printProcessingMessage "Append averages matrix to csv"
+    let rows    = averages |> Seq.map (fun a -> a.step)    |> Seq.distinct |> Seq.cache
+    let columns = averages |> Seq.map (fun a -> a.service) |> Seq.distinct |> Seq.cache
     let matrix = Array2D.zeroCreate (Seq.length rows)  (Seq.length columns)
     
     let getRow step = Seq.findIndex (fun s -> s.Equals(step)) rows
@@ -67,8 +95,9 @@ let calcAverageMatrixToCsv averages =
                     |> Seq.map (fun i -> $"{Seq.item i rows}{rowStr i};")
     let firstLine = Seq.fold (fun f r -> $"{f}{r};") ";" columns
     let allLines = strLines |> Seq.append [firstLine]
-
-    File.WriteAllLines(Config.matrixAvgCsv, allLines)
+    
+    File.AppendAllLines(Config.resultsCsv, allLines)
+    printProcessingMessage "Done"
 
 // Calculations
 
@@ -117,3 +146,19 @@ let calcRequestAverages (durations : seq<Duration>) =
     |> Seq.groupBy (fun d -> (d.step, d.service))
     |> Seq.map (fun (ss,d) -> let step, service = ss
                               {step = step; service = service; average = calcMsAverage d})
+
+let calcMetrics (timestamps: seq<Timestamp>) =
+    let timestampCount = Seq.length timestamps
+    let externalRequestCount = timestamps
+                                |> Seq.distinctBy (fun t -> t.id) 
+                                |> Seq.length
+    let internalRequestCount = timestamps
+                                |> Seq.filter (fun t -> t.action.Equals("Start"))
+                                |> Seq.groupBy (fun t -> (t.id, t.service, t.step))  
+                                |> Seq.length
+    let nodeCounts = timestamps
+                        |> Seq.filter (fun t -> t.action.Contains("_Node_"))
+                        |> Seq.map (fun t -> t.action)
+                        |> Seq.countBy (fun a -> a)
+    
+    (externalRequestCount, internalRequestCount, nodeCounts, timestampCount)

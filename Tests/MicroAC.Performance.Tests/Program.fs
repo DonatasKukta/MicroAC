@@ -1,14 +1,17 @@
 ﻿open NBomber
 open NBomber.FSharp
-open FSharp.Control.Tasks
+open NBomber.Configuration
+
 open Serilog
 
+open FSharp.Control.Tasks
+
+open System
 open System.Net.Http
 open System.Net.Http.Json
 open System.Threading
 
 open Types
-open NBomber.Configuration
 
 let email i = $"testemail{i}@SeedTestData.com"
 
@@ -27,7 +30,7 @@ let runTests() =
     |> NBomberRunner.run
     |> ignore
 
-let debug() =
+let debugRequest() =
     task {
         printf "Debug send operation"
         let http = new HttpClient()
@@ -47,16 +50,21 @@ let postTestCalculations() =
     | false -> eprintfn "_timetsamps.csv file not found in reports folder. Ensure postScenarioHandling step es run at the end of at least one Scenario."
     | true -> 
         let timestamps = Csv.readTimestampsFromFile()
+        let metrics = Csv.calcMetrics timestamps
         let durations  = Csv.calcRequestDurations timestamps
         let averages   = Csv.calcRequestAverages durations
+        Csv.appendMetricsToCsv metrics
         Csv.writeDurationsToCsv       durations
         Csv.writeRequestAveragesToCsv averages
-        Csv.calcAverageMatrixToCsv    averages
+        Csv.appendCalcAverageMatrixToCsv    averages
 
 [<EntryPoint>]
 let main argv =
     Csv.deleteCsvFiles()
-    //debug() |> ignore
+    //debugRequest() |> ignore
+    let started = DateTime.Now;
     runTests() |> ignore
+    let completed = DateTime.Now;
+    Csv.writeTestTimesToCsv started completed
     postTestCalculations()
     0

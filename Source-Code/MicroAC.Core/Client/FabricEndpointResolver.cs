@@ -7,6 +7,7 @@ using System.Linq;
 using Microsoft.ServiceFabric.Services.Client;
 
 using Newtonsoft.Json.Linq;
+using System.Fabric;
 
 namespace MicroAC.Core.Client
 {
@@ -42,14 +43,15 @@ namespace MicroAC.Core.Client
         public async Task<string> GetServiceEndpoint(string fabricServiceType)
         { 
             var uri = new Uri("fabric:/" + fabricServiceType);
-
             var partition = await Resolver.ResolveAsync( uri, PartitionKey, CancellationTokenSource.Token);
+            // Rertieves random endpoint from the partition
+            return GetURL(partition.GetEndpoint());
+        }
 
-            var addressString = partition.Endpoints.First().Address;
-            var addresses = JObject.Parse(addressString);
-            var address = (string)addresses["Endpoints"].First();
-
-            return address;
+        string GetURL(ResolvedServiceEndpoint endpoint)
+        {
+            var address = JObject.Parse(endpoint.Address);
+            return (string)address["Endpoints"].First();
         }
     }
 }

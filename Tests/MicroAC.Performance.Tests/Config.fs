@@ -23,7 +23,8 @@ let reportsFolder = getPath ""
 let timestampsCsv = getPath "_timestamps.csv"
 let durationsCsv  = getPath "_durations.csv"
 let averagesCsv   = getPath "_averages.csv"
-let matrixAvgCsv  = getPath "_matrixAvg.csv" 
+let metricsCsv    = getPath "_matrixAvg.csv"
+let resultsCsv    = getPath "_results.csv" 
 
 let coreConfigPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + "/appsettings.core.json"
 let private coreConfig = JsonValue.Parse(File.ReadAllText coreConfigPath)
