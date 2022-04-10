@@ -7,15 +7,19 @@ namespace WebShop.Common
 {
     public class DataGenerator
     {
-        Faker<Order> FakeOrder;
-
-        Faker<Order.Item> FakeOrderItem;
-
-        Faker<Order.PaymentDetails> FakeOrderPaymentDetails;
-
-        Faker<Shipment> FakeShipment;
-
-        Faker<WebShopCart> FakeCart;
+        readonly Faker<Order> FakeOrder;
+         
+        readonly Faker<Order.Item> FakeOrderItem;
+         
+        readonly Faker<Order.PaymentDetails> FakeOrderPaymentDetails;
+         
+        readonly Faker<Shipment> FakeShipment;
+         
+        readonly Faker<WebShopCart> FakeCart;
+         
+        readonly Faker<CartItem> FakeCartItem;
+         
+        readonly Faker<Product> FakeProduct;
 
         public DataGenerator()
         {
@@ -48,31 +52,35 @@ namespace WebShop.Common
                 .RuleFor(i => i.Products, f => FakeOrderItem.GenerateBetween(1, 10))
                 .RuleFor(i => i.Payment, f => FakeOrderPaymentDetails.Generate())
                 .RuleFor(i => i.Shipment, f => FakeShipment.Generate());
+
+            FakeCartItem = new Faker<CartItem>()
+                .RuleForType(typeof(Guid), f => f.Random.Guid())
+                .RuleFor(i => i.Quantity, f => f.Commerce.Random.Int(1, 10))
+                .RuleFor(i => i.AddedAt, f => f.Date.Recent(1));
+
+            FakeCart = new Faker<WebShopCart>()
+                .RuleForType(typeof(Guid), f => f.Random.Guid())
+                .RuleFor(i => i.Items, f => FakeCartItem.GenerateBetween(3, 15));
+
+            FakeProduct = new Faker<Product>()
+                .RuleForType(typeof(Guid), f => f.Random.Guid())
+                .RuleFor(i => i.Name, f => f.Commerce.Product())
+                .RuleFor(i => i.Description, f => f.Commerce.ProductDescription())
+                .RuleFor(i => i.Price, f => f.Random.Decimal(50, 2000))
+                .RuleFor(i => i.Quantity, f => f.Random.Int(3, 1000));
         }
 
-        public Order GenerateOrder()
-        {
-            return FakeOrder.Generate();
-        }
+        public Product GenerateProduct() => FakeProduct.Generate();
+        public IEnumerable<Product> GenerateProducts() => FakeProduct.GenerateBetween(10, 100);
 
-        public IEnumerable<Order> GenerateOrders()
-        {
-            return FakeOrder.Generate(100);
-        }
+        public Order GenerateOrder() => FakeOrder.Generate();
+        public IEnumerable<Order> GenerateOrders() => FakeOrder.GenerateBetween(5, 100);
+        public Order.PaymentDetails GenerateOrderPaymentDetails() => FakeOrderPaymentDetails.Generate();
 
-        public Order.PaymentDetails GenerateOrderPaymentDetails()
-        {
-            return FakeOrderPaymentDetails.Generate();
-        }
+        public Shipment GenerateShipment() => FakeShipment.Generate();
+        public List<Shipment> GenerateShipments() => FakeShipment.GenerateBetween(10, 100);
 
-        public Shipment GenerateShipment()
-        {
-            return FakeShipment.Generate();
-        }
-
-        public List<Shipment> GenerateShipments()
-        {
-            return FakeShipment.Generate(100);
-        }
+        public WebShopCart GenerateCart() => FakeCart.Generate();
+        public CartItem GenerateCartItem() => FakeCartItem.Generate();
     }
 }

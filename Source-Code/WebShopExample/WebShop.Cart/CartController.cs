@@ -14,11 +14,14 @@ namespace WebShop.Cart
     [Route("/")]
     public class CartController : Controller
     {
+        readonly DataGenerator Data;
+
         readonly IWebShopApiClient WebShopApi;
 
         public CartController(IWebShopApiClient webShopApi)
         {
             WebShopApi = webShopApi;
+            Data = new DataGenerator();
         }
 
         [HttpPost()]
@@ -28,29 +31,25 @@ namespace WebShop.Cart
                 this.HttpContext,
                 MicroACServices.Products,
                 HttpMethod.Get,
-                $"/");
+                $"/{Guid.NewGuid()}");
 
-            return new WebShopCart()
-            {
-                Id = Guid.NewGuid(),
-                UserId = Guid.Empty,
-                Items = new List<CartItem>()
-            };
+            return Data.GenerateCart();
         }
 
         [HttpGet("/{cartId}")]
-        public WebShopCart GetCart(Guid cartId)
+        public async Task<WebShopCart> GetCart(Guid cartId)
         {
-            return new WebShopCart()
-            {
-                Id = cartId,
-                UserId = Guid.Empty,
-                Items = Items
-            };
+            await WebShopApi.SendServiceRequest(
+                this.HttpContext,
+                MicroACServices.Products,
+                HttpMethod.Get);
+
+            return Data.GenerateCart();
         }
 
         [HttpPost("/{cartId}/products")]
-        public ActionResult AddCartItem([FromBody] CartItem newCartItem)  {
+        public ActionResult AddCartItem([FromBody] CartItem newCartItem)
+        {
             return Ok();
         }
 
@@ -65,15 +64,6 @@ namespace WebShop.Cart
         {
             return Ok();
         }
-
-        List<CartItem> Items = new()
-            {
-                new CartItem { ProductId = 1, Quantity = 4, AddedAt = DateTime.Now},
-                new CartItem { ProductId = 3, Quantity = 2, AddedAt = DateTime.Now.AddMinutes(-5)},
-                new CartItem { ProductId = 1, Quantity = 4, AddedAt = DateTime.Now.AddMinutes(-1)},
-                new CartItem { ProductId = 1, Quantity = 6, AddedAt = DateTime.Now.AddMinutes(-20)},
-                new CartItem { ProductId = 1, Quantity = 3, AddedAt = DateTime.Now.AddMinutes(-3)}
-            };
     }
 
 }

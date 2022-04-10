@@ -20,8 +20,8 @@ namespace WebShop.Orders
 
         public OrdersController(IWebShopApiClient webShopApi)
         {
-            Data = new DataGenerator();
             WebShopApi = webShopApi;
+            Data = new DataGenerator();
         }
 
         [HttpGet]
@@ -48,6 +48,12 @@ namespace WebShop.Orders
                 this.HttpContext,
                 MicroACServices.Cart,
                 HttpMethod.Get,
+                $"/{cartId}");
+
+            await WebShopApi.SendServiceRequest(
+                this.HttpContext,
+                MicroACServices.Cart,
+                HttpMethod.Delete,
                 $"/{cartId}");
 
             await WebShopApi.SendServiceRequest(

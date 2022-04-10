@@ -28,7 +28,7 @@ namespace WebShop.IntegrationTests.Steps
         [Given(@"product")]
         public void GivenProduct()
         {
-            SetJsonBody(new Product());
+            SetJsonBody(RequestDataGenerator.GenerateProduct());
         }
 
         [Then(@"the response contains a list of products")]

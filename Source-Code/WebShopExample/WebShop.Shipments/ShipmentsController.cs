@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 using MicroAC.Core.Client;
 
@@ -12,10 +14,12 @@ namespace WebShop.Shipments
     [Route("/")]
     public class ShipmentsController : Controller
     {
+        IWebShopApiClient WebShopApi;
         DataGenerator Data;
 
-        public ShipmentsController()
+        public ShipmentsController(IWebShopApiClient webShopApi)
         {
+            WebShopApi = webShopApi;
             Data = new DataGenerator();
         }
 
@@ -35,26 +39,42 @@ namespace WebShop.Shipments
 
         [HttpPost("/{orderId}")]
         [MicroAuth]
-        public ActionResult CreateShipment(
+        public async Task<ActionResult> CreateShipment(
             [FromRoute] Guid orderId, 
             [FromBody] Shipment shipment)
         {
+            await WebShopApi.SendServiceRequest(
+                this.HttpContext,
+                MicroACServices.Products,
+                HttpMethod.Get);
+
             return Created(Guid.NewGuid().ToString(), shipment);
         }
 
         [HttpPut("/{shipmentId}")]
         [MicroAuth]
-        public ActionResult UpdateShipment(
+        public async Task<ActionResult> UpdateShipment(
             [FromRoute] Guid shipmentId,
             [FromBody] Shipment shipmentDetails)
         {
+            await WebShopApi.SendServiceRequest(
+                this.HttpContext,
+                MicroACServices.Products,
+                HttpMethod.Get,
+                $"/{shipmentId}");
+
             return Ok(shipmentDetails);
         }
 
         [HttpDelete("/{shipmentId}")]
         [MicroAuth]
-        public ActionResult DeleteShipment([FromRoute] Guid shipmentId)
+        public async Task<ActionResult> DeleteShipment([FromRoute] Guid shipmentId)
         {
+            await WebShopApi.SendServiceRequest(
+                this.HttpContext,
+                MicroACServices.Products,
+                HttpMethod.Get);
+
             return Ok();
         }
     }

@@ -1,4 +1,0 @@
-test_suite,test_name,scenario,duration,step_name,request_count,ok,failed,rps,min,mean,max,50_percent,75_percent,95_percent,99_percent,std_dev,data_transfer_min_kb,data_transfer_mean_kb,data_transfer_max_kb,data_transfer_all_mb
-http,nbomber_default_test_name,debug,00:05:00,Login,18000,18000,0,60,44,73,123,78,663,91,111,04,138,11,225,28,364,03,55,07,1,545,1,547,1,548,27,1919
-http,nbomber_default_test_name,debug,00:05:00,Refresh,18000,18000,0,60,25,45,122,71,597,91,111,74,140,16,225,92,322,3,52,7,1,016,1,018,1,019,17,8878
-http,nbomber_default_test_name,debug,00:05:00,ResourceApi,17940,17940,0,59,8,1015,92,1143,83,1881,82,1134,59,1162,24,1227,78,1359,87,54,85,1,902,1,905,1,908,33,3910

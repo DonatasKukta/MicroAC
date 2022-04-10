@@ -32,7 +32,7 @@ namespace WebShop.IntegrationTests.Steps
         public void GivenNewCartItem()
         {
             AppendToRequestUrl($"products");
-            SetJsonBody(new CartItem { ProductId = 1, AddedAt = DateTime.Now, Quantity = 4 });
+            SetJsonBody(RequestDataGenerator.GenerateCartItem());
         }
 
         [Given(@"with product id")]

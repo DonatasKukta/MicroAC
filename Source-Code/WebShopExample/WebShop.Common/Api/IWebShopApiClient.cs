@@ -13,7 +13,7 @@ namespace WebShop.Common
             HttpContext context,
             MicroACServices service,
             HttpMethod method,
-            string route,
+            string route = "/",
             object body = null);
     }
 }

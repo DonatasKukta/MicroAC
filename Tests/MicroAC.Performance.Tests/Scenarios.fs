@@ -14,7 +14,7 @@ open Types
 let withdefaultSettings scenario  =
     scenario 
     //|> Scenario.withLoadSimulations [KeepConstant(copies = 1, during = seconds 20)]
-    |> Scenario.withLoadSimulations [KeepConstant(copies = 50, during = seconds 100)]
+    |> Scenario.withLoadSimulations [KeepConstant(copies = 40, during = seconds 100)]
     //|> Scenario.withLoadSimulations [InjectPerSec(rate = 2, during = minutes 5)]
     |> Scenario.withoutWarmUp
 
