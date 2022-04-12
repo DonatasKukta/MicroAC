@@ -27,7 +27,7 @@ let login httpFactory (users: IFeed<LoginInput>) =
         timeout = globalTimeout,
         execute = fun context ->
              let saveResponse = saveResponseInContext<LoginResult, LoginInput> loginStep context
-             Http.createRequest "POST" Config.loginUrl
+             Http.createRequest (getHttpMethod Action.Login) (getUrl Service.Authentication Action.Login)
              |> Http.withHeader "Content-Type" "application/json"
              |> Http.withBody (JsonContent.Create context.FeedItem)
              |> Http.withCheck saveResponse 
@@ -45,7 +45,7 @@ let resourceApi httpFactory =
              if(Option.isNone loginResponseObj) then return Response.fail("Refresh step couldn't get LoginResult", -1)
              else 
              let accessJwt = (loginResponseObj.Value:?> ApiResponse<LoginResult>).body.accessJwt
-             return! Http.createRequest "GET" Config.resourceActionUrl
+             return! Http.createRequest (getHttpMethod Action.GetOne) (getUrl Service.ResourceApi Action.GetOne)
                      |> Http.withHeader HttpHeaders.Authorization accessJwt
                      |> Http.withCheck saveResponse
                      |> Http.send context
@@ -63,7 +63,7 @@ let refresh httpFactory =
              if(Option.isNone loginResponseObj) then return Response.fail("Refresh step couldn't get LoginResult", -1)
              else 
              let refreshJwt = (toApiResponse loginResponseObj).body.refreshJwt
-             return!  Http.createRequest "POST" Config.refreshUrl
+             return!  Http.createRequest (getHttpMethod Action.Refresh) (getUrl Service.Authentication Action.Refresh)
                          |> Http.withBody (new StringContent(refreshJwt))
                          |> Http.withCheck saveResponse
                          |> Http.send context
@@ -91,8 +91,8 @@ let webshop name service action httpFactory feed =
                 | true -> ""
                 | false -> (toApiResponse loginResponseObj).body.accessJwt
             
-            let method = getWebShopHttpMethod action
-            let url = getWebShopUrl service action
+            let method = getHttpMethod action
+            let url = getUrl service action
             
             return!  Http.createRequest method url
                         |> Http.withHeader HttpHeaders.Authorization accessJwt

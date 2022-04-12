@@ -10,11 +10,6 @@ let private settings = "appsettings.json"
 
 type private configProvider = JsonProvider<settings>
 let private config = configProvider.Load(settings)
- 
-let loginUrl = config.LoginUrl 
-let refreshUrl = config.RefreshUrl
-let resourceActionUrl = config.ResourceActionUrl
-let webShopReverseProxyUrl = config.WebShopReverseProxyUrl
 
 let private date = DateTime.Now.ToString().Replace(':', '.')
 let getPath filename = Path.Combine(config.ReportsFolder, date, filename) 

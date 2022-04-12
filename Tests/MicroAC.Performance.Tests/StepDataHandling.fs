@@ -51,7 +51,7 @@ let getApiResponseNew stepKey (stepContext : IStepContext<_,_>) =
         | true -> Some value
         | false -> None
 
-let getWebShopHttpMethod action = 
+let getHttpMethod action = 
     match action with
     | Action.SubmitPayment 
     | Action.SubmitShipment
@@ -69,7 +69,7 @@ let endpointResolver = new FabricEndpointResolver();
 endpointResolver.InitialiseEndpoints();
 
 
-let getWebShopUrl service action = 
+let getUrl service action = 
     let baseUrl = 
         match Config.centralAuthorizationEnabled with 
         | true -> $"{endpointResolver.GetServiceEndpoint(Service.RequestManager)}/{Enum.GetName service}"
@@ -84,6 +84,9 @@ let getWebShopUrl service action =
         | (Service.Cart,    Action.DeleteCartItem) -> $"/{id}/products/{id}"
         | (Service.Orders,  Action.SubmitPayment)  -> $"/{id}/payment"
         | (Service.Orders,  Action.SubmitShipment) -> $"/{id}/shipment"
+        | (Service.ResourceApi, Action.GetOne)   -> "/Action"
+        | (Service.Authentication, Action.Login)   -> "/Login"
+        | (Service.Authentication, Action.Refresh) -> "/Refresh"
         | (Service.Orders,  Action.Create)
         | (Service.Shipments, _)
         // Common cases
@@ -92,8 +95,6 @@ let getWebShopUrl service action =
         | (_, Action.GetOne) -> $"/{id}"
         | (_, Action.GetList) 
         | (_, Action.Create) -> ""
-        | (Service.Authentication, Action.Login)   -> "/Login"
-        | (Service.Authentication, Action.Refresh) -> "/Refresh"
         | (service , action) -> $"Unrecognised {service} and {action} path combination."
 
     baseUrl + path

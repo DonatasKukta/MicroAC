@@ -12,6 +12,7 @@ open System.Net.Http.Json
 open System.Threading
 
 open Types
+open StepDataHandling
 
 let email i = $"testemail{i}@SeedTestData.com"
 
@@ -34,7 +35,7 @@ let debugRequest() =
     task {
         printf "Debug send operation"
         let http = new HttpClient()
-        let req = new HttpRequestMessage(HttpMethod.Post, Config.loginUrl)
+        let req = new HttpRequestMessage(HttpMethod.Post, getUrl Service.Authentication Action.Login)
         let json = JsonContent.Create({ Email= email 1; Password= email 1 })
         req.Content <- json :> HttpContent
         let result = http.Send(req)
