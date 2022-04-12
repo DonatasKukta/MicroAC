@@ -114,7 +114,7 @@ namespace WebShop.IntegrationTests.Steps
                 ? EndpointResolver.GetServiceEndpoint(MicroACServices.RequestManager) 
                     + "/"
                     + Enum.GetName(typeof(MicroACServices), service)
-                : EndpointResolver.GetServiceEndpoint(service) + "/";
+                : EndpointResolver.GetServiceEndpoint(service);
             return url ?? string.Empty;
         }
     }

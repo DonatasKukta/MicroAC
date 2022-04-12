@@ -16,7 +16,7 @@ let withdefaultSettings scenario  =
     //|> Scenario.withLoadSimulations [KeepConstant(copies = 1, during = seconds 20)]
     |> Scenario.withLoadSimulations [KeepConstant(copies = 40, during = seconds 100)]
     //|> Scenario.withLoadSimulations [InjectPerSec(rate = 2, during = minutes 5)]
-    |> Scenario.withoutWarmUp
+    |> Scenario.withWarmUpDuration (seconds 30)
 
 let data = new DataGenerator()
 let email i = $"testemail{i}@SeedTestData.com"

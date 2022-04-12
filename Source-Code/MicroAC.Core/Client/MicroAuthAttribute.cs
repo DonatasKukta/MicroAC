@@ -64,6 +64,7 @@ namespace MicroAC.Core.Client
 
         async Task<IEnumerable<Permission>> RetrievePermissionsFromAuthorizationService(HttpContext httpContext)
         {
+            httpContext.RequestServices.GetService<IEndpointResolver>().InitialiseEndpoints();
             var authorization = httpContext.RequestServices.GetService<IAuthorizationServiceClient>();
 
             var externalAccessToken = GetToken(HttpHeaders.Authorization, httpContext);

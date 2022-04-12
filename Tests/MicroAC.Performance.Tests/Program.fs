@@ -40,8 +40,8 @@ let debugRequest() =
         let result = http.Send(req)
         let! response = StepDataHandling.readApiResponse<LoginResult> result "debugResponse" 
         response.timestamps 
-        |> Seq.cast<string> 
-        |> Seq.iter (fun x -> printfn "%A " x)
+            |> Seq.cast<string> 
+            |> Seq.iter (fun x -> printfn "%A " x)
         Csv.appendTimestampsToCsv (new Mutex()) (Steps.toResult response) |> ignore
     }
 
