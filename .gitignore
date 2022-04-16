@@ -1,6 +1,7 @@
 *.7z
 Notes
 GenerateDbDTOs.bat
+/monitorResults
 /results
 *feature.cs
 
@@ -15,6 +16,7 @@ appsettings.persistance.json
 */MicroAC.Database.Seed/appsettings.json
 */MicroAC.Database.Seed/results/
 */MicroAC.Performance.Tests/appsettings.json
+*/MicroAC.Performance.Tests.Monitor/appsettings.json
 
 *-users.sql
 
