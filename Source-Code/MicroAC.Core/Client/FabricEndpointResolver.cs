@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
 
+using Microsoft.Extensions.Configuration;
 using Microsoft.ServiceFabric.Services.Client;
 
 using Newtonsoft.Json.Linq;
@@ -17,7 +18,7 @@ namespace MicroAC.Core.Client
 
         readonly object InitialisationLock = new object();
 
-        readonly ServicePartitionResolver Resolver = ServicePartitionResolver.GetDefault();
+        readonly ServicePartitionResolver Resolver;// = ServicePartitionResolver.GetDefault();
 
         readonly ServicePartitionKey PartitionKey = new ServicePartitionKey();
 
@@ -40,9 +41,15 @@ namespace MicroAC.Core.Client
         string GetFabricType(MicroACServices service) => $"fabric:/MicroAC.ServiceFabric/{Services[service]}";
         string GetFabricType(string service) => $"fabric:/{service}";
 
-        public FabricEndpointResolver()
+        public FabricEndpointResolver(IConfiguration config) 
+            : this(config.GetValue<string>("SfClusterClientConnectionEndpoint"))
         {
 
+        }
+
+        public FabricEndpointResolver(string endpoint)
+        {
+            Resolver = new ServicePartitionResolver(endpoint);
         }
 
         public void InitialiseEndpoints()

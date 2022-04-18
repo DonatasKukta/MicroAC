@@ -12,9 +12,11 @@ namespace Example.ResourceApi
     [ApiController]
     public class ResourceApiController : ControllerBase
     {
-        public ResourceApiController()
-        {
+        IEndpointResolver EndpointResolver;
 
+        public ResourceApiController(IEndpointResolver endpointResolver)
+        {
+            EndpointResolver = endpointResolver;
         }
 
         [HttpGet("/Action")]
@@ -25,14 +27,13 @@ namespace Example.ResourceApi
             )]
         public async Task<ActionResult> Index()
         {
-            var resolver = new FabricEndpointResolver();
-            resolver.InitialiseEndpoints();
+            EndpointResolver.InitialiseEndpoints();
 
             var services = Enum.GetValues(typeof(MicroACServices)).Cast<MicroACServices>();
             // make list 3x original size
             services = services.Concat(services.Concat(services));
 
-            var endpoints = services.Select(s =>  resolver.GetServiceEndpoint(s));
+            var endpoints = services.Select(s => EndpointResolver.GetServiceEndpoint(s));
 
             var response = new
             {

@@ -19,7 +19,7 @@ namespace WebShop.Common
 
             services.AddSingleton<HttpClient>();
             
-            services.AddSingleton<IEndpointResolver,FabricEndpointResolver>();
+            services.AddSingleton<IEndpointResolver, FabricEndpointResolver>();
             
             services.AddSingleton<IWebShopApiClient, WebShopApiClient>();
         }

@@ -65,7 +65,7 @@ let getHttpMethod action =
     | Action.AddCartItem   
     | Action.Create -> "POST"
 
-let endpointResolver = new FabricEndpointResolver();
+let endpointResolver = new FabricEndpointResolver(Config.clusterEndpoint);
 endpointResolver.InitialiseEndpoints();
 
 

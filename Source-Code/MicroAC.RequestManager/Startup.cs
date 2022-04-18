@@ -15,6 +15,7 @@ namespace MicroAC.RequestManager
     {
         IConfiguration _config = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
+                .AddJsonFile("appsettings.core.json")
                 .AddEnvironmentVariables()
                 .Build();
 
