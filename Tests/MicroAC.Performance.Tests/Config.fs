@@ -5,6 +5,8 @@ open System.IO
 open System.Reflection
 open FSharp.Data
 
+open NBomber
+
 [<Literal>]
 let private settings = "appsettings.json"
 
@@ -12,9 +14,13 @@ type private configProvider = JsonProvider<settings>
 let private config = configProvider.Load(settings)
 
 let private date = DateTime.Now.ToString().Replace(':', '.')
+let testLoadSize = config.TestLoadSize
+let warmupEnabled = config.WarmupEnabled
+let testDuration = minutes config.TestDurationMin
 let getPath filename = Path.Combine(config.ReportsFolder, date, filename) 
 
 let reportsFolder = getPath ""
+let warmupReportsFolder = (getPath "") + "_warmup"
 let timestampsCsv = getPath $"{date}_timestamps.csv"
 let durationsCsv  = getPath $"{date}_durations.csv"
 let averagesCsv   = getPath $"{date}_averages.csv"

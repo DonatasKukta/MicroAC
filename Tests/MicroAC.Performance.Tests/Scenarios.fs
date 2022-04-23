@@ -10,14 +10,6 @@ open System.Threading
 open WebShop.Common
 open Types
 
-
-let withdefaultSettings scenario  =
-    scenario 
-    //|> Scenario.withLoadSimulations [KeepConstant(copies = 1, during = seconds 20)]
-    |> Scenario.withLoadSimulations [KeepConstant(copies = 40, during = seconds 100)]
-    //|> Scenario.withLoadSimulations [InjectPerSec(rate = 2, during = minutes 5)]
-    |> Scenario.withWarmUpDuration (seconds 30)
-
 let data = new DataGenerator()
 let email i = $"testemail{i}@SeedTestData.com"
 
@@ -66,37 +58,59 @@ let GenerateScenarios() =
     let submitOrder    = Steps.submitOrder    httpFactory     
 
     let final = Steps.postScenarioHandling csvMutex
-
-    let basicAuth = 
-        [login; refresh; resource; final]
-        |> Scenario.create "basic auth"              
-        |> withdefaultSettings
     
-    let dataAnalyst = 
-        [login; getProducts; getShipments; getOrders; createProduct;final] 
-        |> Scenario.create "data analyst" 
-        |> withdefaultSettings
-    
-    let allSteps =  
+    let allSteps = 
         [
             login; refresh; resource;
             getProduct; getProducts; createProduct; updateProduct; deleteProduct;
             getCart; createCart; addCartItem; deleteCart; deleteCartItem;
             getShipment; getShipments; createShipment; updateShipment; deleteShipment;
             getOrder; getOrders; createOrder; deleteOrder; submitShipment; submitPayment; submitOrder;
-            final;
-        ] 
-        |> Scenario.create "all steps" 
-        |> withdefaultSettings
+        ];
 
-    let debugStep = 
-        [login; submitOrder; final;]
-        |> Scenario.create "debug" 
-        |> withdefaultSettings
+    let warmupScenario =  
+        allSteps
+        |> Scenario.create "Warmup"
+        |> Scenario.withLoadSimulations [KeepConstant(copies = 5, during = seconds 30)]
+        |> Scenario.withoutWarmUp
+    
+    let testScenario = 
+        allSteps
+        |> List.append [final]
+        |> Scenario.create "Test Scenario"
+        |> Scenario.withLoadSimulations 
+            [KeepConstant(copies = Config.testLoadSize, during = Config.testDuration)]
+        |> Scenario.withoutWarmUp    
 
-    [
-        //debugStep;
-        allSteps;
-        //basicAuth; 
-        //dataAnalyst
-    ]
+    (testScenario, warmupScenario)
+
+(*
+TODO: Decide if multiple scenarios are relevant
+
+let basicAuth = 
+    [login; refresh; resource; final]
+    |> Scenario.create "basic auth" 
+    |> Scenario.withLoadSimulations [KeepConstant(copies = 10, during = seconds 100)]
+
+let casualBrowsing = 
+    [login; getProducts; createCart; getProduct; addCartItem; deleteCartItem; refresh; final] 
+    |> Scenario.create "browsing" 
+    |> Scenario.withLoadSimulations [KeepConstant(copies = 10, during = testDuration)]
+    
+let placingOrders = 
+    [login; getProduct; addCartItem; deleteCartItem; refresh; final] 
+    |> Scenario.create "browsing" 
+    |> Scenario.withLoadSimulations [KeepConstant(copies = 10, during = testDuration)]
+    
+let checkingOrder = 
+    [login; getOrder; getOrder; getProducts; getShipment; final]
+    |> Scenario.create "data analyst"
+    |> Scenario.withLoadSimulations [KeepConstant(copies = 10, during = testDuration)]
+
+let dataAnalyst = 
+    [login; getProducts; getShipments; getOrders; getProducts; final]
+    |> Scenario.create "data analyst"
+    |> Scenario.withLoadSimulations [KeepConstant(copies = 10, during = testDuration)]
+
+    let testScenarios = [basicAuth; casualBrowsing; checkingOrder; placingOrders; dataAnalyst] 
+*)

@@ -6,19 +6,6 @@ open System.IO
 open System
 open System.Threading
 
-let deleteFile file =
-    if (File.Exists file) then File.Delete (file)
-
-let deleteCsvFiles() = 
-    printfn "%s" Config.timestampsCsv
-    printfn "%s" Config.durationsCsv 
-    printfn "%s" Config.averagesCsv  
-    printfn "%s" Config.resultsCsv 
-    deleteFile Config.timestampsCsv
-    deleteFile Config.durationsCsv
-    deleteFile Config.averagesCsv
-    deleteFile Config.resultsCsv
-
 let printProcessingMessage message =
     printfn "%A - %s" DateTime.Now message
 

@@ -1,18 +1,11 @@
-﻿open NBomber
-open NBomber.FSharp
+﻿open NBomber.FSharp
 open NBomber.Configuration
 
 open Serilog
 
-open FSharp.Control.Tasks
-
 open System
-open System.Net.Http
-open System.Net.Http.Json
-open System.Threading
 
 open Types
-open StepDataHandling
 
 let email i = $"testemail{i}@SeedTestData.com"
 
@@ -21,30 +14,27 @@ let users =
     |> Seq.map(fun i -> { Email= email i; Password= email i })
     |> Feed.createCircular "users"
 
-let runTests() =
-    Scenarios.GenerateScenarios()
-    |> NBomberRunner.registerScenarios
+let runWarmup() = 
+    let _, warmupScenario = Scenarios.GenerateScenarios()
+    warmupScenario
+    |> NBomberRunner.registerScenario
     |> NBomberRunner.withTestSuite "http"
-    |> NBomberRunner.withReportFolder Config.reportsFolder
+    |> NBomberRunner.withReportFolder Config.warmupReportsFolder
     |> NBomberRunner.withReportFormats [ReportFormat.Html; ReportFormat.Txt]
     |> NBomberRunner.withLoggerConfig(fun () -> LoggerConfiguration().MinimumLevel.Verbose())
+    |> NBomberRunner.withoutReports
     |> NBomberRunner.run
     |> ignore
 
-let debugRequest() =
-    task {
-        printf "Debug send operation"
-        let http = new HttpClient()
-        let req = new HttpRequestMessage(HttpMethod.Post, getUrl Service.Authentication Action.Login)
-        let json = JsonContent.Create({ Email= email 1; Password= email 1 })
-        req.Content <- json :> HttpContent
-        let result = http.Send(req)
-        let! response = StepDataHandling.readApiResponse<LoginResult> result "debugResponse" 
-        response.timestamps 
-            |> Seq.cast<string> 
-            |> Seq.iter (fun x -> printfn "%A " x)
-        Csv.appendTimestampsToCsv (new Mutex()) (Steps.toResult response) |> ignore
-    }
+let runTests() =
+    let mainScenario, _ = Scenarios.GenerateScenarios()
+    mainScenario
+    |> NBomberRunner.registerScenario
+    |> NBomberRunner.withTestSuite "http"
+    |> NBomberRunner.withReportFolder Config.reportsFolder
+    |> NBomberRunner.withReportFormats [ReportFormat.Html; ReportFormat.Txt]
+    |> NBomberRunner.run
+    |> ignore
 
 let postTestCalculations() = 
     match System.IO.File.Exists(Config.timestampsCsv) with
@@ -61,8 +51,7 @@ let postTestCalculations() =
 
 [<EntryPoint>]
 let main argv =
-    Csv.deleteCsvFiles()
-    //debugRequest() |> ignore
+    if Config.warmupEnabled then runWarmup()
     let started = DateTime.Now;
     runTests() |> ignore
     let completed = DateTime.Now;
