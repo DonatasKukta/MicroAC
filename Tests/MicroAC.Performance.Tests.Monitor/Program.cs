@@ -14,13 +14,13 @@ namespace MicroAC.Performance.Tests.Monitor
     /// </summary>
     class Program
     {
-        static readonly string ResultsFolder = new ConfigurationBuilder()
+        static readonly IConfiguration Config = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json")
-            .Build()
-            .GetSection("ResultsFolder")
-            .Value;
+            .Build();
 
-        static readonly TimeSpan Delay = TimeSpan.FromSeconds(2);
+        static readonly string ResultsFolder = Config.GetSection("ResultsFolder").Value;
+        static readonly TimeSpan Delay = 
+            TimeSpan.FromSeconds(int.Parse(Config.GetSection("DelaySeconds").Value));
 
         static PerformanceMonitor PerformanceMonitor = new PerformanceMonitor();
 
