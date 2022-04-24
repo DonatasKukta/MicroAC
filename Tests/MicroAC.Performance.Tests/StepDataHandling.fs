@@ -71,7 +71,7 @@ endpointResolver.InitialiseEndpoints();
 
 let getUrl service action = 
     let baseUrl = 
-        match Config.centralAuthorizationEnabled with 
+        match Config.centralAuthEnabled with 
         | true -> $"{endpointResolver.GetServiceEndpoint(Service.RequestManager)}/{Enum.GetName service}"
         | false -> endpointResolver.GetServiceEndpoint(service)
     

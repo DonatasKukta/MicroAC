@@ -25,28 +25,28 @@ let appendTimestampsToCsv (mutex : Mutex) (response:ApiResult ) =
                         |> (parseRawTimestamps response.id response.step)
                         |> Seq.map toTimestampCsvStr
     mutex.WaitOne() |> ignore
-    File.AppendAllLines(Config.timestampsCsv , timestampsStr)
+    File.AppendAllLines(Config.timestampsCsv() , timestampsStr)
     mutex.ReleaseMutex() 
     timestampsStr
 
 let readTimestampsFromFile() =
-    File.ReadAllLines(Config.timestampsCsv)
+    File.ReadAllLines(Config.timestampsCsv())
     |> Seq.cast<string>
     |> Seq.map fromTimestampCsvStr
 
 let writeDurationsToCsv (durations: seq<Duration>) = 
     printProcessingMessage "Write durations to csv"
     let lines = durations |> Seq.map (fun d -> $"{d.requestId};{d.step};{d.service};{d.duration};")
-    File.WriteAllLines(Config.durationsCsv, lines)
+    File.WriteAllLines(Config.durationsCsv(), lines)
     
 let writeRequestAveragesToCsv (averages: seq<Average>) = 
     printProcessingMessage "Write averages to csv"
     let str = averages |> Seq.map (fun a -> $"{a.step};{a.service};{a.average};")
-    File.WriteAllLines(Config.averagesCsv, str)
+    File.WriteAllLines(Config.averagesCsv(), str)
 
 let writeTestTimesToCsv (started:DateTime) completed = 
     printProcessingMessage "Write Run times to csv"
-    File.WriteAllLines(Config.resultsCsv, [
+    File.WriteAllLines(Config.resultsCsv(), [
         $"Start;{started}";
         $"End;{completed }";
         $"Duration;{(completed - started)}";
@@ -58,13 +58,25 @@ let appendMetricsToCsv (externalRequestCount, internalRequestCount, nodeCounts, 
         nodeCounts
         |> Seq.map (fun (node, count) -> $"{node};{count}")
         |> Seq.append [ 
-            $"Timestamps;{timestampCount}"
+            $"LoadSize;{Config.testLoadSize}";
+            $"LoadDuration;{Config.testDuration}";
+            $"CentralAuth;${Config.centralAuthEnabled}";
+            $"Timestamps;{timestampCount}";
             $"ExternalRequests;{externalRequestCount}";  
             $"InternalRequests;{internalRequestCount}";
-            ""
+            "";
             ]
+    File.AppendAllLines(Config.resultsCsv(), allLines)
 
-    File.AppendAllLines(Config.resultsCsv, allLines)
+let appendServiceRequestCountsToCsv (timestamps: seq<Timestamp>) = 
+    File.AppendAllLines(Config.resultsCsv(), 
+        timestamps
+        |> Seq.filter (fun t -> t.action = "Start")
+        |> Seq.map (fun t -> t.service)
+        |> Seq.countBy (fun s -> s)
+        |> Seq.map(fun (service ,count) -> $"{service};{count}")
+        |> Seq.append [ ""; ""; ""; "Service;Count"; ] 
+    )
 
 let appendCalcAverageMatrixToCsv averages =
     printProcessingMessage "Append averages matrix to csv"
@@ -83,7 +95,7 @@ let appendCalcAverageMatrixToCsv averages =
     let firstLine = Seq.fold (fun f r -> $"{f}{r};") ";" columns
     let allLines = strLines |> Seq.append [firstLine]
     
-    File.AppendAllLines(Config.resultsCsv, allLines)
+    File.AppendAllLines(Config.resultsCsv(), allLines)
     printProcessingMessage "Done"
 
 // Calculations

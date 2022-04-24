@@ -61,7 +61,7 @@ let GenerateScenarios() =
     
     let allSteps = 
         [
-            login; refresh; resource;
+            login; refresh;
             getProduct; getProducts; createProduct; updateProduct; deleteProduct;
             getCart; createCart; addCartItem; deleteCart; deleteCartItem;
             getShipment; getShipments; createShipment; updateShipment; deleteShipment;
@@ -71,12 +71,11 @@ let GenerateScenarios() =
     let warmupScenario =  
         allSteps
         |> Scenario.create "Warmup"
-        |> Scenario.withLoadSimulations [KeepConstant(copies = 5, during = seconds 30)]
+        |> Scenario.withLoadSimulations [KeepConstant(copies = 30, during = minutes 1)]
         |> Scenario.withoutWarmUp
     
     let testScenario = 
-        allSteps
-        |> List.append [final]
+         allSteps @ [final]
         |> Scenario.create "Test Scenario"
         |> Scenario.withLoadSimulations 
             [KeepConstant(copies = Config.testLoadSize, during = Config.testDuration)]

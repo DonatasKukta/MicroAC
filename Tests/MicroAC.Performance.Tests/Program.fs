@@ -10,7 +10,7 @@ open Types
 let email i = $"testemail{i}@SeedTestData.com"
 
 let users = 
-    { 1 .. 1 .. 15000 } 
+    { 1 .. 1 .. 30000 } 
     |> Seq.map(fun i -> { Email= email i; Password= email i })
     |> Feed.createCircular "users"
 
@@ -19,7 +19,7 @@ let runWarmup() =
     warmupScenario
     |> NBomberRunner.registerScenario
     |> NBomberRunner.withTestSuite "http"
-    |> NBomberRunner.withReportFolder Config.warmupReportsFolder
+    |> NBomberRunner.withReportFolder (Config.warmupReportsFolder())
     |> NBomberRunner.withReportFormats [ReportFormat.Html; ReportFormat.Txt]
     |> NBomberRunner.withLoggerConfig(fun () -> LoggerConfiguration().MinimumLevel.Verbose())
     |> NBomberRunner.withoutReports
@@ -31,27 +31,36 @@ let runTests() =
     mainScenario
     |> NBomberRunner.registerScenario
     |> NBomberRunner.withTestSuite "http"
-    |> NBomberRunner.withReportFolder Config.reportsFolder
+    |> NBomberRunner.withReportFolder (Config.reportsFolder())
     |> NBomberRunner.withReportFormats [ReportFormat.Html; ReportFormat.Txt]
     |> NBomberRunner.run
     |> ignore
 
 let postTestCalculations() = 
-    match System.IO.File.Exists(Config.timestampsCsv) with
+    match System.IO.File.Exists(Config.timestampsCsv()) with
     | false -> eprintfn "_timetsamps.csv file not found in reports folder. Ensure postScenarioHandling step es run at the end of at least one Scenario."
     | true -> 
-        let timestamps = Csv.readTimestampsFromFile()
-        let metrics = Csv.calcMetrics timestamps
-        let durations  = Csv.calcRequestDurations timestamps
-        let averages   = Csv.calcRequestAverages durations
+        let timestamps  = Csv.readTimestampsFromFile()
+        let metrics     = Csv.calcMetrics timestamps
+        let durations   = Csv.calcRequestDurations timestamps
+        let averages    = Csv.calcRequestAverages durations
         Csv.appendMetricsToCsv metrics
-        Csv.writeDurationsToCsv       durations
+        Csv.writeDurationsToCsv durations
         Csv.writeRequestAveragesToCsv averages
-        Csv.appendCalcAverageMatrixToCsv    averages
+        Csv.appendCalcAverageMatrixToCsv averages
+        Csv.appendServiceRequestCountsToCsv timestamps
+        
+let checkTestLoadSize (size: string option) = 
+    match size with 
+    | Some size -> Config.testLoadSize <- int size
+    | None -> ()
 
 [<EntryPoint>]
-let main argv =
+let main argv =    
     if Config.warmupEnabled then runWarmup()
+
+    argv |> Seq.tryHead |> checkTestLoadSize |> ignore
+
     let started = DateTime.Now;
     runTests() |> ignore
     let completed = DateTime.Now;
