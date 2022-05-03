@@ -17,6 +17,7 @@ appsettings.persistance.json
 */MicroAC.Database.Seed/results/
 */MicroAC.Performance.Tests/appsettings.json
 */MicroAC.Performance.Tests.Monitor/appsettings.json
+*/MicroAC.Performance.Tests.Monitor/monitorResults
 
 *-users.sql
 

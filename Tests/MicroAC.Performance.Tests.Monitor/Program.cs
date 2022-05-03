@@ -31,7 +31,7 @@ namespace MicroAC.Performance.Tests.Monitor
             
             var resultsFile = GetResultsFilePath();
 
-            await File.WriteAllLinesAsync(resultsFile, new string[] { "Time;CPU;RAM;" });
+            await File.WriteAllLinesAsync(resultsFile, new string[] { "Time;CPU;RAM MB;RAM %;" });
 
             while (true)
             {
@@ -62,11 +62,11 @@ namespace MicroAC.Performance.Tests.Monitor
             do
             {
                 var cpuUsage = PerformanceMonitor.getCpuUsagePercent();
-                var ramUsage = PerformanceMonitor.getRamUsagePercent();
-                var time = DateTime.Now.ToString();
+                (float ramMb, double ramPercent) = PerformanceMonitor.GetRamUsage();
+                 var time = DateTime.Now.ToString();
 
-                Console.WriteLine($"{time} | CPU: {cpuUsage}% | RAM:{ramUsage}% |");
-                await File.AppendAllLinesAsync(resultsFile, new string[] { $"{time};{cpuUsage};{ramUsage};" });
+                Console.WriteLine($"{time} | CPU: {cpuUsage}% | RAM:{ramPercent}%  - {ramMb}Mb");
+                await File.AppendAllLinesAsync(resultsFile, new string[] { $"{time};{cpuUsage};{ramMb};{ramPercent};" });
             }
             while (await DelayAndCheckForCancel());
         }
@@ -93,7 +93,12 @@ namespace MicroAC.Performance.Tests.Monitor
         public int getCpuUsagePercent() =>
             (int)Math.Round(CpuCounter.NextValue());
 
-        public double getRamUsagePercent()
-             => Math.Round(100 * (TotalMb - RamCounter.NextValue()) / TotalMb);
+        public (float, double) GetRamUsage()
+        {
+            var availableMb = RamCounter.NextValue();
+            var inUseMb = TotalMb - availableMb;
+            var inUsePercent = Math.Round(100 * inUseMb / TotalMb);
+            return (inUseMb, inUsePercent);
+        }
     }
 }

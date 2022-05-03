@@ -19,7 +19,7 @@ let cartItemFeed = [new CartItem()]            |> Feed.createCircular "cartsItem
 let productFeed  = [new Product()]             |> Feed.createCircular "products"  |> Some
 let paymentFeed  = [new Order.PaymentDetails()]|> Feed.createCircular "payments"  |> Some
 let usersFeed = 
-    { 1 .. 1 .. 15000} 
+    { 1 .. 1 .. 30000} 
     |> Seq.map(fun i -> { Email= email i; Password= email i })
     |> Feed.createCircular "users"
 
@@ -71,14 +71,15 @@ let GenerateScenarios() =
     let warmupScenario =  
         allSteps
         |> Scenario.create "Warmup"
-        |> Scenario.withLoadSimulations [KeepConstant(copies = 30, during = minutes 1)]
+        |> Scenario.withLoadSimulations [KeepConstant(copies = 5, during = minutes 1)]
         |> Scenario.withoutWarmUp
     
     let testScenario = 
          allSteps @ [final]
         |> Scenario.create "Test Scenario"
         |> Scenario.withLoadSimulations 
-            [KeepConstant(copies = Config.testLoadSize, during = Config.testDuration)]
+            //[KeepConstant(copies = Config.testLoadSize, during = Config.testDuration)]
+            [RampPerSec(rate = Config.testLoadSize, during = Config.testDuration)]
         |> Scenario.withoutWarmUp    
 
     (testScenario, warmupScenario)

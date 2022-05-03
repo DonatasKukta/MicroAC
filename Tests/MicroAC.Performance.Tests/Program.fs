@@ -4,6 +4,7 @@ open NBomber.Configuration
 open Serilog
 
 open System
+open System.Threading.Tasks
 
 open Types
 
@@ -65,5 +66,8 @@ let main argv =
     runTests() |> ignore
     let completed = DateTime.Now;
     Csv.writeTestTimesToCsv started completed
+
+    async {Task.Delay(5000) |> Async.AwaitTask |> ignore} |> Async.RunSynchronously
+
     postTestCalculations()
     0

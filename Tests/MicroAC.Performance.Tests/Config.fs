@@ -22,7 +22,7 @@ let private config = configProvider.Load(settings)
 let private date = DateTime.Now.ToString().Replace(':', '.')
 let centralStr = match centralAuthEnabled with | true -> "Central" | false -> "NotCentral"
 
-let mutable testLoadSize = config.TestLoadSize
+let mutable testLoadSize = int config.TestLoadSize
 let warmupEnabled = config.WarmupEnabled
 let testDuration = minutes config.TestDurationMin
 
