@@ -24,7 +24,8 @@ namespace WebShop.Cart
             Data = new DataGenerator();
         }
 
-        [HttpPost()]
+        [HttpPost]
+        [MicroAuth]
         public async Task<WebShopCart> CreateCart()
         {
             await WebShopApi.SendServiceRequest(
@@ -37,6 +38,7 @@ namespace WebShop.Cart
         }
 
         [HttpGet("/{cartId}")]
+        [MicroAuth]
         public async Task<WebShopCart> GetCart(Guid cartId)
         {
             await WebShopApi.SendServiceRequest(
@@ -48,18 +50,21 @@ namespace WebShop.Cart
         }
 
         [HttpPost("/{cartId}/products")]
+        [MicroAuth]
         public ActionResult AddCartItem([FromBody] CartItem newCartItem)
         {
             return Ok();
         }
 
         [HttpDelete("/{cartId}")]
+        [MicroAuth]
         public ActionResult DeleteCart()
         {
             return Ok();
         }
 
         [HttpDelete("/{cartId}/products/{productId}")]
+        [MicroAuth]
         public ActionResult DeleteCartItem()
         {
             return Ok();

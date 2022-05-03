@@ -26,6 +26,7 @@ namespace WebShop.Products
         }
 
         [HttpGet]
+        [MicroAuth]
         public IEnumerable<Product> GetProducts()
         {
             return Data.GenerateProducts();
