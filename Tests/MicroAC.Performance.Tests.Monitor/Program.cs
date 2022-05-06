@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Configuration;
@@ -71,11 +72,11 @@ namespace MicroAC.Performance.Tests.Monitor
             while (await DelayAndCheckForCancel());
         }
 
-        async static Task<bool> DelayAndCheckForCancel()
+        static async Task<bool> DelayAndCheckForCancel()
         {
-            var readTask = Task.Run(Console.ReadKey);
-            var completedTask = await Task.WhenAny(readTask, Task.Delay(Delay));
-            return !object.ReferenceEquals(readTask, completedTask);
+            await Task.Delay(Delay);
+            var isCancelled = Console.KeyAvailable;
+            return !isCancelled;
         }
     }
 
