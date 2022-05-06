@@ -2,7 +2,9 @@
 
 using MicroAC.Core.Auth;
 using MicroAC.Core.Client;
+using MicroAC.Core.Constants;
 
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace WebShop.Common
@@ -18,8 +20,9 @@ namespace WebShop.Common
             services.AddSingleton<IAuthorizationServiceClient, AuthorizationServiceClient>();
 
             services.AddSingleton<HttpClient>();
-            
-            services.AddSingleton<IEndpointResolver, FabricEndpointResolver>();
+
+            services.AddSingleton<IEndpointResolver, FabricReverseProxyEndpointResolver>();
+            //services.AddSingleton<IEndpointResolver, FabricEndpointResolver>();
             
             services.AddSingleton<IWebShopApiClient, WebShopApiClient>();
         }

@@ -1,4 +1,9 @@
-﻿namespace MicroAC.Core.Constants
+﻿using System.Collections.Generic;
+using System.Linq;
+
+using MicroAC.Core.Client;
+
+namespace MicroAC.Core.Constants
 {
     public static class HttpHeaders
     {
@@ -19,6 +24,14 @@
     {
         public const string CentralAuthorizationEnabled = "CentralAuthorizationEnabled";
 
+        public const string SfClusterClientConnectionEndpoint = "SfClusterClientConnectionEndpoint";
+        
+        public const string SfReverseProxyPorts = "SfReverseProxyPorts";
+
+        public const string SfReverseProxyIp = "SfReverseProxyIp";
+
+        public const string SfReverseProxyEnabled = "SfReverseProxyEnabled";
+
         public const string StrictAuthorizationEnabled = "StrictAuthorizationEnabled";
     }
 
@@ -26,4 +39,25 @@
     {
         public const string Permissions = "Permissions";
     }
+
+    internal static class Fabric
+    {
+        static readonly Dictionary<MicroACServices, string> FabricServices = new()
+        {
+            { MicroACServices.ResourceApi,    "Example.ResourceApi" },
+            { MicroACServices.RequestManager, "MicroAC.RequestManager" },
+            { MicroACServices.Authentication, "MicroAC.Authentication" },
+            { MicroACServices.Authorization,  "MicroAC.Authorization" },
+            { MicroACServices.Orders,         "WebShop.Orders" },
+            { MicroACServices.Shipments,      "WebShop.Shipments" },
+            { MicroACServices.Cart,           "WebShop.Cart" },
+            { MicroACServices.Products,       "WebShop.Products" }
+        };
+
+        public static string GetServiceTypeName(MicroACServices service) => FabricServices[service];
+
+        public static IEnumerable<MicroACServices> GetRegisteredServices() 
+            => FabricServices.Keys.ToList();
+    }
+
 }

@@ -2,10 +2,11 @@ using System.Net.Http;
 
 using MicroAC.Core.Client;
 using MicroAC.Core.Common;
+using MicroAC.Core.Constants;
 using MicroAC.Core.Exceptions;
 
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -35,7 +36,9 @@ namespace MicroAC.RequestManager
 
             services.AddSingleton<IConfiguration>(_config);
 
-            services.AddSingleton<IEndpointResolver, FabricEndpointResolver>();
+            _ = _config.GetValue<bool>(ConfigKeys.SfReverseProxyEnabled)
+                ? services.AddSingleton<IEndpointResolver, FabricReverseProxyEndpointResolver>()
+                : services.AddSingleton<IEndpointResolver, FabricEndpointResolver>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -11,7 +11,11 @@ let coreConfigPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)
 let private coreConfig = JsonValue.Parse(File.ReadAllText coreConfigPath)
 
 let centralAuthEnabled = coreConfig.["CentralAuthorizationEnabled"].AsBoolean()
-let clusterEndpoint = coreConfig.["SfClusterClientConnectionEndpoint"].AsString();
+let clusterEndpoint = coreConfig.["SfClusterClientConnectionEndpoint"].AsString()
+let reverseProxyEnabled = coreConfig.["SfReverseProxyEnabled"].AsBoolean()
+let SfReverseProxyIp = coreConfig.["SfReverseProxyIp"].AsString()
+let reverseProxyPorts : seq<int> = 
+    Seq.map (fun (value: JsonValue) -> value.AsInteger()) (coreConfig.["SfReverseProxyPorts"].AsArray())
 
 [<Literal>]
 let private settings = "appsettings.json"

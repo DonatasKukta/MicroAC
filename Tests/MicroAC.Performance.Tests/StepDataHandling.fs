@@ -65,7 +65,11 @@ let getHttpMethod action =
     | Action.AddCartItem   
     | Action.Create -> "POST"
 
-let endpointResolver = new FabricEndpointResolver(Config.clusterEndpoint);
+let endpointResolver = 
+    match Config.reverseProxyEnabled with
+    | true -> new FabricReverseProxyEndpointResolver(Config.SfReverseProxyIp, Config.reverseProxyPorts) :> IEndpointResolver
+    | false -> new FabricEndpointResolver(Config.clusterEndpoint) :> IEndpointResolver
+
 endpointResolver.InitialiseEndpoints();
 
 

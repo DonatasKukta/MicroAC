@@ -36,7 +36,6 @@ namespace MicroAC.Persistence
             return user.PasswordHash.SequenceEqual(generatedHash);
         }
 
-        //TODO: Handle edge cases
         public byte[] HashPassword(byte[] password, byte[] salt)
         {
             using HashAlgorithm algorithm = HashAlgorithm.Create("SHA512");

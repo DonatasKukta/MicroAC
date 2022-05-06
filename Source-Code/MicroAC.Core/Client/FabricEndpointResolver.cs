@@ -9,6 +9,7 @@ using Microsoft.ServiceFabric.Services.Client;
 
 using Newtonsoft.Json.Linq;
 using System.Fabric;
+using MicroAC.Core.Constants;
 
 namespace MicroAC.Core.Client
 {
@@ -24,25 +25,15 @@ namespace MicroAC.Core.Client
 
         readonly CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
 
-        readonly Dictionary<MicroACServices, string> Services = new Dictionary<MicroACServices, string>()
-        {
-            { MicroACServices.ResourceApi,    "Example.ResourceApi" },
-            { MicroACServices.RequestManager, "MicroAC.RequestManager" },
-            { MicroACServices.Authentication, "MicroAC.Authentication" },
-            { MicroACServices.Authorization,  "MicroAC.Authorization" },
-            { MicroACServices.Orders,         "WebShop.Orders" },
-            { MicroACServices.Shipments,      "WebShop.Shipments" },
-            { MicroACServices.Cart,           "WebShop.Cart" },
-            { MicroACServices.Products,       "WebShop.Products" }
-        };
-
         readonly ConcurrentDictionary<string, EndpointContainer> ResolvedEndpoints = new();
 
-        string GetFabricType(MicroACServices service) => $"fabric:/MicroAC.ServiceFabric/{Services[service]}";
-        string GetFabricType(string service) => $"fabric:/{service}";
+        static string GetFabricType(MicroACServices service) 
+            => $"fabric:/MicroAC.ServiceFabric/{Fabric.GetServiceTypeName(service)}";
+        static string GetFabricType(string service) 
+            => $"fabric:/{service}";
 
         public FabricEndpointResolver(IConfiguration config) 
-            : this(config.GetValue<string>("SfClusterClientConnectionEndpoint"))
+            : this(config.GetValue<string>(ConfigKeys.SfClusterClientConnectionEndpoint))
         {
 
         }
@@ -56,13 +47,17 @@ namespace MicroAC.Core.Client
         {
             lock (InitialisationLock)
             {
-                if (Initialised) return;
+                if (Initialised)
+                {
+                    return;
+                }
 
-                foreach (var service in Services.Keys)
+                foreach (var service in Fabric.GetRegisteredServices())
                 {
                     var fabricType = GetFabricType(service);
                     var partition = Resolver.ResolveAsync(new Uri(fabricType), PartitionKey, CancellationTokenSource.Token).Result;
-                    var container = new EndpointContainer(partition);
+                    var endpoints = partition.Endpoints.Select(endpoint => GetEndpoint(endpoint)).ToList();
+                    var container = new EndpointContainer(endpoints);
                     if (!ResolvedEndpoints.TryAdd(fabricType, container))
                         throw new Exception($"Unable to add EndPoint container of '{fabricType}'");
                 }
@@ -82,52 +77,10 @@ namespace MicroAC.Core.Client
             return container?.GetEndpoint();
         }
 
-        class EndpointContainer
+        string GetEndpoint(ResolvedServiceEndpoint endpoint)
         {
-            readonly object ReadLock = new object();
-
-            readonly List<string> Endpoints;
-
-            int Index;
-
-            int Count;
-
-            public EndpointContainer(ResolvedServicePartition partition)
-            {
-                Endpoints = partition.Endpoints.Select(endpoint => GetURL(endpoint)).ToList();
-                Index = 0;
-                Count = Endpoints.Count;
-
-                if (Count < 1)
-                {
-                    throw new Exception("Unable to extract endpoints from ResolvedServicePartition");
-                }
-            }
-
-            public string GetEndpoint()
-            {
-                lock (ReadLock)
-                {
-                    var endpoint = Endpoints[Index];
-
-                    if (Index == Count - 1)
-                    {
-                        Index = 0;
-                    }
-                    else
-                    {
-                        Index++;
-                    }
-
-                    return endpoint;
-                }
-            }
-
-            string GetURL(ResolvedServiceEndpoint endpoint)
-            {
-                var address = JObject.Parse(endpoint.Address);
-                return (string)address["Endpoints"].First();
-            }
+            var address = JObject.Parse(endpoint.Address);
+            return (string)address["Endpoints"].First();
         }
     }
 }

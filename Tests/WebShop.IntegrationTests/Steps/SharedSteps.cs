@@ -46,7 +46,8 @@ namespace WebShop.IntegrationTests.Steps
                 Response = new HttpResponseMessage()
             };
             State.Request.Headers.Add(HttpHeaders.Authorization, TestAuthToken);
-            EndpointResolver = new FabricEndpointResolver(Configuration);
+            //EndpointResolver = new FabricEndpointResolver(Configuration);
+            EndpointResolver = new FabricReverseProxyEndpointResolver(Configuration);
             EndpointResolver.InitialiseEndpoints();
             State.Url = RetrieveUrl(service);
         }

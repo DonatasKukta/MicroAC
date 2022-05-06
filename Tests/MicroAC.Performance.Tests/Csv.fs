@@ -60,7 +60,7 @@ let appendMetricsToCsv (externalRequestCount, internalRequestCount, nodeCounts, 
         |> Seq.append [ 
             $"LoadSize;{Config.testLoadSize}";
             $"LoadDuration;{Config.testDuration}";
-            $"CentralAuth;${Config.centralAuthEnabled}";
+            $"CentralAuth;{Config.centralAuthEnabled};;ReverseProxy;{Config.reverseProxyEnabled}";
             $"Timestamps;{timestampCount}";
             $"ExternalRequests;{externalRequestCount}";  
             $"InternalRequests;{internalRequestCount}";

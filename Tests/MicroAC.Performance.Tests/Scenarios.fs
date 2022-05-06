@@ -71,15 +71,14 @@ let GenerateScenarios() =
     let warmupScenario =  
         allSteps
         |> Scenario.create "Warmup"
-        |> Scenario.withLoadSimulations [KeepConstant(copies = 5, during = minutes 1)]
+        |> Scenario.withLoadSimulations [InjectPerSec(rate = 1, during = minutes 1)]
         |> Scenario.withoutWarmUp
     
     let testScenario = 
          allSteps @ [final]
         |> Scenario.create "Test Scenario"
         |> Scenario.withLoadSimulations 
-            //[KeepConstant(copies = Config.testLoadSize, during = Config.testDuration)]
-            [RampPerSec(rate = Config.testLoadSize, during = Config.testDuration)]
+            [KeepConstant(copies = Config.testLoadSize, during = Config.testDuration)]
         |> Scenario.withoutWarmUp    
 
     (testScenario, warmupScenario)

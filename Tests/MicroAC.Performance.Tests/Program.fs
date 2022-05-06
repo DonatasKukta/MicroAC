@@ -34,6 +34,7 @@ let runTests() =
     |> NBomberRunner.withTestSuite "http"
     |> NBomberRunner.withReportFolder (Config.reportsFolder())
     |> NBomberRunner.withReportFormats [ReportFormat.Html; ReportFormat.Txt]
+    |> NBomberRunner.withLoggerConfig(fun () -> LoggerConfiguration().MinimumLevel.Verbose())
     |> NBomberRunner.run
     |> ignore
 
