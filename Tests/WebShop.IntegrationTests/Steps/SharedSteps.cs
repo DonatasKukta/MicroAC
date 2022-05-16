@@ -20,19 +20,17 @@ namespace WebShop.IntegrationTests.Steps
 {
     public class SharedSteps
     {
-        //TODO: Move to config
-        static readonly string TestAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI0YzlkZjM3MS1lZjVlLTRhOTgtYTllNC00ODUyNDA3ZDI0MGEiLCJpc3MiOiJNaWNyb0FDOkF1dGhlbnRpY2F0aW9uU2VydmljZSIsImF1ZCI6Ik1pY3JvQUM6QXV0aG9yaXphdGlvblNlcnZpY2UiLCJzdWIiOiJNaWNyb0FDOlVzZXIiLCJ1aWQiOiJmZTk4MzEwYi1lYmMyLTQyOTktOTg1NC1mYmVhNDZmNjI1OTEiLCJ1cm9sZXMiOlsiUm9sZTEwX1NlZWRUZXN0RGF0YSJdLCJuYmYiOjE2NDc3OTk4MDQsImV4cCI6MTY2NTA3OTgwNCwiaWF0IjoxNjQ3Nzk5ODA0fQ.zeEV6S0dbzNZMwTBxadf34WJzXPjTmFBzx7s_EAOCVA";
-
         protected readonly TestState State;
 
         protected readonly DataGenerator RequestDataGenerator;
 
         readonly HttpClient HttpClient;
 
-        readonly IEndpointResolver EndpointResolver;
+        protected readonly IEndpointResolver EndpointResolver;
 
-        IConfiguration Configuration = new ConfigurationBuilder()
+        protected IConfiguration Configuration = new ConfigurationBuilder()
             .AddJsonFile("appsettings.core.json")
+            .AddJsonFile("appsettings.json")
             .AddEnvironmentVariables()
             .Build();
 
@@ -45,7 +43,7 @@ namespace WebShop.IntegrationTests.Steps
                 Request = new HttpRequestMessage(),
                 Response = new HttpResponseMessage()
             };
-            State.Request.Headers.Add(HttpHeaders.Authorization, TestAuthToken);
+            State.Request.Headers.Add(HttpHeaders.Authorization, Configuration.GetValue<string>("TestAccessToken"));
             //EndpointResolver = new FabricEndpointResolver(Configuration);
             EndpointResolver = new FabricReverseProxyEndpointResolver(Configuration);
             EndpointResolver.InitialiseEndpoints();

@@ -18,6 +18,7 @@ appsettings.persistance.json
 */MicroAC.Performance.Tests/appsettings.json
 */MicroAC.Performance.Tests.Monitor/appsettings.json
 */MicroAC.Performance.Tests.Monitor/monitorResults
+*/WebShop.IntegrationTests/appsettings.json
 
 *-users.sql
 
