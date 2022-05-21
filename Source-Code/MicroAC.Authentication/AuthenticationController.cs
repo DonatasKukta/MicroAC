@@ -58,7 +58,7 @@ namespace MicroAC.Authentication
         [HttpPost("Login")]
         public async Task<ActionResult> Login([FromBody] LoginCredentials credentials)
         {
-            if (credentials == null || credentials.Email == null /* || credentials.Password == null*/)
+            if (credentials == null || credentials.Email == null || credentials.Password == null)
             {
                 return BadRequest("Login credentials not provided.");
             }

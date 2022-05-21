@@ -7,6 +7,10 @@ namespace MicroAC.Core.Client
 {
     public interface IAuthorizationServiceClient
     {
-        Task<(IEnumerable<Permission> permissions, IEnumerable<string> timestamps)> Authorize(string externalAccessToken);
+        Task<(IEnumerable<Permission> permissions,
+              IEnumerable<string> roles, 
+              IEnumerable<string> timestamps, 
+              string internalAccessToken)> 
+                   Authorize(string externalAccessToken);
     }
 }

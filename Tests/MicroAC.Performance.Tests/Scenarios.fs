@@ -82,34 +82,3 @@ let GenerateScenarios() =
         |> Scenario.withoutWarmUp    
 
     (testScenario, warmupScenario)
-
-(*
-TODO: Decide if multiple scenarios are relevant
-
-let basicAuth = 
-    [login; refresh; resource; final]
-    |> Scenario.create "basic auth" 
-    |> Scenario.withLoadSimulations [KeepConstant(copies = 10, during = seconds 100)]
-
-let casualBrowsing = 
-    [login; getProducts; createCart; getProduct; addCartItem; deleteCartItem; refresh; final] 
-    |> Scenario.create "browsing" 
-    |> Scenario.withLoadSimulations [KeepConstant(copies = 10, during = testDuration)]
-    
-let placingOrders = 
-    [login; getProduct; addCartItem; deleteCartItem; refresh; final] 
-    |> Scenario.create "browsing" 
-    |> Scenario.withLoadSimulations [KeepConstant(copies = 10, during = testDuration)]
-    
-let checkingOrder = 
-    [login; getOrder; getOrder; getProducts; getShipment; final]
-    |> Scenario.create "data analyst"
-    |> Scenario.withLoadSimulations [KeepConstant(copies = 10, during = testDuration)]
-
-let dataAnalyst = 
-    [login; getProducts; getShipments; getOrders; getProducts; final]
-    |> Scenario.create "data analyst"
-    |> Scenario.withLoadSimulations [KeepConstant(copies = 10, during = testDuration)]
-
-    let testScenarios = [basicAuth; casualBrowsing; checkingOrder; placingOrders; dataAnalyst] 
-*)

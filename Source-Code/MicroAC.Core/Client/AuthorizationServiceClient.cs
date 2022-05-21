@@ -27,7 +27,12 @@ namespace MicroAC.Core.Client
             EndpointResolver = endpointResolver;
         }
 
-        public async Task<(IEnumerable<Permission> permissions, IEnumerable<string> timestamps)> Authorize(string externalAccessToken)
+        public async Task<(
+            IEnumerable<Permission> permissions,
+            IEnumerable<string> roles,
+            IEnumerable<string> timestamps,
+            string internalAccessToken)>
+                Authorize(string externalAccessToken)
         {
             var authorizationUrl = EndpointResolver.GetServiceEndpoint(MicroACServices.Authorization);
 
@@ -39,14 +44,15 @@ namespace MicroAC.Core.Client
             request.Headers.Add(HttpHeaders.Authorization, externalAccessToken);
 
             using var response = await HttpClient.SendAsync(request);
-
+            
             response.EnsureSuccessStatusCode();
-            var accessInternalToken = await response.Content.ReadAsStringAsync();
+            var internalAccessToken = await response.Content.ReadAsStringAsync();
 
-            var permissions = TokenHandler.GetValidatedPermissions(accessInternalToken);
+            var permissions = TokenHandler.GetValidatedPermissions(internalAccessToken);
+            var roles = TokenHandler.GetValidatedRoles(internalAccessToken);
             var timestamps = response.Headers.GetValues(HttpHeaders.Timestamps);
 
-            return (permissions, timestamps);
+            return (permissions, roles, timestamps, internalAccessToken);
         }
     }
 }

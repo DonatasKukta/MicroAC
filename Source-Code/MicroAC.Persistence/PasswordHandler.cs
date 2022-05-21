@@ -34,7 +34,7 @@ namespace MicroAC.Persistence
         {
             var generatedHash = HashPassword(EncodeStr(password), user.Salt);
             return user.PasswordHash.SequenceEqual(generatedHash);
-        }
+        } 
 
         public byte[] HashPassword(byte[] password, byte[] salt)
         {

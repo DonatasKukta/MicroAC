@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -25,7 +24,7 @@ namespace WebShop.Cart
         }
 
         [HttpPost]
-        [MicroAuth]
+        [MicroAuth(ServiceName = "Carts", Action = "Create")]
         public async Task<WebShopCart> CreateCart()
         {
             await WebShopApi.SendServiceRequest(
@@ -38,7 +37,7 @@ namespace WebShop.Cart
         }
 
         [HttpGet("/{cartId}")]
-        [MicroAuth]
+        [MicroAuth(ServiceName = "Carts", Action = "Get", Value = "Self")]
         public async Task<WebShopCart> GetCart(Guid cartId)
         {
             await WebShopApi.SendServiceRequest(
@@ -50,25 +49,24 @@ namespace WebShop.Cart
         }
 
         [HttpPost("/{cartId}/products")]
-        [MicroAuth]
+        [MicroAuth(ServiceName = "Carts", Action = "Update", Value = "CartItem")]
         public ActionResult AddCartItem([FromBody] CartItem newCartItem)
         {
             return Ok();
         }
 
         [HttpDelete("/{cartId}")]
-        [MicroAuth]
+        [MicroAuth(ServiceName = "Carts", Action = "Delete", Value = "Cart")]
         public ActionResult DeleteCart()
         {
             return Ok();
         }
 
         [HttpDelete("/{cartId}/products/{productId}")]
-        [MicroAuth]
+        [MicroAuth(ServiceName = "Carts", Action = "Delete", Value = "CartItem")]
         public ActionResult DeleteCartItem()
         {
             return Ok();
         }
     }
-
 }

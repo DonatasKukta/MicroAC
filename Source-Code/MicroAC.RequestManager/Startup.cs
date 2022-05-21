@@ -46,14 +46,11 @@ namespace MicroAC.RequestManager
         {
             app.UseMicroACProblemDetails();
 
-            //TODO: Apply CORS policies
             app.UseCors(x => x
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .SetIsOriginAllowed(origin => true)
-                .WithExposedHeaders(
-                    _config.GetValue<string>("Timestamp:Header"), 
-                    "X-ServiceFabricRequestId"));
+                .WithExposedHeaders(HttpHeaders.Timestamps, HttpHeaders.FabricRequestId));
 
             if (_config.GetValue<bool>("Timestamp:Enabled"))
             {

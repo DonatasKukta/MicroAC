@@ -4,6 +4,9 @@
 let main argv =
     printfn "Let's generate data for performance tests!"
     printfn "Result folder is %s" (Config.getPath "")
+    
+    printfn "Generate random passwords:"
+    Generate.passwords()
 
     Database.saveStateToScript("backup.sql")
     Database.removeSeededValues()

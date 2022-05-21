@@ -117,8 +117,6 @@ namespace MicroAC.RequestManager
         {
             this.HttpContext.AppendTimestampHeaders(response.Headers);
             
-            // TODO: Fix header transfer
-            
             this.HttpContext.AddActionMessage(_serviceName, "Receive");
 
             this.HttpContext.Response.StatusCode = (int)response.StatusCode;

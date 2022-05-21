@@ -1,11 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
-using System.Linq;
+﻿using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Primitives;
-using System.Net.Http.Headers;
 using System.Fabric;
 
 namespace MicroAC.Core.Common
@@ -39,42 +35,6 @@ namespace MicroAC.Core.Common
             }, context);
 
             await _next(context);
-        }
-    }
-
-    //TODO: This is basically debug logging implementation. Needs refactor (with DI).
-    public static class HttpContextTimestampExtensions
-    {
-        static string _timeNow
-        { 
-            get { return DateTime.Now.ToString(Constants.TimestampFormat); }
-        }
-
-        static string _timestampHeader = Core.Constants.HttpHeaders.Timestamps;
-
-        internal static void AddStartTimestamp(this HttpContext context, string name)
-        {
-            context.Response.Headers.Append(_timestampHeader, $"{name}-Start-{_timeNow}");
-        }
-
-        internal static void AddEndTimestamp(this HttpContext context, string name)
-        {
-            context.Response.Headers.Append(_timestampHeader, $"{name}-End-{_timeNow}");
-        }
-
-        public static void AddActionMessage(this HttpContext context, string name, string message)
-        {
-            context.Response.Headers.Append(_timestampHeader, $"{name}-{message}-{_timeNow}");
-        }
-
-        public static void AppendTimestampHeaders(this HttpContext context, HttpResponseHeaders headers)
-        {
-            var containsTimestampHeaders = headers.TryGetValues(_timestampHeader, out var timestamps);
-
-            if (containsTimestampHeaders)
-            {
-                context.Response.Headers.Append(_timestampHeader, new StringValues(timestamps.ToArray()));
-            }
         }
     }
 }

@@ -48,10 +48,8 @@ namespace MicroAC.Persistence
         private async Task<IEnumerable<string>> GetUserRoles(Guid userId) => 
             await _context.UsersRoles.Where(ur => ur.User == userId)
                                     .Select(ur => ur.Role)
-                                    //.AsNoTracking()
                                     .ToListAsync();
 
-        //TODO: Implement Automapping
         private static Domain.User Map(DTO.User user, IEnumerable<string> roles)
         {
             return new Domain.User

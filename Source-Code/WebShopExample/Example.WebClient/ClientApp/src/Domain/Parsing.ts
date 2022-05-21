@@ -41,7 +41,7 @@ export function parseResourceApiActionBody(body: any): ResourceApiBody {
   var json = JSON.parse(body);
   return {
     message: json.message,
-    internalAccessToken: json.internalAccessToken,
-    decodedInternalAccessToken: parseJwt(json.internalAccessToken)
+    internalAccessToken: json.jwt,
+    decodedInternalAccessToken: parseJwt(json.jwt)
   };
 }

@@ -24,11 +24,9 @@ namespace MicroAC.Persistence
 
         public async Task<IEnumerable<Domain.Permission>> GetRolePermissions(IEnumerable<string> roles) => 
             await Context.RolesPermissions.Where(rp => roles.Contains(rp.Role))
-                                    .Select(rp => Map(rp.PermissionNavigation))
-                                    .ToListAsync();
+                                          .Select(rp => Map(rp.PermissionNavigation))
+                                          .ToListAsync();
 
-
-        //TODO: Implement Automapping
         private static Domain.Permission Map(DTO.Permission permission)
         {
             return new Domain.Permission

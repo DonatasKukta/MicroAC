@@ -24,21 +24,21 @@ namespace WebShop.Shipments
         }
 
         [HttpGet]
-        [MicroAuth]
+        [MicroAuth(ServiceName = "Shipments", Action = "View", Value = "All")]
         public IEnumerable<Shipment> GetShipments()
         {
             return Data.GenerateShipments();
         }
 
         [HttpGet("/{shipmentId}")]
-        [MicroAuth]
+        [MicroAuth(ServiceName = "Shipments", Action = "View", Value = "One")]
         public Shipment GetShipment([FromRoute] Guid shipmentId)
         {
             return Data.GenerateShipment();
         }
 
         [HttpPost("/{orderId}")]
-        [MicroAuth]
+        [MicroAuth(ServiceName = "Shipments", Action = "Create")]
         public async Task<ActionResult> CreateShipment(
             [FromRoute] Guid orderId, 
             [FromBody] Shipment shipment)
@@ -52,7 +52,7 @@ namespace WebShop.Shipments
         }
 
         [HttpPut("/{shipmentId}")]
-        [MicroAuth]
+        [MicroAuth(ServiceName = "Shipments", Action = "Update")]
         public async Task<ActionResult> UpdateShipment(
             [FromRoute] Guid shipmentId,
             [FromBody] Shipment shipmentDetails)
@@ -67,7 +67,7 @@ namespace WebShop.Shipments
         }
 
         [HttpDelete("/{shipmentId}")]
-        [MicroAuth]
+        [MicroAuth(ServiceName = "Shipments", Action = "Delete")]
         public async Task<ActionResult> DeleteShipment([FromRoute] Guid shipmentId)
         {
             await WebShopApi.SendServiceRequest(

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using MicroAC.Core.Auth;
 using System.Threading.Tasks;
 using MicroAC.Core.Constants;
+using MicroAC.Core.Common;
 
 namespace MicroAC.Core.Client
 {
@@ -32,7 +33,8 @@ namespace MicroAC.Core.Client
 
             httpContext.Items.Add(HttpContextKeys.Permissions, permissions);
 
-            if (!config.GetValue<bool>(ConfigKeys.StrictAuthorizationEnabled))
+            if (!config.GetValue<bool>(ConfigKeys.StrictAuthorizationEnabled)
+                && httpContext.GetValidatedRoles().Any(r => r.Contains("SeedTestData")))
             {
                 await next();
                 return;
@@ -59,7 +61,13 @@ namespace MicroAC.Core.Client
             var internalAccessToken = GetToken(HttpHeaders.InternalJWT, httpContext);
 
             var tokenHandler = httpContext.RequestServices.GetService<IJwtTokenHandler<AccessInternal>>();
-            return tokenHandler.GetValidatedPermissions(internalAccessToken);
+            var validatedPermissions = tokenHandler.GetValidatedPermissions(internalAccessToken);
+            var roles = tokenHandler.GetValidatedRoles(internalAccessToken);
+
+            httpContext.Items.Add(HttpContextKeys.InternalAccessToken, internalAccessToken);
+            httpContext.Items.Add(HttpContextKeys.Roles, roles);
+
+            return validatedPermissions;
         }
 
         async Task<IEnumerable<Permission>> RetrievePermissionsFromAuthorizationService(HttpContext httpContext)
@@ -69,9 +77,11 @@ namespace MicroAC.Core.Client
 
             var externalAccessToken = GetToken(HttpHeaders.Authorization, httpContext);
 
-            (var permissions, var timestamps) = await authorization.Authorize(externalAccessToken);
+            (var permissions, var roles, var timestamps, var internalAccessToken) = await authorization.Authorize(externalAccessToken);
 
             httpContext.Response.Headers.Append(HttpHeaders.Timestamps, timestamps.ToArray());
+            httpContext.Items.Add(HttpContextKeys.InternalAccessToken, internalAccessToken);
+            httpContext.Items.Add(HttpContextKeys.Roles, roles);
 
             return permissions;
         }

@@ -63,8 +63,7 @@ namespace MicroAC.Authorization
 
             var accessClaims = _accessExternalTokenHandler.Validate(token);
 
-            var roles = accessClaims.Claims.Where(c => c.Type == MicroACClaimTypes.Roles)
-                                                           .Select(c => c.Value);
+            var roles = accessClaims.Claims.Where(c => c.Type == MicroACClaimTypes.Roles).Select(c => c.Value);
 
             if (roles.Count() < 1)
             {

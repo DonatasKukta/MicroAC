@@ -12,33 +12,30 @@ DECLARE @User8   AS UNIQUEIDENTIFIER=NEWID();
 DECLARE @User9   AS UNIQUEIDENTIFIER=NEWID();
 DECLARE @User10  AS UNIQUEIDENTIFIER=NEWID();
 
-DECLARE @Permission0  AS UNIQUEIDENTIFIER=NEWID();
-DECLARE @Permission1 AS UNIQUEIDENTIFIER=NEWID();
-DECLARE @Permission01 AS UNIQUEIDENTIFIER=NEWID();
+DECLARE @Permission1  AS UNIQUEIDENTIFIER=NEWID();
 DECLARE @Permission2  AS UNIQUEIDENTIFIER=NEWID();
-DECLARE @Permission02 AS UNIQUEIDENTIFIER=NEWID();
 DECLARE @Permission3  AS UNIQUEIDENTIFIER=NEWID();
 DECLARE @Permission4  AS UNIQUEIDENTIFIER=NEWID();
 DECLARE @Permission5  AS UNIQUEIDENTIFIER=NEWID();
-DECLARE @Permission05 AS UNIQUEIDENTIFIER=NEWID();
 DECLARE @Permission6  AS UNIQUEIDENTIFIER=NEWID();
 DECLARE @Permission7  AS UNIQUEIDENTIFIER=NEWID();
-DECLARE @Permission07 AS UNIQUEIDENTIFIER=NEWID();
 DECLARE @Permission8  AS UNIQUEIDENTIFIER=NEWID();
 DECLARE @Permission9  AS UNIQUEIDENTIFIER=NEWID();
 DECLARE @Permission10 AS UNIQUEIDENTIFIER=NEWID();
 DECLARE @Permission11 AS UNIQUEIDENTIFIER=NEWID();
 DECLARE @Permission12 AS UNIQUEIDENTIFIER=NEWID();
-DECLARE @Permission120 AS UNIQUEIDENTIFIER=NEWID();
 DECLARE @Permission13 AS UNIQUEIDENTIFIER=NEWID();
 DECLARE @Permission14 AS UNIQUEIDENTIFIER=NEWID();
 DECLARE @Permission15 AS UNIQUEIDENTIFIER=NEWID();
 DECLARE @Permission16 AS UNIQUEIDENTIFIER=NEWID();
-DECLARE @Permission160 AS UNIQUEIDENTIFIER=NEWID();
 DECLARE @Permission17 AS UNIQUEIDENTIFIER=NEWID();
 DECLARE @Permission18 AS UNIQUEIDENTIFIER=NEWID();
 DECLARE @Permission19 AS UNIQUEIDENTIFIER=NEWID();
-
+DECLARE @Permission20 AS UNIQUEIDENTIFIER=NEWID();
+DECLARE @Permission21 AS UNIQUEIDENTIFIER=NEWID();
+DECLARE @Permission22 AS UNIQUEIDENTIFIER=NEWID();
+DECLARE @Permission23 AS UNIQUEIDENTIFIER=NEWID();
+DECLARE @Permission24 AS UNIQUEIDENTIFIER=NEWID();
 
 INSERT INTO [dbo].[Organisations] ([Name]) VALUES
 ('MicroAC'),
@@ -48,110 +45,87 @@ INSERT INTO [dbo].[Organisations] ([Name]) VALUES
 ('Co-Herent');
 
 INSERT INTO [dbo].[Roles]([Name])VALUES
-('Administrator'),
-('Free User'),
-('Client'),
-('Consultant'),
-('Manager'),
-('Data Analyst');
+('View-Everything'),
+('Update-Everything'),
+('Delete-Everything'),
+('Create-Everything');
 
 INSERT INTO [dbo].[Users]([Id],[Name],[Surname],[Email],[Phone],[Organisation],[Blocked],[PasswordHash],[Salt])VALUES
-(@User1,'admin'			,'admin' 		,'admin@admin.com'					,'+37065111111','MicroAC'			,0,NULL,NULL),
-(@User2,'Antanas'		,'Antanaitis'	,'Antanas.Antanaitis@gmail.com'		,'+37065348586','MicroAC'			,0,NULL,NULL),
-(@User3,'Jonas'			,'Jonaitis'		,'Jonas.Jonaitis@gmail.com'			,'+37065348586','MicroAC'			,0,NULL,NULL),
-(@User4,'Kazimieras'	,'Antanaitis'	,'Kazimieras.antanaitis@gmail.com'	,'+37065348586','MicroAC'			,0,NULL,NULL),
-(@User5,'Deimantė'		,'Deimantienė'	,'Deimantė.Deimantienė@gmail.com'	,'+37065348586','MicroAC'			,0,NULL,NULL),
-(@User6,'Mantas'		,'Mantauskas'	,'Mantas.Mantauskas@gmail.com'		,'+37065348586','IT Technologies'	,0,NULL,NULL),
-(@User7,'Justas'		,'Justauskas'	,'Justas.Justauskas@gmail.com'		,'+37065348586','Co-Herent'			,0,NULL,NULL),
-(@User8,'Rolandas'		,'Rolandaitis'	,'Rolandas.Rolandaitis@gmail.com'	,'+37065348586','Fine Solutions'	,0,NULL,NULL),
-(@User9,'Dovilė'		,'Dovilienė'	,'Dovilė.Dovilienė@gmail.com'		,'+37065348586','IT Technologies'	,0,NULL,NULL),
-(@User10,'Dominykas'	,'Dominykaitis'	,'Dominykas.Dominykaitis@gmail.com'	,'+37065348586','Analyticus'		,0,NULL,NULL);
+(@User1, 'admin'		,'admin' 		,'everything@microac.com'				,'+37065111111','IT Technologies'	,0, 0xC71AC7AE8EC8E9684F28554561599E80F7DAA8E2629AADC2130D5350243A2E89B2C62C32790A0697946A36A944A200101F29AF5501451FFB1050A4068853C5F4, 0x46D086824097E4A395CFFF46699C73C4),
+(@User2, 'Antanas'		,'Antanaitis'	,'view@microac.com'						,'+37065348586','Co-Herent'			,0, 0x8438BCA5CD89A3BBB720257264D2B0F41AC6514128A699CE557139C54EB39011CBC44C2153104EC9EFBF91E084D7CBC406005162D48EF8F77D560142D3A120DE, 0xA1CD1034135B4EA36F84A54ADF7A0EA0),
+(@User3, 'Jonas'		,'Jonaitis'		,'update@microac.com'					,'+37065348586','Fine Solutions'	,0, 0x8F7A98B4E23AAF07B09660A02C7470B86C211315417DFAC2400E862BCEC7A5699F3455A0B4B6F0EDF536C2C7E27D6A45B64CA27C108B3FCCF2B338A0DE8EAAB7, 0x9CE3C1176CE48E824E0221BE0F3B5358),
+(@User4, 'Kazimieras'	,'Antanaitis'	,'create@microac.com'					,'+37065348586','IT Technologies'	,0, 0xB6C7C7A835D7BD8712A0D43B16610AADBE211BEF92EDCCBA898C8B9F164F3EC816B6DB6D02D699BCB649203D93CFEF5B1918296596C862AB1A7BE6A0958C8BC8, 0xF0A328184BE991EB81E312BCF19AC41A),
+(@User5, 'Deimantė'		,'Deimantienė'	,'delete@microac.com'					,'+37065348586','Analyticus'		,0, 0xA7AEA6A8A24915BD84CA8F71F7181B16DC20D069A0DA9183618A95328693C80DC366D06134F0E87E7E891DFB2A50B282AFD9AFF5F8E41AAA4BF9A36E4F11E3B6, 0xC15EA986DA5B57BD3F8EE610398F9334),
+(@User6, 'Mantas'		,'Mantauskas'	,'Mantas.Mantauskas@microac.com'		,'+37065348586','IT Technologies'	,0, 0x166626CA623C7F22CF9D68A21375B22D773FDB956A1CA6AF5B90700BE4ED916203E0CB9EADE9A8C79619640F48086E20F6B07D0F4E890061F8DB04BB15B1DD60, 0x304D5A3C52F655B351D69589D1D290B4),
+(@User7, 'Justas'		,'Justauskas'	,'Justas.Justauskas@microac.com'		,'+37065348586','Co-Herent'			,0, 0xF1F0A54073F18EBD99E9AF9D360AF9F4D3AEEC7551CA332E8E94470DD995B844B50B8BA16F0AD4B146B1C65E548E2B7BA0AC789060393FAD0F6C3966EAEBC24F, 0x3E07FDB192CD7D944B6BD9BD0380B1F2),
+(@User8, 'Rolandas'		,'Rolandaitis'	,'Rolandas.Rolandaitis@microac.com'		,'+37065348586','Fine Solutions'	,0, 0xC21463762A85B24648454B69158BE45286B2D86ECC1867D8440E7FF8E2A56BFD4C839666AF400C21F2E4FB971C487D33A8BA6267E7C0B9DCA3B1B2F858117B37, 0x4FDE8BA43F87C7CA08F63404C6CEEC6D),
+(@User9, 'Dovilė'		,'Dovilienė'	,'Dovilė.Dovilienė@microac.com'			,'+37065348586','IT Technologies'	,0, 0x85A75F7C0382185A6DBF0C89276FA0A00F311D3B94D70CAA089696024E09613CF82BC2324624F3BF200D81B51836E47325FADA0823FD3C39AADFF4BB71FB2FBB, 0x25A33AF246EC74B73F32A89B9879CE7D),
+(@User10,'Dominykas'	,'Dominykaitis'	,'Dominykas.Dominykaitis@microac.com'	,'+37065348586','Analyticus'		,0, 0x173DAD564F87C2505E22D99610725E62958DD90118F7A234A3B9BA83388A353CB92AC555AB8516E8AA5D4A18274E57C2FC6D9B98C5036326B27455C1B2D56543, 0x7F6BBFD1AE7F5F6C3C28D47A96E0AD70);
 
 INSERT INTO [dbo].[Users_Roles]([User],[Role])VALUES
-(@User1, 'Administrator'),
-(@User2, 'Free User'),
-(@User3, 'Client'),
-(@User4, 'Consultant'),
-(@User5, 'Manager'),
-(@User6, 'Data Analyst'),
-(@User7, 'Administrator'),
-(@User8, 'Free User'),
-(@User9, 'Client'),
-(@User10, 'Consultant'),
-(@User10, 'Administrator'),
-(@User9, 'Free User'),
-(@User8, 'Client'),
-(@User7, 'Consultant'),
-(@User6, 'Manager'),
-(@User5, 'Data Analyst'),
-(@User4, 'Administrator'),
-(@User3, 'Free User'),
-(@User2, 'Client'),
-(@User1, 'Consultant');
+(@User1, 'View-Everything'	),
+(@User1, 'Update-Everything'),
+(@User1, 'Delete-Everything'),
+(@User1, 'Create-Everything'),
+(@User2, 'View-Everything'  ),
+(@User3, 'Update-Everything'),
+(@User4, 'Delete-Everything'),
+(@User5, 'Create-Everything');
 
 INSERT INTO [dbo].[Services] ([Name]) VALUES
-('MicroAC-Users'),
+('Carts'),
 ('Products'),
-('Shipping'),
-('Admin'),
-('Customers'),
-('Cart');
+('Shipments'),
+('Orders');
 
 INSERT INTO [dbo].[Permissions]([Id],[ServiceName],[Action],[Value],[Description]) VALUES
-(@Permission0 ,'Products'		,'All'		,'All'		,''),
-(@Permission01,'Products'		,'View'		,'All'		,''),
-(@Permission1 ,'Products'		,'View'		,'Active'	,''),
-(@Permission2 ,'Products'		,'Update'	,'All'		,''),
-(@Permission02,'Products'		,'Update'	,'Quantity'	,''),
-(@Permission3 ,'Products'		,'Create'	,'All'		,''),
-(@Permission4 ,'Products'		,'Delete'	,'Disabled'	,''),
-(@Permission05,'Shipping'		,'View'		,'Orders'	,''),
-(@Permission5 ,'Shipping'		,'Create'	,'Order'	,''),
-(@Permission6 ,'Shipping'		,'Start'	,'Order'	,''),
-(@Permission7 ,'Shipping'		,'Update'	,'Contacts'	,''),
-(@Permission07,'Shipping'		,'Cancel'	,'Order'	,''),
-(@Permission8 ,'MicroAC-Users'	,'Register'	,'User'		,''),
-(@Permission9 ,'MicroAC-Users'	,'View'		,'Users'	,''),
-(@Permission10,'MicroAC-Users'	,'Modify'	,'User'		,''),
-(@Permission11,'MicroAC-Users'	,'Delete'	,'User'		,''),
-(@Permission120,'Admin'			,'All'		,'All'		,''),
-(@Permission12,'Admin'			,'Update'	,'Settings'	,''),
-(@Permission13,'Admin'			,'Update'	,'Services'	,''),
-(@Permission14,'Admin'			,'View'		,'Services'	,''),
-(@Permission15,'Admin'			,'Edit'		,'Metadata'	,''),
-(@Permission160,'Cart'			,'View'		,'All'		,''),
-(@Permission16,'Cart'			,'View'		,'My-Items'	,''),
-(@Permission17,'Cart'			,'Add'		,'My-Item'	,''),
-(@Permission18,'Cart'			,'Remove'	,'My-Item'	,''),
-(@Permission19,'Cart'			,'PlaceOrder','My-Cart'	,'');
+(@Permission1	,'Products'	,'View'	  ,'One'			,''),
+(@Permission2	,'Products'	,'View'	  ,'All'			,''),
+(@Permission3	,'Products'	,'Create' ,''				,''),
+(@Permission4	,'Products'	,'Update' ,''				,''),
+(@Permission5	,'Products'	,'Delete' ,''				,''),
+(@Permission6	,'Products'	,'Delete' ,''				,''),
+(@Permission7	,'Carts'	,'Create' ,''				,''),
+(@Permission8	,'Carts'	,'Get'	  ,'Self'			,''),
+(@Permission9	,'Carts'	,'Update' ,'Self'			,''),
+(@Permission10	,'Carts'	,'Delete' ,'Cart'			,''),
+(@Permission11	,'Carts'	,'Delete' ,'CartItem'		,''),
+(@Permission12	,'Shipments','View'	  ,'One'			,''),
+(@Permission13	,'Shipments','View'	  ,'All'			,''),
+(@Permission14	,'Shipments','Create' ,'' 				,''),
+(@Permission15	,'Shipments','Update' ,'' 				,''),
+(@Permission16	,'Shipments','Delete' ,'' 				,''),
+(@Permission17	,'Orders'	,'View'	  ,'One'			,''),
+(@Permission18	,'Orders'	,'View'	  ,'All'			,''),
+(@Permission19	,'Orders'	,'Create' ,''				,''),
+(@Permission21	,'Orders'	,'Submit' ,'PaymentDetails'	,''),
+(@Permission22	,'Orders'	,'Submit' ,'ShipmentDetails',''),
+(@Permission23	,'Orders'	,'Submit' ,'Order'			,''),
+(@Permission24	,'Orders'	,'Delete' ,'Self'			,'');
 
 INSERT INTO [dbo].[Roles_Permissions]([Role],[Permission])VALUES
-('Administrator'	,@Permission0),
-('Administrator'	,@Permission1),
-('Data Analyst'		,@Permission01),
-('Consultant'		,@Permission02),
-('Consultant'		,@Permission5),
-('Client'			,@Permission5),
-('Free User'		,@Permission5),
-('Data Analyst'		,@Permission05),
-('Consultant'		,@Permission6),
-('Consultant'		,@Permission7),
-('Consultant'		,@Permission07),
-('Administrator'	,@Permission8),
-('Administrator'	,@Permission9),
-('Administrator'	,@Permission10),
-('Administrator'	,@Permission11),
-('Administrator'	,@Permission120),
-('Administrator'	,@Permission16),
-('Consultant'		,@Permission160),
-('Data Analyst'		,@Permission160),
-('Free User'		,@Permission16),
-('Free User'		,@Permission17),
-('Free User'		,@Permission18),
-('Free User'		,@Permission19),
-('Client'			,@Permission16),
-('Client'			,@Permission17),
-('Client'			,@Permission18),
-('Client'			,@Permission19);
+('View-Everything'		,@Permission1	),
+('View-Everything'		,@Permission2	),
+('Create-Everything'	,@Permission3	),
+('Update-Everything'	,@Permission4	),
+('Delete-Everything'	,@Permission5	),
+('Delete-Everything'	,@Permission6	),
+('Create-Everything'	,@Permission7	),
+('View-Everything'		,@Permission8	),
+('Update-Everything'	,@Permission9	),
+('Delete-Everything'	,@Permission10	),
+('Delete-Everything'	,@Permission11	),
+('View-Everything'		,@Permission12	),
+('View-Everything'		,@Permission13	),
+('Create-Everything'	,@Permission14	),
+('Update-Everything'	,@Permission15	),
+('Delete-Everything'	,@Permission16	),
+('View-Everything'		,@Permission17	),
+('View-Everything'		,@Permission18	),
+('Create-Everything'	,@Permission19	),
+('Update-Everything'	,@Permission21	),
+('Update-Everything'	,@Permission22	),
+('Update-Everything'	,@Permission23	),
+('Delete-Everything'	,@Permission24	);
 
 GO

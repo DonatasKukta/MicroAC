@@ -20,6 +20,8 @@ namespace MicroAC.Core.Auth
         ClaimsPrincipal Validate(string token);
 
         IEnumerable<Permission> GetValidatedPermissions(string token);
+        
+        IEnumerable<string> GetValidatedRoles(string token);
     }
 
     public class JwtTokenHandler<TokenType> : IJwtTokenHandler<TokenType>
@@ -73,6 +75,24 @@ namespace MicroAC.Core.Auth
                 var result = sClaims.Select(c => JsonSerializer.Deserialize<Permission>(c.Value));
 
                 return result;
+            }
+            catch (Exception e)
+            {
+                throw new AuthorizationFailedException("Failed to authorize the request", e);
+            }
+        }
+
+        public IEnumerable<string> GetValidatedRoles(string token)
+        {
+            try
+            {
+                var claimsPrincipal = _jwtHandler.ValidateToken(token, _validationParameters, out var stoken);
+
+                var userRoles = claimsPrincipal.Claims
+                                    .Where(c => c.Type == MicroACClaimTypes.Roles)
+                                    .Select(c => c.Value);
+                 
+                return userRoles;
             }
             catch (Exception e)
             {

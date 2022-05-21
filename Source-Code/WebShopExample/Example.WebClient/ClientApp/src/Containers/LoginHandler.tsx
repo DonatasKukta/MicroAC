@@ -10,8 +10,8 @@ const authUrl =
   'http://localhost:19081/MicroAC.ServiceFabric/MicroAC.RequestManager/Authentication/Login';
 
 const defaultCredentialsState: Credentials = {
-  email: 'Jonas.Jonaitis@gmail.com',
-  password: 'passwrd'
+  email: 'everything@microac.com',
+  password: 'password123'
 };
 
 interface IProps {

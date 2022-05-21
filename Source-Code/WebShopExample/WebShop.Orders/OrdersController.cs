@@ -25,14 +25,14 @@ namespace WebShop.Orders
         }
 
         [HttpGet]
-        [MicroAuth]
+        [MicroAuth(ServiceName = "Orders", Action = "View", Value = "One")]
         public IEnumerable<Order> GetOrders()
         {
             return Data.GenerateOrders();
         }
 
         [HttpGet("/{id}")]
-        [MicroAuth]
+        [MicroAuth(ServiceName = "Orders", Action = "View", Value = "All")]
         public Order GetOrder([FromRoute] Guid id)
         {
             var order = Data.GenerateOrder();
@@ -41,7 +41,7 @@ namespace WebShop.Orders
         }
 
         [HttpPost("/{cartId}")]
-        [MicroAuth]
+        [MicroAuth(ServiceName = "Orders", Action = "Create")]
         public async Task<ActionResult> CreateOrder([FromRoute] Guid cartId)
         {
             await WebShopApi.SendServiceRequest(
@@ -71,14 +71,14 @@ namespace WebShop.Orders
         }
 
         [HttpDelete("/{orderId}")]
-        [MicroAuth]
+        [MicroAuth(ServiceName = "Orders", Action = "Delete", Value = "Self")]
         public ActionResult DeleteOrder([FromRoute] Guid orderId)
         {
             return Ok();
         }
 
         [HttpPut("/{orderId}/shipment")]
-        [MicroAuth]
+        [MicroAuth(ServiceName = "Orders", Action = "Submit", Value = "ShipmentDetails")]
         public async Task<ActionResult> SubmitShipmentDetails(
             [FromRoute] Guid orderId, 
             [FromBody] Shipment shipmentDetails)
@@ -94,7 +94,7 @@ namespace WebShop.Orders
         }
 
         [HttpPut("/{orderId}/payment")]
-        [MicroAuth]
+        [MicroAuth(ServiceName = "Orders", Action = "Submit", Value = "PaymentDetails")]
         public async Task<ActionResult> SubmitPaymentDetails(
             [FromRoute] Guid orderId,
             [FromBody] Order.PaymentDetails paymentDetails)
@@ -110,7 +110,7 @@ namespace WebShop.Orders
         }
 
         [HttpPut("/{orderId}")]
-        [MicroAuth]
+        [MicroAuth(ServiceName = "Orders", Action = "Submit", Value = "Order")]
         public async Task<Order> SubmitOrder([FromRoute] Guid orderId)
         {
             await WebShopApi.SendServiceRequest(

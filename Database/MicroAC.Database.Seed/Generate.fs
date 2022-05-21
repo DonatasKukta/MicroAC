@@ -15,6 +15,21 @@ let private bytes (s:string) = Encoding.UTF8.GetBytes(s)
 let private passwordHandler = new PasswordHandler(Config.pepperStr)
 let private hash passw salt = passwordHandler.HashPassword(bytes passw, salt)
 
+let passwords() =
+    let random = new Random(1)
+    let salt : byte array =  Array.zeroCreate 16
+    let ByteToHex bytes =  bytes 
+                            |> Array.map (fun (x : byte) -> System.String.Format("{0:X2}", x))
+                            |> String.concat System.String.Empty
+    
+    let printPasswords i =
+        random.NextBytes(salt)
+        let passwordHash = ByteToHex (hash "password123" salt)
+        let passwordSalt = ByteToHex salt
+        printfn "%i hash:%s  salt:%s" i passwordHash passwordSalt
+
+    {1..1..5} |> Seq.iter printPasswords
+
 let users (organisations:seq<Organisation>) = 
     let random = new Random(1)
     let createUser (i, o :Organisation) = 

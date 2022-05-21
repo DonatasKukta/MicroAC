@@ -26,21 +26,21 @@ namespace WebShop.Products
         }
 
         [HttpGet]
-        [MicroAuth]
+        [MicroAuth(ServiceName = "Products", Action = "View", Value = "All")]
         public IEnumerable<Product> GetProducts()
         {
             return Data.GenerateProducts();
         }
 
         [HttpGet("/{id}")]
-        [MicroAuth]
+        [MicroAuth(ServiceName = "Products", Action = "View", Value = "One")]
         public Product GetProduct([FromRoute] Guid id)
         {
             return Data.GenerateProduct();
         }
 
         [HttpPost]
-        [MicroAuth]
+        [MicroAuth(ServiceName = "Products", Action = "Create")]
         public ActionResult CreateProduct([FromBody] Product product)
         {
             return product == null
@@ -49,7 +49,7 @@ namespace WebShop.Products
         }
 
         [HttpPut("/{id}")]
-        [MicroAuth]
+        [MicroAuth(ServiceName = "Products", Action = "Update")]
         public async Task<ActionResult> UpdateProduct([FromRoute] Guid id, [FromBody] Product product)
         {
             await WebShopApi.SendServiceRequest(
@@ -63,7 +63,7 @@ namespace WebShop.Products
         }
 
         [HttpDelete("/{id}")]
-        [MicroAuth]
+        [MicroAuth(ServiceName = "Products", Action = "Delete")]
         public async Task<ActionResult> DeleteProduct(Guid id)
         {
             await WebShopApi.SendServiceRequest(

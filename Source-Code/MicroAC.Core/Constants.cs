@@ -18,6 +18,8 @@ namespace MicroAC.Core.Constants
         public const string InternalJWT = "MicroAC-JWT";
 
         public const string Timestamps = "MicroAC-Timestamp";
+
+        public const string FabricRequestId = "X-ServiceFabricRequestId";
     }
 
     public static class ConfigKeys
@@ -37,7 +39,11 @@ namespace MicroAC.Core.Constants
 
     public static class HttpContextKeys
     {
-        public const string Permissions = "Permissions";
+        public const string Permissions = "ValidatedPermissions";
+
+        public const string InternalAccessToken = "ValidatedInternalAccessToken";
+
+        public const string Roles = "ValidatedRoles";
     }
 
     internal static class Fabric
