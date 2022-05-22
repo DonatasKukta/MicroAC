@@ -8,7 +8,7 @@ function SendRequest<T>(
   responseCallback: (result: BaseResult<T>) => void
 ) {
   let result: BaseResult<T> = { ...defaultBaseResult };
-
+  console.warn(url, request);
   fetch(url, request)
     .then(response => {
       result.statusCode = response.status;
@@ -30,7 +30,18 @@ function SendRequest<T>(
     .then(bodyStr => {
       result.body = parseBody(bodyStr);
     })
-    .catch(error => console.error('Error from SendRequest.', url, request, result, error))
+    .catch(error => {
+      console.error(
+        'Error from SendRequest.',
+        url,
+        'request',
+        request,
+        'result',
+        result,
+        'error',
+        error
+      );
+    })
     .finally(() => {
       responseCallback(result);
     });

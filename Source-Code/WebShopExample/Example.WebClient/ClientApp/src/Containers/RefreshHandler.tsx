@@ -4,9 +4,10 @@ import { defaultBaseResult, RefreshResult, Token } from '../Domain/Models';
 import { parseJwt, parseRefreshBody } from '../Domain/Parsing';
 import SendRequest from '../Domain/SendRequest';
 import RequestHandler from '../Components/CommonResponseFields';
-//TODO: Move to env config
-const authUrl =
-  'http://localhost:19081/MicroAC.ServiceFabric/MicroAC.RequestManager/Authentication/Refresh';
+import Accordion from '../Components/Accordion';
+import { getUrl, Service, Action } from '../Domain/WebShopRequestCreator';
+
+const authUrl = getUrl(Service.Authentication, Action.Refresh);
 
 interface IProps {
   refreshJwt: Token;
@@ -44,10 +45,15 @@ const RefreshHandler = (props: IProps) => {
   };
 
   return (
-    <div>
-      <h1> Kliento autentifikavimo atnaujinimas </h1>
-      <p>Įvestis - atnaujinimo žetonas: {refreshJwt}</p>
-      <Button variant="contained" onClick={handleSendRequest} disabled={isButtonDisabled}>
+    <Accordion title="Prieigos žetono atnaujinimas" main>
+      <Accordion title="Įvestis - atnaujinimo žetonas" main={false}>
+        <p style={{ overflowWrap: 'anywhere' }}> {refreshJwt}</p>
+      </Accordion>
+      <Button
+        style={{ margin: '10px' }}
+        variant="contained"
+        onClick={handleSendRequest}
+        disabled={isButtonDisabled}>
         Siųsti
       </Button>
       <RequestHandler response={refreshResult}>
@@ -60,7 +66,7 @@ const RefreshHandler = (props: IProps) => {
             JSON.stringify(parseJwt(refreshResult.body), null, '\t')}
         </pre>
       </RequestHandler>
-    </div>
+    </Accordion>
   );
 };
 export default RefreshHandler;

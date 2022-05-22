@@ -1,13 +1,18 @@
-import { TextField, Button } from '@mui/material';
+import {
+  TextField,
+  Button,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary
+} from '@mui/material';
 import { useState } from 'react';
 import { Credentials, defaultBaseResult, LoginResult, Token } from '../Domain/Models';
 import { parseLoginBody } from '../Domain/Parsing';
 import SendRequest from '../Domain/SendRequest';
 import RequestHandler from '../Components/CommonResponseFields';
+import { getUrl, Service, Action } from '../Domain/WebShopRequestCreator';
 
-//TODO: Move to env config
-const authUrl =
-  'http://localhost:19081/MicroAC.ServiceFabric/MicroAC.RequestManager/Authentication/Login';
+const authUrl = getUrl(Service.Authentication, Action.Login);
 
 const defaultCredentialsState: Credentials = {
   email: 'everything@microac.com',
@@ -52,41 +57,50 @@ const LoginHandler = (props: IProps) => {
   };
 
   return (
-    <div>
-      <h1> Kliento autentifikavimas</h1>
-      <TextField
-        label="Email"
-        variant="filled"
-        value={credentials.email}
-        onChange={d => setCredentials({ ...credentials, email: d.target.value })}
-      />
-      <TextField
-        label="Password"
-        variant="filled"
-        type="password"
-        value={credentials.password}
-        onChange={d => setCredentials({ ...credentials, password: d.target.value })}
-      />
-      <Button variant="contained" onClick={() => handleSendRequest()}>
-        Siųsti
-      </Button>
-      <RequestHandler response={loginResult}>
-        <p style={{ overflowWrap: 'anywhere' }}>
-          Gautas išorinis priegos žetonas: {loginResult?.body?.accessJwt}
-        </p>
-        Dekoduotas išorinis preigos žetonas:
-        <pre style={{ textAlign: 'left', overflowWrap: 'anywhere' }}>
-          {JSON.stringify(loginResult?.body?.decodedAccessJwt, null, '\t')}
-        </pre>
-        <p style={{ overflowWrap: 'anywhere' }}>
-          Gautas išorinis atnaujinimo žetonas: {loginResult?.body?.refreshJwt}
-        </p>
-        Dekoduotas išorinis atnaujinimo žetonas:
-        <pre style={{ textAlign: 'left', overflowWrap: 'anywhere' }}>
-          {JSON.stringify(loginResult?.body?.decodedRefreshJwt, null, '\t')}
-        </pre>
-      </RequestHandler>
-    </div>
+    <Accordion>
+      <AccordionSummary>
+        <h1> Kliento autentifikavimas</h1>
+      </AccordionSummary>
+      <AccordionDetails>
+        <div>
+          <TextField
+            label="Email"
+            variant="filled"
+            value={credentials.email}
+            onChange={d => setCredentials({ ...credentials, email: d.target.value })}
+          />
+          <TextField
+            label="Password"
+            variant="filled"
+            type="password"
+            value={credentials.password}
+            onChange={d => setCredentials({ ...credentials, password: d.target.value })}
+          />
+          <Button
+            style={{ margin: '10px' }}
+            variant="contained"
+            onClick={() => handleSendRequest()}>
+            Siųsti
+          </Button>
+          <RequestHandler response={loginResult}>
+            <p style={{ overflowWrap: 'anywhere' }}>
+              Gautas išorinis priegos žetonas: {loginResult?.body?.accessJwt}
+            </p>
+            Dekoduotas išorinis preigos žetonas:
+            <pre style={{ textAlign: 'left', overflowWrap: 'anywhere' }}>
+              {JSON.stringify(loginResult?.body?.decodedAccessJwt, null, '\t')}
+            </pre>
+            <p style={{ overflowWrap: 'anywhere' }}>
+              Gautas išorinis atnaujinimo žetonas: {loginResult?.body?.refreshJwt}
+            </p>
+            Dekoduotas išorinis atnaujinimo žetonas:
+            <pre style={{ textAlign: 'left', overflowWrap: 'anywhere' }}>
+              {JSON.stringify(loginResult?.body?.decodedRefreshJwt, null, '\t')}
+            </pre>
+          </RequestHandler>
+        </div>
+      </AccordionDetails>
+    </Accordion>
   );
 };
 export default LoginHandler;

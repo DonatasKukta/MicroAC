@@ -4,9 +4,10 @@ import { BaseResult, defaultBaseResult, ResouceApiResult, Token } from '../Domai
 import { parseResourceApiActionBody } from '../Domain/Parsing';
 import SendRequest from '../Domain/SendRequest';
 import RequestHandler from '../Components/CommonResponseFields';
-//TODO: Move to env config
-const resourceActionUrl =
-  'http://localhost:19081/MicroAC.ServiceFabric/MicroAC.RequestManager/ResourceApi/Action';
+import Accordion from '../Components/Accordion';
+import { Action, getUrl, Service } from '../Domain/WebShopRequestCreator';
+
+const resourceActionUrl = getUrl(Service.ResourceApi, Action.GetOne);
 
 interface IProps {
   accessJwt: Token;
@@ -49,23 +50,29 @@ const ResourceApiActionHandler = (props: IProps) => {
   };
 
   return (
-    <div>
-      <h1> Resurso mikropaslaugos kvietimas </h1>
-      <p>Įvestis - prieigos žetonas: {accessJwt}</p>
-      <Button variant="contained" onClick={handleSendRequest} disabled={isButtonDisabled}>
+    <Accordion title="Resurso mikropaslaugos kvietimas" main>
+      <Accordion title="Įvestis - prieigos žetonas" main={false}>
+        <p style={{ overflowWrap: 'anywhere' }}> {accessJwt}</p>
+      </Accordion>
+      <Button
+        style={{ margin: '10px' }}
+        variant="contained"
+        onClick={handleSendRequest}
+        disabled={isButtonDisabled}>
         Siųsti
       </Button>
       <RequestHandler response={actionResult}>
-        <p>Gauta žinutė: {actionResult?.body?.message}</p>
-        <p style={{ overflowWrap: 'anywhere' }}>
-          Gautas vidinis priegos žetonas: {actionResult?.body?.internalAccessToken}
-        </p>
-        Dekoduotas vidinis preigos žetonas:
-        <pre style={{ textAlign: 'left', overflowWrap: 'anywhere' }}>
-          {JSON.stringify(actionResult?.body?.decodedInternalAccessToken, null, '\t')}
-        </pre>
+        <Accordion title={`Gauta žinutė: ${actionResult?.body?.message}`} main={false}>
+          <p style={{ overflowWrap: 'anywhere' }}>
+            Gautas vidinis priegos žetonas: {actionResult?.body?.internalAccessToken}
+          </p>
+          Dekoduotas vidinis preigos žetonas:
+          <pre style={{ textAlign: 'left', overflowWrap: 'anywhere' }}>
+            {JSON.stringify(actionResult?.body?.decodedInternalAccessToken, null, '\t')}
+          </pre>
+        </Accordion>
       </RequestHandler>
-    </div>
+    </Accordion>
   );
 };
 

@@ -45,3 +45,7 @@ export function parseResourceApiActionBody(body: any): ResourceApiBody {
     decodedInternalAccessToken: parseJwt(json.jwt)
   };
 }
+
+export function parseAnyBody(body: any): any {
+  return body ? JSON.parse(body) : {};
+}

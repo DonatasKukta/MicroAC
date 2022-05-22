@@ -1,5 +1,6 @@
 import { BaseResult } from '../Domain/Models';
 import { ProcessTimestamps, PrintTimestamp } from '../Domain/TimestampProcessor';
+import Accordion from './Accordion';
 import ProcessedTimestampTable from './ProcessedTimestampTable';
 
 interface IProps<T> {
@@ -11,13 +12,12 @@ export default function RequestHandler<T>(props: React.PropsWithChildren<IProps<
 
   return (
     <div>
-      {props.children}
       <p>HTTP Būsenos kodas: {response.statusCode}</p>
       <p>Užklausos ID: {response.requestId}</p>
-      <div>
-        Užklausos žymos:
+      <Accordion title="Užklausos žymos" main={false}>
         <ProcessedTimestampTable timestamps={response.timestamps} />
-      </div>
+      </Accordion>
+      {props.children}
     </div>
   );
 }
