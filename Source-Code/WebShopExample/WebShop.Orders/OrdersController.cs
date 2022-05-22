@@ -47,20 +47,19 @@ namespace WebShop.Orders
             await WebShopApi.SendServiceRequest(
                 this.HttpContext,
                 MicroACServices.Cart,
-                HttpMethod.Get,
-                $"/{cartId}");
+                HttpMethod.Post);
 
             await WebShopApi.SendServiceRequest(
                 this.HttpContext,
                 MicroACServices.Cart,
-                HttpMethod.Delete,
-                $"/{cartId}");
+                HttpMethod.Post);
 
             await WebShopApi.SendServiceRequest(
                 this.HttpContext,
                 MicroACServices.Products,
-                HttpMethod.Get,
-                "/");
+                HttpMethod.Post,
+                "/",
+                Data.GenerateProduct());
 
             var order = Data.GenerateOrder();
             
@@ -116,8 +115,9 @@ namespace WebShop.Orders
             await WebShopApi.SendServiceRequest(
                 this.HttpContext,
                 MicroACServices.Products,
-                HttpMethod.Get,
-                $"/");
+                HttpMethod.Put,
+                $"/{orderId}",
+                Data.GenerateProduct());
 
             await WebShopApi.SendServiceRequest(
                 this.HttpContext,

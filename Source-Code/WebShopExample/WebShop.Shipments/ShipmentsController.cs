@@ -46,7 +46,9 @@ namespace WebShop.Shipments
             await WebShopApi.SendServiceRequest(
                 this.HttpContext,
                 MicroACServices.Products,
-                HttpMethod.Get);
+                HttpMethod.Post,
+                "",
+                Data.GenerateProduct());
 
             return Created(Guid.NewGuid().ToString(), shipment);
         }
@@ -60,8 +62,9 @@ namespace WebShop.Shipments
             await WebShopApi.SendServiceRequest(
                 this.HttpContext,
                 MicroACServices.Products,
-                HttpMethod.Get,
-                $"/{shipmentId}");
+                HttpMethod.Put,
+                $"/{shipmentId}",
+                Data.GenerateProduct());
 
             return Ok(shipmentDetails);
         }
@@ -73,7 +76,8 @@ namespace WebShop.Shipments
             await WebShopApi.SendServiceRequest(
                 this.HttpContext,
                 MicroACServices.Products,
-                HttpMethod.Get);
+                HttpMethod.Delete,
+                $"/{shipmentId}");
 
             return Ok();
         }

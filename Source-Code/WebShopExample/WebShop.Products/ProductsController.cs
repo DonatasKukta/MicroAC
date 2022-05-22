@@ -69,9 +69,8 @@ namespace WebShop.Products
             await WebShopApi.SendServiceRequest(
                 this.HttpContext,
                 MicroACServices.Cart,
-                HttpMethod.Post,
-                $"/{id}/products",
-                Data.GenerateCartItem());
+                HttpMethod.Delete,
+                $"/{id}/products/{id}");
 
             return Ok();
         }

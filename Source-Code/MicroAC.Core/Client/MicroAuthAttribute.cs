@@ -12,6 +12,7 @@ using MicroAC.Core.Auth;
 using System.Threading.Tasks;
 using MicroAC.Core.Constants;
 using MicroAC.Core.Common;
+using MicroAC.Core.Exceptions;
 
 namespace MicroAC.Core.Client
 {
@@ -102,7 +103,7 @@ namespace MicroAC.Core.Client
 
             return filtered.Any()
                 ? filtered
-                : throw new UnauthorizedAccessException();
+                : throw new AuthorizationFailedException();
         }
     }
 }

@@ -30,8 +30,9 @@ namespace WebShop.Cart
             await WebShopApi.SendServiceRequest(
                 this.HttpContext,
                 MicroACServices.Products,
-                HttpMethod.Get,
-                $"/{Guid.NewGuid()}");
+                HttpMethod.Post,
+                "",
+                Data.GenerateProduct());
 
             return Data.GenerateCart();
         }
@@ -49,7 +50,7 @@ namespace WebShop.Cart
         }
 
         [HttpPost("/{cartId}/products")]
-        [MicroAuth(ServiceName = "Carts", Action = "Update", Value = "CartItem")]
+        [MicroAuth(ServiceName = "Carts", Action = "Update", Value = "Self")]
         public ActionResult AddCartItem([FromBody] CartItem newCartItem)
         {
             return Ok();
